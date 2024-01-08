@@ -23,5 +23,5 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with:
       env: prod
-    secrets:
-      NAIS_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+    # secrets:
+    #  NAIS_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}

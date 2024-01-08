@@ -2,16 +2,15 @@ name: Build, push, and deploy
 
 on:
   workflow_call:
+    secrets: inherit
     inputs:
       env:
         required: true
         type: string
-    secrets:
-      NAIS_WORKLOAD_IDENTITY_PROVIDER:
-        required: true
 
 jobs:
   build:
+    secrets: inherit
     name: Build and push Docker container
     runs-on: ubuntu-latest
     permissions:
