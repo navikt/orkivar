@@ -4,6 +4,11 @@ run-name:  Deploy ORKIVAR feature branch ${{ github.ref_name }} to dev by @${{ g
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
 jobs:
   dev:
     name: Deploy to dev
