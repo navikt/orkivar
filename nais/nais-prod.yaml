@@ -1,0 +1,44 @@
+kind: Application
+apiVersion: nais.io/v1alpha1
+metadata:
+  name: orkivar
+  namespace: dab
+  labels:
+    team: dab
+spec:
+  port: 8080
+  liveness:
+    path: /isAlive
+    port: 8080
+    initialDelay: 5
+  readiness:
+    path: /isReady
+    port: 8080
+    initialDelay: 5
+  prometheus:
+    enabled: true
+    path: /metrics
+  replicas:
+    min: 1
+    max: 1
+    cpuThresholdPercentage: 50
+  resources:
+    limits:
+      cpu: "2"
+      memory: 1024Mi
+    requests:
+      cpu: 200m
+      memory: 768Mi
+  azure:
+    application:
+      enabled: true
+      allowAllUsers: true
+      claims:
+        extra:
+          - "NAVident"
+
+  env:
+    - name: DOKARK_CLIENT_URL
+      value: https://dokarkiv.prod-fss-pub.nais.io/rest/journalpostapi/v1
+    - name: DOKARK_SCOPE
+      value: api://prod-fss.teamdokumenthandtering.dokarkiv/.default
