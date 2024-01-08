@@ -6,6 +6,9 @@ on:
       env:
         required: true
         type: string
+    secrets:
+      NAIS_WORKLOAD_IDENTITY_PROVIDER:
+        required: true
 
 jobs:
   build:
