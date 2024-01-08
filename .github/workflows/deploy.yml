@@ -9,7 +9,6 @@ on:
 
 jobs:
   build:
-    secrets: inherit
     name: Build and push Docker container
     runs-on: ubuntu-latest
     permissions:
