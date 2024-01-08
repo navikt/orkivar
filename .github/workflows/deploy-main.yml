@@ -20,6 +20,7 @@ jobs:
   dev:
     name: Deploy to dev
     uses: ./.github/workflows/deploy.yml
+    secrets: inherit
     with:
       env: dev
   prod:
