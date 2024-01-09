@@ -4,4 +4,4 @@ WORKDIR /app
 COPY build/libs/*.jar ./
 EXPOSE 8080
 USER nonroot
-CMD ["app.jar"]
+CMD ["dab.poao.nav.no.orkivar-all.jar"]
