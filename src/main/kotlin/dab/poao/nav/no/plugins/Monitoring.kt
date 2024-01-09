@@ -11,11 +11,9 @@ import org.slf4j.event.*
 
 fun Application.configureMonitoring() {
     val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
-    
-        install(MicrometerMetrics) {
-            registry = appMicrometerRegistry
-            // ...
-        }
+    install(MicrometerMetrics) {
+        registry = appMicrometerRegistry
+    }
     install(CallLogging) {
         level = Level.INFO
         filter { call -> call.request.path().startsWith("/") }

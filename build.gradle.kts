@@ -4,6 +4,7 @@ val kotlin_version: String by project
 val logback_version: String by project
 val logstash_encoder_version: String by project
 val tokensupport_version: String by project
+val mockoauth_version: String by project
 
 val prometeus_version: String by project
 plugins {
@@ -46,4 +47,5 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:$logstash_encoder_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:2.3.6")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation("no.nav.security:mock-oauth2-server:$mockoauth_version")
 }

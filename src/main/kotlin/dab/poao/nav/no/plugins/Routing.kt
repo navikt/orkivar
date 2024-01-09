@@ -7,17 +7,16 @@ import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 
-fun Application.configureRouting(dokarkClient: DokarkClient = DokarkClient(this.environment.config)) {
+fun Application.configureRouting(dokarkClient: DokarkClient = DokarkClient(environment.config)) {
     routing {
         healthEndpoints()
         get("/") {
             call.respondText("Hello World!")
         }
-        authenticate("Azure") {
+        authenticate("AzureAD") {
             post("/arkiver") {
                 dokarkClient.opprettJournalpost()
             }
         }
-
     }
 }
