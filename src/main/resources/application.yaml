@@ -4,3 +4,12 @@ ktor:
             - dab.poao.nav.no.ApplicationKt.module
     deployment:
         port: 8080
+
+azure:
+    client-id: "$AZURE_APP_CLIENT_ID"
+    token-endpoint: "$AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"
+    client-secret: "$AZURE_APP_CLIENT_SECRET"
+
+dokark:
+    client-url: "$DOKARK_CLIENT_URL"
+    client-scope: "$DOKARK_SCOPE"

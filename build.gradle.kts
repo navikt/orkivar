@@ -31,9 +31,12 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus:$prometeus_version")
     implementation("io.ktor:ktor-server-call-logging-jvm")
     implementation("io.ktor:ktor-server-netty-jvm")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstash_encoder_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:2.3.6")
     implementation("io.ktor:ktor-server-config-yaml:2.3.7")
+    implementation("io.ktor:ktor-client-okhttp-jvm:2.3.7")
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
