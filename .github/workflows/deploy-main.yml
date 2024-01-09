@@ -23,11 +23,9 @@ jobs:
     secrets: inherit
     with:
       env: dev
-  prod:
-    name: Deploy to prod
-    uses: ./.github/workflows/deploy.yml
-    secrets: inherit
-    with:
-      env: prod
-    # secrets:
-    #  NAIS_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+#  prod:
+#    name: Deploy to prod
+#    uses: ./.github/workflows/deploy.yml
+#    secrets: inherit
+#    with:
+#      env: prod
