@@ -39,6 +39,12 @@ spec:
       claims:
         extra:
           - "NAVident"
+  accessPolicy:
+    inbound:
+      rules:
+        - application: veilarbpersonflate
+          namespace: poao
+          cluster: dev-gcp
 
   env:
     - name: DOKARK_CLIENT_URL
