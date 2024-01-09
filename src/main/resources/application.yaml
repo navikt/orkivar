@@ -6,10 +6,19 @@ ktor:
         port: 8080
 
 azure:
-    client-id: "$AZURE_APP_CLIENT_ID"
-    token-endpoint: "$AZURE_OPENID_CONFIG_TOKEN_ENDPOINT"
-    client-secret: "$AZURE_APP_CLIENT_SECRET"
+    client-id: "$AZURE_APP_CLIENT_ID:null"
+    token-endpoint: "$AZURE_OPENID_CONFIG_TOKEN_ENDPOINT:null"
+    client-secret: "$AZURE_APP_CLIENT_SECRET:null"
 
 dokark:
-    client-url: "$DOKARK_CLIENT_URL"
-    client-scope: "$DOKARK_SCOPE"
+    client-url: "$DOKARK_CLIENT_URL:null"
+    client-scope: "$DOKARK_SCOPE:null"
+
+no:
+    nav:
+        security:
+            jwt:
+                issuers:
+                    - discoveryurl: "$AZURE_APP_WELL_KNOWN_URL:null"
+                      accepted_audience: "$AZURE_APP_CLIENT_ID:null"
+                      issuer_name: "AzureAD"
