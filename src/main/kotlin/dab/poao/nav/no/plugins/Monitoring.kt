@@ -2,12 +2,15 @@ package dab.poao.nav.no.plugins
 
 import io.ktor.server.application.*
 import io.ktor.server.metrics.micrometer.*
+import io.ktor.server.plugins.callid.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.micrometer.prometheus.*
 import org.slf4j.event.*
+
+val excludedPaths = listOf("/isAlive", "/isReady", "/metrics")
 
 fun Application.configureMonitoring() {
     val appMicrometerRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
@@ -16,7 +19,11 @@ fun Application.configureMonitoring() {
     }
     install(CallLogging) {
         level = Level.INFO
-        filter { call -> call.request.path().startsWith("/") }
+        filter { call ->
+            val path = call.request.path()
+            path.startsWith("/") && !excludedPaths.contains(path)
+        }
+        callIdMdc("nav-call-id")
     }
     routing {
         get("/metrics-micrometer") {
