@@ -5,6 +5,7 @@ val logback_version: String by project
 val logstash_encoder_version: String by project
 val tokensupport_version: String by project
 val mockoauth_version: String by project
+val dab_common_version: String by project
 
 val prometeus_version: String by project
 plugins {
@@ -25,6 +26,7 @@ application {
 
 repositories {
     mavenCentral()
+    maven("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
 }
 
 dependencies {
@@ -41,6 +43,8 @@ dependencies {
     implementation("io.ktor:ktor-client-auth:$ktor_version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-client-okhttp-jvm:2.3.7")
+
+    implementation("no.nav.poao.dab:ktor-oauth-client:$dab_common_version")
 
     implementation("no.nav.security:token-validation-ktor-v2:$tokensupport_version")
     implementation("io.micrometer:micrometer-registry-prometheus:$prometeus_version")
