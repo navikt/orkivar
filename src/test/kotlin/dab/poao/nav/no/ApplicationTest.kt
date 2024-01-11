@@ -10,6 +10,7 @@ import io.ktor.server.engine.*
 import io.ktor.server.testing.*
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.slf4j.LoggerFactory
+import java.util.*
 import kotlin.test.*
 
 private val logger = LoggerFactory.getLogger("dab.poao.nav.no.ApplicationTest.kt")
@@ -21,7 +22,11 @@ class ApplicationTest {
             configureAuthentication()
             configureRouting()
         }
-        client.get("/").apply {
+
+        client.get("/") {
+//        client.post("/arkiver") {
+//            bearerAuth(getAzureToken("G123123"))
+        }.apply {
             assertEquals(HttpStatusCode.OK, status)
             assertEquals("Hello World!", bodyAsText())
         }
@@ -41,8 +46,8 @@ class ApplicationTest {
                 "no.nav.security.jwt.issuers.0.issuer_name" to acceptedIssuer,
                 "no.nav.security.jwt.issuers.0.discoveryurl" to "${server.wellKnownUrl(acceptedIssuer)}",
                 "no.nav.security.jwt.issuers.0.accepted_audience" to acceptedAudience,
-                "azure.client-id" to "clientId",
-                "azure.token-endpoint" to "tokenEndpoint",
+                "azure.client-id" to acceptedAudience,
+                "azure.token-endpoint" to server.tokenEndpointUrl(acceptedIssuer).toString(),
                 "azure.client-secret" to "clientSecret",
                 "dokark.client-url" to "http://dok.ark.no",
                 "dokark.client-scope" to "dok.scope",
@@ -50,3 +55,9 @@ class ApplicationTest {
         }
     }
 }
+
+fun getAzureToken(navIdent: String) = ApplicationTest.server
+    .issueToken(
+        subject = navIdent,
+        claims = mapOf("NAVident" to navIdent, "oid" to UUID.randomUUID()))
+    .serialize()

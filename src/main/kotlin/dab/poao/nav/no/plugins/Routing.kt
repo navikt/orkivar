@@ -6,6 +6,8 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import no.nav.security.token.support.v2.TokenValidationContextPrincipal
+import java.lang.IllegalArgumentException
 
 fun Application.configureRouting(dokarkClient: DokarkClient = DokarkClient(environment.config)) {
     routing {
@@ -15,7 +17,10 @@ fun Application.configureRouting(dokarkClient: DokarkClient = DokarkClient(envir
         }
         authenticate("AzureAD") {
             post("/arkiver") {
-                dokarkClient.opprettJournalpost()
+                call.principal<TokenValidationContextPrincipal>()
+                    ?.context?.firstValidToken?.encodedToken
+                    ?.let { dokarkClient.opprettJournalpost(it) }
+                    ?: throw IllegalArgumentException("No token found")
             }
         }
     }

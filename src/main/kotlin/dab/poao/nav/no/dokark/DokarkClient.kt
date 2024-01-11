@@ -2,13 +2,12 @@ package dab.poao.nav.no.dokark
 
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
-import io.ktor.client.plugins.auth.*
-import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.config.*
 import no.nav.poao.dab.ktor_oauth_client.AzureClient
+import no.nav.poao.dab.ktor_oauth_client.IncomingToken
 import no.nav.poao.dab.ktor_oauth_client.OauthClientCredentialsConfig
 
 class DokarkClient(config: ApplicationConfig) {
@@ -19,22 +18,11 @@ class DokarkClient(config: ApplicationConfig) {
         install(ContentNegotiation) {
             json()
         }
-        install(Auth) {
-            bearer {
-                loadTokens {
-                    val accessToken = azureClient.getM2MToken(clientScope)
-                    BearerTokens(accessToken, "")
-                }
-                refreshTokens {
-                    val accessToken = azureClient.getM2MToken(clientScope)
-                    BearerTokens(accessToken, "")
-                }
-            }
-        }
     }
 
-    suspend fun opprettJournalpost() {
+    suspend fun opprettJournalpost(token: IncomingToken) {
         client.post("$clientUrl/rest/journalpostapi/v1/journalpost") {
+            header("authorization", "Bearer ${azureClient.getOnBehalfOfToken(clientScope, token)}")
             setBody(dummyJournalpost)
         }
     }
