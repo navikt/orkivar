@@ -1,5 +1,8 @@
 package dab.poao.nav.no.dokark
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Journalpost(
     val avsenderMottaker: AvsenderMottaker? = null,
     val behandlingstema: String? = null,
@@ -17,35 +20,41 @@ data class Journalpost(
     val tittel: String? = null,
 )
 
+@Serializable
 data class AvsenderMottaker(
     val id: String,
     val idType: String,
     val navn: String,
 )
 
+@Serializable
 data class Bruker(
     val id: String,
     val idType: String,
 )
 
+@Serializable
 data class Dokument(
     val brevkode: String,
     val dokumentvarianter: List<Dokumentvariant>,
     val tittel: String,
 )
 
+@Serializable
 data class Dokumentvariant(
     val filtype: String,
     val fysiskDokument: String,
     val variantformat: String,
 )
 
+@Serializable
 data class Sak(
     val fagsakId: String,
     val fagsaksystem: String,
     val sakstype: String,
 )
 
+@Serializable
 data class Tilleggsopplysninger(
     val nokkel: String,
     val verdi: String,
