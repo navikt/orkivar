@@ -22,7 +22,7 @@ class DokarkClient(config: ApplicationConfig) {
 
     suspend fun opprettJournalpost(token: IncomingToken) {
         client.post("$clientUrl/rest/journalpostapi/v1/journalpost") {
-            header("authorization", "Bearer ${azureClient.getOnBehalfOfToken(clientScope, token)}")
+            header("authorization", "Bearer ${azureClient.getOnBehalfOfToken("profile $clientScope" , token)}")
             setBody(dummyJournalpost)
         }
     }
