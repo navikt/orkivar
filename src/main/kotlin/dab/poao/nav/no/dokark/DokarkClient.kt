@@ -23,7 +23,7 @@ class DokarkClient(config: ApplicationConfig) {
         }
         install(Logging) {
             logger = Logger.DEFAULT
-            level = LogLevel.HEADERS // TODO: Fjern etter at debugging er ferdig
+            level = LogLevel.BODY // TODO: Fjern etter at debugging er ferdig
         }
     }
 
