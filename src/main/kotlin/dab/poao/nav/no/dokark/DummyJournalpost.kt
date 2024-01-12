@@ -1,6 +1,7 @@
 package dab.poao.nav.no.dokark
 
 val dummyJournalpost = Journalpost(
+    tema = "OPP",
     dokumenter = listOf(
         Dokument(
             brevkode = "NAV 04-01.04",

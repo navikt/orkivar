@@ -2,10 +2,12 @@ package dab.poao.nav.no.dokark
 
 import dab.poao.nav.no.azureAuth.logger
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.config.*
@@ -28,10 +30,13 @@ class DokarkClient(config: ApplicationConfig) {
     }
 
     suspend fun opprettJournalpost(token: IncomingToken) {
-        client.post("$clientUrl/rest/journalpostapi/v1/journalpost") {
+        val res = client.post("$clientUrl/rest/journalpostapi/v1/journalpost") {
             header("authorization", "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}")
             contentType(ContentType.Application.Json)
             setBody(dummyJournalpost)
+        }
+        if (!res.status.isSuccess()) {
+            logger.warn("Failet å opprette journalpost:", res.bodyAsText())
         }
     }
 }
