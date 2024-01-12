@@ -2,6 +2,7 @@ package dab.poao.nav.no.plugins
 
 import dab.poao.nav.no.dokark.DokarkClient
 import dab.poao.nav.no.health.healthEndpoints
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
@@ -17,14 +18,18 @@ fun Application.configureRouting(dokarkClient: DokarkClient = DokarkClient(envir
         }
         authenticate("AzureAD") {
             post("/arkiver") {
-                call.request.header("Authorization")
+                val result = call.request.header("Authorization")
                     ?.split(" ")
                     ?.lastOrNull()
 //                call.principal<TokenValidationContextPrincipal>()
 //                    ?.context?.firstValidToken?.encodedToken
                     ?.let { dokarkClient.opprettJournalpost(it) }
                     ?: throw IllegalArgumentException("No token found")
-                call.respond("OK")
+                if (!result) {
+                    call.respond(HttpStatusCode.InternalServerError, "Feiled med opplasting")
+                } else {
+                    call.respond("OK")
+                }
             }
         }
     }

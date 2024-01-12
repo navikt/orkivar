@@ -29,7 +29,7 @@ class DokarkClient(config: ApplicationConfig) {
         }
     }
 
-    suspend fun opprettJournalpost(token: IncomingToken) {
+    suspend fun opprettJournalpost(token: IncomingToken): Boolean {
         val res = client.post("$clientUrl/rest/journalpostapi/v1/journalpost") {
             header("authorization", "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}")
             contentType(ContentType.Application.Json)
@@ -37,7 +37,9 @@ class DokarkClient(config: ApplicationConfig) {
         }
         if (!res.status.isSuccess()) {
             logger.warn("Failet å opprette journalpost:", res.bodyAsText())
+            return false
         }
+        return true
     }
 }
 
