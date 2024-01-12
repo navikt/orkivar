@@ -35,6 +35,7 @@ class AzureClient(config: ApplicationConfig) {
     }
 
     private suspend fun fetchAndStoreAccessToken(scope: String): AccessToken {
+        logger.info("client secret for debugging $clientSecret , clientid: $azureClientId")
         val tokenResponse: TokenResponse = try {
             httpClient.post(tokenEndpoint) {
                 contentType(ContentType.Application.FormUrlEncoded)
