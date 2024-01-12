@@ -31,9 +31,8 @@ class DokarkClient(config: ApplicationConfig) {
 
 fun ApplicationConfig.toOauthConfig(): OauthClientCredentialsConfig {
     val azureClientId = this.property("azure.client-id").getString()
-    val clientSecret = this.property("azure.client-secret").toString()
+    val clientSecret = this.property("azure.client-secret").getString()
     val tokenEndpoint = this.property("azure.token-endpoint").getString()
-    logger.info("client secret for debugging $clientSecret , clientid: $azureClientId")
     return OauthClientCredentialsConfig(
         clientId = azureClientId,
         clientSecret = clientSecret,
