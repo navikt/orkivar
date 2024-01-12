@@ -43,6 +43,7 @@ spec:
     outbound:
       external:
         - host: dokarkiv-q2.dev-fss-pub.nais.io
+        - host: dokarkiv-q2.dev.intern.nav.no
     inbound:
       rules:
         - application: veilarbpersonflate
