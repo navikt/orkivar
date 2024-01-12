@@ -1,5 +1,14 @@
 package dab.poao.nav.no.dokark
 
+import java.io.File
+
+class pdfaleser {
+    fun hentpdf(): ByteArray {
+        val pdfurl = this::class.java.classLoader.getResource("eksempel-pdfa.pdf")
+        return File(pdfurl.toURI()).readBytes()
+    }
+}
+
 val dummyJournalpost = Journalpost(
     avsenderMottaker = AvsenderMottaker(
         id = "01117400200",
@@ -21,7 +30,7 @@ val dummyJournalpost = Journalpost(
             dokumentvarianter = listOf(
                 Dokumentvariant(
                     "PDFA",
-                    "U8O4a25hZCBvbSBkYWdwZW5nZXIgdmVkIHBlcm1pdHRlcmluZw==",
+                    pdfaleser().hentpdf().toString(),
                     "ARKIV")
             )
         )
