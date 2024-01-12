@@ -51,6 +51,6 @@ spec:
 
   env:
     - name: DOKARK_CLIENT_URL
-      value: https://dokarkiv-q2.dev-fss-pub.nais.io
+      value: https://dokarkiv-q2.dev.intern.nav.no
     - name: DOKARK_SCOPE
       value: api://dev-fss.teamdokumenthandtering.dokarkiv/.default

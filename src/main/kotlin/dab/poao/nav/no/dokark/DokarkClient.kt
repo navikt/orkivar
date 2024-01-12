@@ -4,6 +4,7 @@ import dab.poao.nav.no.azureAuth.logger
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -20,11 +21,15 @@ class DokarkClient(config: ApplicationConfig) {
         install(ContentNegotiation) {
             json()
         }
+        install(Logging) {
+            logger = Logger.DEFAULT
+            level = LogLevel.HEADERS // TODO: Fjern etter at debugging er ferdig
+        }
     }
 
     suspend fun opprettJournalpost(token: IncomingToken) {
         client.post("$clientUrl/rest/journalpostapi/v1/journalpost") {
-            header("authorization", "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope" , token)}")
+            header("authorization", "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}")
             contentType(ContentType.Application.Json)
             setBody(dummyJournalpost)
         }
