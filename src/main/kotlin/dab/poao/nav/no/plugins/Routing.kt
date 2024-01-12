@@ -24,6 +24,7 @@ fun Application.configureRouting(dokarkClient: DokarkClient = DokarkClient(envir
 //                    ?.context?.firstValidToken?.encodedToken
                     ?.let { dokarkClient.opprettJournalpost(it) }
                     ?: throw IllegalArgumentException("No token found")
+                call.respond("OK")
             }
         }
     }
