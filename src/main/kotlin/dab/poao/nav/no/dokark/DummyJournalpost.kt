@@ -1,6 +1,7 @@
 package dab.poao.nav.no.dokark
 
 import java.io.File
+import java.util.*
 
 
 //class PdfReader {
@@ -40,7 +41,7 @@ val dummyJournalpost = Journalpost(
             )
         )
     ),
-    eksternReferanseId = "a0f480a3-8ab2-4c56-8c93-e53bb35bec2b",
+    eksternReferanseId = UUID.randomUUID().toString(),
     journalfoerendeEnhet = "0701",
     journalposttype = "INNGAAENDE",
     kanal = "NAV_NO",
@@ -50,7 +51,7 @@ val dummyJournalpost = Journalpost(
         sakstype = "FAGSAK"
     ),
     tilleggsopplysninger = listOf(Tilleggsopplysninger(
-        nokkel = "bucid",
+        nokkel = "orkivar",
         verdi = "12345"
     )),
     tittel = "Søknad om dagpenger ved permittering"
