@@ -51,6 +51,7 @@ class ApplicationTest {
                 "azure.client-secret" to "clientSecret",
                 "dokark.client-url" to "http://dok.ark.no",
                 "dokark.client-scope" to "dok.scope",
+                "orkivar-pdfgen.url" to "http://pdf.gen.no"
             )
         }
     }
