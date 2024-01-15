@@ -1,5 +1,6 @@
 package dab.poao.nav.no.pdfgenClient
 
+import dab.poao.nav.no.azureAuth.logger
 import dab.poao.nav.no.pdfgenClient.dto.PdfgenPayload
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -22,10 +23,14 @@ class PdfgenClient(config: ApplicationConfig) {
     }
 
     suspend fun generatePdf(payload: PdfgenPayload): PdfgenResult {
-        val response = client.post("$pdfgenUrl/api/v1/genpdf/dab/aktivitetsplan") {
-            setBody(payload)
-            contentType(ContentType.Application.Json)
+        val response = runCatching {
+            client.post("$pdfgenUrl/api/v1/genpdf/dab/aktivitetsplan") {
+                setBody(payload)
+                contentType(ContentType.Application.Json)
+            }
         }
+            .onFailure { logger.error("Nettverksfeil?", it) }
+            .getOrElse { return FailedPdfGen("Feilet å generere pdf") }
         return when (response.status.isSuccess()) {
             true -> PdfSuccess(response.bodyAsText())
             false -> FailedPdfGen("Feilet å generere pdf")
