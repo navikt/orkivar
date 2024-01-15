@@ -44,6 +44,11 @@ spec:
           namespace: dab
       external:
         - host: dokarkiv.prod-fss-pub.nais.io
+    inbound:
+      rules:
+        - application: veilarbaktivitet
+          namespace: pto
+          cluster: prod-fss
 
   env:
     - name: DOKARK_CLIENT_URL
