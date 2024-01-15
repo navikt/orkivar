@@ -1,6 +1,7 @@
 package dab.poao.nav.no.dokark
 
 import dab.poao.nav.no.azureAuth.logger
+import dab.poao.nav.no.pdfgenClient.PdfSuccess
 import dab.poao.nav.no.pdfgenClient.PdfgenResult
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
@@ -29,7 +30,7 @@ class DokarkClient(config: ApplicationConfig) {
         }
     }
 
-    suspend fun opprettJournalpost(token: IncomingToken, pdfResult: PdfgenResult.PdfSuccess, navn: String, fnr: String): DokarkResult {
+    suspend fun opprettJournalpost(token: IncomingToken, pdfResult: PdfSuccess, navn: String, fnr: String): DokarkResult {
         val res = client.post("$clientUrl/rest/journalpostapi/v1/journalpost") {
             header("authorization", "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}")
             contentType(ContentType.Application.Json)
