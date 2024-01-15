@@ -1,0 +1,23 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: orkivar-alert
+  namespace: dab
+  labels:
+    team: dab
+spec:
+  groups:
+    - name: orkivar-alert
+      rules:
+        - alert: InstanceDown
+          expr: kube_deployment_status_replicas_available{namespace="dab", deployment="orkivar"} == 0
+          for: 20s
+          annotations:
+            consequence: Application is unavailable
+            action: "`kubectl describe pod <podname>` -> `kubectl logs <podname>`"
+            summary: |-
+              Applikasjonen er nede.
+          labels:
+            namespace: dab
+            severity: critical
+            send_resolved: "false"
