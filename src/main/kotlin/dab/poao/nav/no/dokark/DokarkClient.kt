@@ -2,7 +2,6 @@ package dab.poao.nav.no.dokark
 
 import dab.poao.nav.no.azureAuth.logger
 import dab.poao.nav.no.pdfgenClient.PdfSuccess
-import dab.poao.nav.no.pdfgenClient.PdfgenResult
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.contentnegotiation.*
