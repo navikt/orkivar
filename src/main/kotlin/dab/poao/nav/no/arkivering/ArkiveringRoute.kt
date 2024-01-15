@@ -15,6 +15,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.lang.IllegalArgumentException
+import java.time.ZonedDateTime
 
 fun Route.arkiveringRoutes(
     dokarkClient: DokarkClient,
@@ -27,7 +28,8 @@ fun Route.arkiveringRoutes(
             ?.lastOrNull() ?: throw IllegalArgumentException("No token found")
 
         val (metadata) = call.receive<ArkiveringsPayload>()
-        val (fnr, navn, tidspunkt) = metadata
+        val (fnr, navn) = metadata
+        val tidspunkt = ZonedDateTime.now().toString()
 
         val dokarkResult = runCatching {
             val pdfResult = pdfgenClient.generatePdf(payload = PdfgenPayload(navn, fnr, tidspunkt))

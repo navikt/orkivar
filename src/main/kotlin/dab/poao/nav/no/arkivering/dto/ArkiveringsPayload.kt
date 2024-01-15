@@ -12,5 +12,7 @@ data class ArkiveringsPayload(
 data class ArkiveringsMetadata (
     val fnr: Fnr,
     val navn: Navn,
-    val tidspunkt: String,
+//    val snapshotTidspunkt: String,
 )
+
+
