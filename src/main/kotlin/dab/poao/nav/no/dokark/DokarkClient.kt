@@ -1,8 +1,8 @@
 package dab.poao.nav.no.dokark
 
 import dab.poao.nav.no.azureAuth.logger
+import dab.poao.nav.no.pdfgenClient.PdfgenResult
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
@@ -29,17 +29,17 @@ class DokarkClient(config: ApplicationConfig) {
         }
     }
 
-    suspend fun opprettJournalpost(token: IncomingToken): Boolean {
+    suspend fun opprettJournalpost(token: IncomingToken, pdfResult: PdfgenResult.PdfSuccess, navn: String, fnr: String): DokarkResult {
         val res = client.post("$clientUrl/rest/journalpostapi/v1/journalpost") {
             header("authorization", "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}")
             contentType(ContentType.Application.Json)
-            setBody(dummyJournalpost)
+            setBody(dummyJournalpost(pdfResult.pdfByteString, navn, fnr))
         }
         if (!res.status.isSuccess()) {
             logger.warn("Failet å opprette journalpost:", res.bodyAsText())
-            return false
+            return DokarkFail("Feilet å laste opp til joark")
         }
-        return true
+        return DokarkSuccess
     }
 }
 
@@ -53,3 +53,7 @@ fun ApplicationConfig.toOauthConfig(): OauthClientCredentialsConfig {
         tokenEndpoint = tokenEndpoint
     )
 }
+
+sealed interface DokarkResult
+data object DokarkSuccess: DokarkResult
+data class DokarkFail(val message: String): DokarkResult

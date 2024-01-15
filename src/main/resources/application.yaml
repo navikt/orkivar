@@ -14,6 +14,9 @@ dokark:
     client-url: "$DOKARK_CLIENT_URL:null"
     client-scope: "$DOKARK_SCOPE:null"
 
+orkivar-pdfgen:
+    url: "$ORKIVAR_PDFGEN_URL:null"
+
 no:
     nav:
         security:

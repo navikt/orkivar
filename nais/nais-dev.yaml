@@ -56,3 +56,5 @@ spec:
       value: https://dokarkiv-q2.dev-fss-pub.nais.io
     - name: DOKARK_SCOPE
       value: api://dev-fss.teamdokumenthandtering.dokarkiv/.default
+    - name: ORKIVAR_PDFGEN_URL
+      value: http://orkivar-pdfgen

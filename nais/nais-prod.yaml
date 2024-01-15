@@ -43,3 +43,5 @@ spec:
       value: https://dokarkiv.prod-fss-pub.nais.io/rest/journalpostapi/v1
     - name: DOKARK_SCOPE
       value: api://prod-fss.teamdokumenthandtering.dokarkiv/.default
+    - name: ORKIVAR_PDFGEN_URL
+      value: http://orkivar-pdfgen
