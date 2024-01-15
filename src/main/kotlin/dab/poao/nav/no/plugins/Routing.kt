@@ -1,5 +1,6 @@
 package dab.poao.nav.no.plugins
 
+import dab.poao.nav.no.azureAuth.logger
 import dab.poao.nav.no.dokark.DokarkClient
 import dab.poao.nav.no.dokark.DokarkFail
 import dab.poao.nav.no.dokark.DokarkResult
@@ -38,12 +39,15 @@ fun Application.configureRouting(
                 val fnr = "11837798592"
                 val timestamp = ZonedDateTime.now().toString()
 
-                val pdfResult = pdfgenClient.generatePdf(payload = PdfgenPayload(navn, fnr, timestamp))
-
-                val dokarkResult = when (pdfResult) {
-                    is PdfSuccess -> dokarkClient.opprettJournalpost(token, pdfResult, navn, fnr)
-                    is FailedPdfGen -> DokarkFail(pdfResult.message)
+                val dokarkResult = runCatching {
+                    val pdfResult = pdfgenClient.generatePdf(payload = PdfgenPayload(navn, fnr, timestamp))
+                    when (pdfResult) {
+                        is PdfSuccess -> dokarkClient.opprettJournalpost(token, pdfResult, navn, fnr)
+                        is FailedPdfGen -> DokarkFail(pdfResult.message)
+                    }
                 }
+                    .onFailure { logger.error("Noe uforventet", it) }
+                    .getOrElse { DokarkFail("Uventet feil") }
                 when (dokarkResult) {
                     is DokarkFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)
                     is DokarkSuccess -> call.respond("OK")
