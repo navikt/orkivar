@@ -41,6 +41,9 @@ spec:
           - "NAVident"
   accessPolicy:
     outbound:
+      rules:
+        - application: orkivar-pdfgen
+          namespace: dab
       external:
         - host: dokarkiv-q2.dev-fss-pub.nais.io
         - host: dokarkiv-q2.dev.intern.nav.no

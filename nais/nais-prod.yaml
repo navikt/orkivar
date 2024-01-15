@@ -37,6 +37,13 @@ spec:
       claims:
         extra:
           - "NAVident"
+  accessPolicy:
+    outbound:
+      rules:
+        - application: orkivar-pdfgen
+          namespace: dab
+      external:
+        - host: dokarkiv.prod-fss-pub.nais.io
 
   env:
     - name: DOKARK_CLIENT_URL
