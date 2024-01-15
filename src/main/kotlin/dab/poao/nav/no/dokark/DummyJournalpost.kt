@@ -18,7 +18,7 @@ val pdfString = "JVBERi0xLjMKJcTl8uXrp/Og0MTGCjQgMCBvYmoKPDwgL0ZpbHRlciAvRmxhdGV
 typealias Fnr = String
 typealias Navn = String
 
-val dummyJournalpost = { fysiskPdf: String, navn: Navn, fnr: Fnr -> Journalpost(
+val dummyJournalpost = { fysiskPdf: ByteArray, navn: Navn, fnr: Fnr -> Journalpost(
     avsenderMottaker = AvsenderMottaker(
         id = fnr,
         navn = navn,

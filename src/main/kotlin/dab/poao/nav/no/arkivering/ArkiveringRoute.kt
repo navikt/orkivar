@@ -1,6 +1,7 @@
 package dab.poao.nav.no.arkivering
 
 import dab.poao.nav.no.arkivering.dto.ArkiveringsPayload
+import dab.poao.nav.no.azureAuth.logger
 import dab.poao.nav.no.dokark.DokarkClient
 import dab.poao.nav.no.dokark.DokarkFail
 import dab.poao.nav.no.dokark.DokarkSuccess
@@ -14,12 +15,12 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.lang.IllegalArgumentException
-import java.time.ZonedDateTime
 
 fun Route.arkiveringRoutes(
     dokarkClient: DokarkClient,
     pdfgenClient: PdfgenClient
 ) {
+
     post("/arkiver") {
         val token = call.request.header("Authorization")
             ?.split(" ")
@@ -28,12 +29,15 @@ fun Route.arkiveringRoutes(
         val (metadata) = call.receive<ArkiveringsPayload>()
         val (fnr, navn, tidspunkt) = metadata
 
-        val pdfResult = pdfgenClient.generatePdf(payload = PdfgenPayload(metadata.navn, fnr, tidspunkt))
-
-        val dokarkResult = when (pdfResult) {
-            is PdfSuccess -> dokarkClient.opprettJournalpost(token, pdfResult, navn, fnr)
-            is FailedPdfGen -> DokarkFail(pdfResult.message)
+        val dokarkResult = runCatching {
+            val pdfResult = pdfgenClient.generatePdf(payload = PdfgenPayload(navn, fnr, tidspunkt))
+            when (pdfResult) {
+                is PdfSuccess -> dokarkClient.opprettJournalpost(token, pdfResult, navn, fnr)
+                is FailedPdfGen -> DokarkFail(pdfResult.message)
+            }
         }
+            .onFailure { logger.error("Noe uforventet", it) }
+            .getOrElse { DokarkFail("Uventet feil") }
         when (dokarkResult) {
             is DokarkFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)
             is DokarkSuccess -> call.respond("OK")
