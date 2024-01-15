@@ -43,7 +43,7 @@ data class Dokument(
 @Serializable
 data class Dokumentvariant(
     val filtype: String,
-    val fysiskDokument: String,
+    val fysiskDokument: ByteArray,
     val variantformat: String,
 )
 

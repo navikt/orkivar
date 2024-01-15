@@ -3,16 +3,18 @@ package dab.poao.nav.no.pdfgenClient
 import dab.poao.nav.no.azureAuth.logger
 import dab.poao.nav.no.pdfgenClient.dto.PdfgenPayload
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.config.*
+import kotlin.io.encoding.Base64
 
 sealed interface PdfgenResult
 data class FailedPdfGen(val message: String) : PdfgenResult
-data class PdfSuccess(val pdfByteString: String) : PdfgenResult
+data class PdfSuccess(val pdfByteString: ByteArray) : PdfgenResult
 
 class PdfgenClient(config: ApplicationConfig) {
     val pdfgenUrl = config.property("orkivar-pdfgen.url").getString()
@@ -32,7 +34,7 @@ class PdfgenClient(config: ApplicationConfig) {
             .onFailure { logger.error("Nettverksfeil?", it) }
             .getOrElse { return FailedPdfGen("Feilet å generere pdf") }
         return when (response.status.isSuccess()) {
-            true -> PdfSuccess(response.bodyAsText())
+            true -> PdfSuccess(response.body())
             false -> FailedPdfGen("Feilet å generere pdf")
         }
     }
