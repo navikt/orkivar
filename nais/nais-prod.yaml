@@ -6,6 +6,8 @@ metadata:
   labels:
     team: dab
 spec:
+  ingresses:
+    - https://orkivar.intern.nav.no
   image: {{ image }}
   port: 8080
   liveness:
