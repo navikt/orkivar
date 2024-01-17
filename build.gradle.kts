@@ -37,6 +37,8 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml:2.3.7")
     implementation("io.ktor:ktor-server-auth:$ktor_version")
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-client-logging-jvm:2.3.7")
     testImplementation("io.ktor:ktor-server-tests-jvm")
 
