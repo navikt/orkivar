@@ -3,6 +3,7 @@ package dab.poao.nav.no.dokark
 import dab.poao.nav.no.azureAuth.logger
 import dab.poao.nav.no.pdfgenClient.PdfSuccess
 import io.ktor.client.*
+import io.ktor.client.engine.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
@@ -15,11 +16,11 @@ import no.nav.poao.dab.ktor_oauth_client.AzureClient
 import no.nav.poao.dab.ktor_oauth_client.IncomingToken
 import no.nav.poao.dab.ktor_oauth_client.OauthClientCredentialsConfig
 
-class DokarkClient(config: ApplicationConfig) {
+class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine) {
     val clientScope = config.property("dokark.client-scope").getString()
     val clientUrl = config.property("dokark.client-url").getString()
     val azureClient = AzureClient(config.toOauthConfig())
-    val client = HttpClient(OkHttp) {
+    val client = HttpClient(httpClientEngine) {
         install(ContentNegotiation) {
             json()
         }
@@ -38,7 +39,7 @@ class DokarkClient(config: ApplicationConfig) {
             .onFailure { logger.error("Noe gikk galt", it) }
             .getOrElse { return DokarkFail("Kunne ikke poste til joark") }
         if (!res.status.isSuccess()) {
-            logger.warn("Failet å opprette journalpost:", res.bodyAsText())
+            logger.warn("Feilet å opprette journalpost:", res.bodyAsText())
             return DokarkFail("Feilet å laste opp til joark")
         }
         return DokarkSuccess

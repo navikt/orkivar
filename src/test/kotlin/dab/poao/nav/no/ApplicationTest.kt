@@ -90,11 +90,17 @@ val mockEngine = MockEngine { request ->
             status = HttpStatusCode.OK,
             headers = headersOf(HttpHeaders.ContentType, "application/json")
         )
+    } else if (request.url.toString() == "http://dok.ark.no/rest/journalpostapi/v1/journalpost") {
+        respond(
+            content = ByteReadChannel("{}"),
+            status = HttpStatusCode.OK,
+            headers = headersOf(HttpHeaders.ContentType, "application/json")
+        )
+    } else {
+        respond(
+            content = ByteReadChannel(""),
+            status = HttpStatusCode.BadRequest,
+            headers = headersOf(HttpHeaders.ContentType, "application/json")
+        )
     }
-    else {
-    respond(
-        content = ByteReadChannel(""),
-        status = HttpStatusCode.BadRequest,
-        headers = headersOf(HttpHeaders.ContentType, "application/json")
-    )}
 }

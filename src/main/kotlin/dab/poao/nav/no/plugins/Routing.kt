@@ -12,7 +12,7 @@ import io.ktor.server.routing.*
 
 fun Application.configureRouting(
     httpClientEngine: HttpClientEngine,
-    dokarkClient: DokarkClient = DokarkClient(environment.config),
+    dokarkClient: DokarkClient = DokarkClient(environment.config, httpClientEngine),
     pdfgenClient: PdfgenClient = PdfgenClient(environment.config, httpClientEngine)
 ) {
     routing {
