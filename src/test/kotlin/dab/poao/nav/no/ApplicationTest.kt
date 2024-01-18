@@ -1,20 +1,28 @@
 package dab.poao.nav.no
 
 import configureAuthentication
+import dab.poao.nav.no.arkivering.dto.ArkiveringsMetadata
+import dab.poao.nav.no.arkivering.dto.ArkiveringsPayload
 import dab.poao.nav.no.plugins.*
+import io.ktor.client.*
+import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.config.*
 import io.ktor.server.engine.*
+import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.testing.*
 import no.nav.security.mock.oauth2.MockOAuth2Server
+import no.nav.security.mock.oauth2.http.json
 import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.test.*
 
 private val logger = LoggerFactory.getLogger("dab.poao.nav.no.ApplicationTest.kt")
 class ApplicationTest {
+
     @Test
     fun testRoot() = testApplication {
         environment { doConfig() }
@@ -22,13 +30,27 @@ class ApplicationTest {
             configureAuthentication()
             configureRouting()
         }
+        val client = HttpClient().apply {
+            install(ContentNegotiation) {
+                json()
+            }
+        }
 
-        client.get("/") {
-//        client.post("/arkiver") {
-//            bearerAuth(getAzureToken("G123123"))
+        client.post("/arkiver") {
+            bearerAuth(getAzureToken("G123123"))
+            header("Content-Type", "application/json; charset=UTF-8")
+            setBody(ArkiveringsPayload(ArkiveringsMetadata(fnr = "123456789", navn = "Navn Navnesen")))
+
+//            setBody("""
+//                {
+//                  "metadata": {
+//                    "navn": "TRIVIELL SKILPADDE",
+//                    "fnr": "01015450300"
+//                  }
+//                }
+//            """.trimIndent())
         }.apply {
             assertEquals(HttpStatusCode.OK, status)
-            assertEquals("Hello World!", bodyAsText())
         }
     }
 
