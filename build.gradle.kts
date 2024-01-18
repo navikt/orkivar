@@ -40,6 +40,7 @@ dependencies {
     implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-client-logging-jvm:2.3.7")
+    implementation("io.ktor:ktor-client-encoding:2.3.7")
     testImplementation("io.ktor:ktor-server-tests-jvm")
 
     implementation("io.ktor:ktor-client-core:$ktor_version")
@@ -56,4 +57,5 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:2.3.6")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testImplementation("no.nav.security:mock-oauth2-server:$mockoauth_version")
+    testImplementation("io.ktor:ktor-client-mock:$ktor_version")
 }
