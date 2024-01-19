@@ -23,8 +23,6 @@ class ApplicationTest {
 
     @Test
     fun testRoot() = testApplication {
-        val postgres = EmbeddedPostgres.start()
-
         environment { doConfig() }
         application {
             module(mockEngine)
@@ -57,6 +55,7 @@ class ApplicationTest {
             MockOAuth2Server()
                 .also { it.start() }
         }
+        val postgres = EmbeddedPostgres.start()
 
         private fun ApplicationEngineEnvironmentBuilder.doConfig(
             acceptedIssuer: String = "default",
@@ -72,7 +71,13 @@ class ApplicationTest {
                 "azure.client-secret" to "clientSecret",
                 "dokark.client-url" to "http://dok.ark.no",
                 "dokark.client-scope" to "dok.scope",
-                "orkivar-pdfgen.url" to "http://pdf.gen.no"
+                "orkivar-pdfgen.url" to "http://pdf.gen.no",
+                "postgres.host" to "localhost",
+                "postgres.port" to postgres.port.toString(),
+                "postgres.database-name" to "postgres",
+                "postgres.username" to "postgres",
+                "postgres.password" to "postgres"
+
             )
         }
     }

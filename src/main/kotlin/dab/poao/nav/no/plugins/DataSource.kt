@@ -5,7 +5,7 @@ import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.application.*
 import javax.sql.DataSource
 
-fun Application.createHikariDataSource(): DataSource {
+fun Application.configureHikariDataSource(): DataSource {
 
     val config = environment.config
     val host = config.property("postgres.host").getString()
