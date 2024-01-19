@@ -11,7 +11,7 @@ fun Application.configureHikariDataSource(): DataSource {
     val host = config.property("postgres.host").getString()
     val port = config.property("postgres.port").getString()
     val databaseName = config.property("postgres.database-name").getString()
-    val user = config.property("postgres.username").getString()
+    val user = config.property("postgres.user").getString()
     val pw = config.property("postgres.password").getString()
 
     return HikariDataSource(HikariConfig().apply {
