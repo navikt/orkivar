@@ -1,6 +1,7 @@
 package dab.poao.nav.no
 
 import configureAuthentication
+import dab.poao.nav.no.database.Repository
 import dab.poao.nav.no.plugins.configureHikariDataSource
 import dab.poao.nav.no.plugins.configureFlyway
 import dab.poao.nav.no.plugins.configureMonitoring
@@ -20,8 +21,9 @@ fun Application.module(httpClientEngine: HttpClientEngine = HttpClient().engine)
         json()
     }
     val datasource = configureHikariDataSource()
+    val repository = Repository(datasource)
     configureAuthentication()
     configureMonitoring()
-    configureRouting(httpClientEngine)
+    configureRouting(httpClientEngine = httpClientEngine, lagreJournalfoering = repository::lagreJournalfoering)
     configureFlyway(datasource)
 }

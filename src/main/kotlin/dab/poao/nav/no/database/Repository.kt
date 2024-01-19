@@ -20,7 +20,6 @@ class Repository(dataSource: DataSource) {
     }
 
     fun lagreJournalfoering(navIdent: String, fnr: Fnr) {
-
         Journalfoering.insert {
             it[Journalfoering.navIdent] = navIdent
             it[Journalfoering.fnr] = fnr

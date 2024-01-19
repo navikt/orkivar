@@ -58,7 +58,7 @@ class ApplicationTest {
         val postgres = EmbeddedPostgres.start()
 
         private fun ApplicationEngineEnvironmentBuilder.doConfig(
-            acceptedIssuer: String = "default",
+            acceptedIssuer: String = "AzureAD",
             acceptedAudience: String = "default"
         ) {
             config = MapApplicationConfig(
