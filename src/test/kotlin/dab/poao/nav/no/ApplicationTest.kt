@@ -75,7 +75,7 @@ class ApplicationTest {
                 "postgres.host" to "localhost",
                 "postgres.port" to postgres.port.toString(),
                 "postgres.database-name" to "postgres",
-                "postgres.username" to "postgres",
+                "postgres.user" to "postgres",
                 "postgres.password" to "postgres"
             )
         }
