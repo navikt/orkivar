@@ -18,6 +18,14 @@ spec:
     path: /isReady
     port: 8080
     initialDelay: 5
+  gcp:
+    sqlInstances:
+      - databases:
+          - name: orkivardb
+        diskAutoresize: true
+        diskType: SSD
+        tier: db-custom-1-3840
+        type: POSTGRES_14
   prometheus:
     enabled: true
     path: /metrics
