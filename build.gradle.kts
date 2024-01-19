@@ -62,7 +62,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:2.3.6")
     implementation("com.zaxxer:HikariCP:$hikaricp_version")
     implementation("org.postgresql:postgresql:$postgres_driver_version")
-    implementation("org.flywaydb:flyway-database-postgresql:$flyway_version")
+    implementation("org.flywaydb:flyway-core:$flyway_version")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testImplementation("no.nav.security:mock-oauth2-server:$mockoauth_version")

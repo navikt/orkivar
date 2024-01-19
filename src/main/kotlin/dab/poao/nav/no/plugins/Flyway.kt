@@ -7,7 +7,6 @@ import javax.sql.DataSource
 
 fun Application.configureFlyway(dataSource: DataSource) {
     Flyway.configure()
-        .locations("db/migration")
         .dataSource(dataSource)
         .load()
         .migrate()
