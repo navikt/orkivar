@@ -10,6 +10,7 @@ import io.ktor.server.config.*
 import io.ktor.server.engine.*
 import io.ktor.server.testing.*
 import io.ktor.utils.io.*
+import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -19,8 +20,11 @@ private val logger = LoggerFactory.getLogger("dab.poao.nav.no.ApplicationTest.kt
 
 class ApplicationTest {
 
+
     @Test
     fun testRoot() = testApplication {
+        val postgres = EmbeddedPostgres.start()
+
         environment { doConfig() }
         application {
             module(mockEngine)

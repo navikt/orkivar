@@ -17,6 +17,13 @@ dokark:
 orkivar-pdfgen:
     url: "$ORKIVAR_PDFGEN_URL:null"
 
+postgres:
+    host: "$NAIS_DATABASE_MYAPP_MYDB_HOST"
+    port: "$NAIS_DATABASE_MYAPP_MYDB_PORT"
+    database-name: "$NAIS_DATABASE_MYAPP_MYDB_DATABASE"
+    user: "$NAIS_DATABASE_MYAPP_MYDB_USERNAME"
+    password: "$NAIS_DATABASE_MYAPP_MYDB_PASSWORD"
+
 no:
     nav:
         security:

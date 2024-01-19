@@ -6,6 +6,9 @@ val logstash_encoder_version: String by project
 val tokensupport_version: String by project
 val mockoauth_version: String by project
 val dab_common_version: String by project
+val hikaricp_version: String by project
+val embedded_postgres_version: String by project
+val postgres_driver_version: String by project
 
 val prometeus_version: String by project
 plugins {
@@ -55,7 +58,11 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstash_encoder_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:2.3.6")
+    implementation("com.zaxxer:HikariCP:$hikaricp_version")
+    implementation("org.postgresql:postgresql:$postgres_driver_version")
+
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testImplementation("no.nav.security:mock-oauth2-server:$mockoauth_version")
     testImplementation("io.ktor:ktor-client-mock:$ktor_version")
+    testImplementation("io.zonky.test:embedded-postgres:$embedded_postgres_version")
 }
