@@ -11,6 +11,7 @@ val embedded_postgres_version: String by project
 val postgres_driver_version: String by project
 val flyway_version: String by project
 val embeddedPostgresBinaries_version: String by project
+val exposed_version: String by project
 
 val prometeus_version: String by project
 plugins {
@@ -63,10 +64,14 @@ dependencies {
     implementation("com.zaxxer:HikariCP:$hikaricp_version")
     implementation("org.postgresql:postgresql:$postgres_driver_version")
     implementation("org.flywaydb:flyway-core:$flyway_version")
+    implementation("io.zonky.test.postgres:embedded-postgres-binaries-bom:$embeddedPostgresBinaries_version")
+    implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testImplementation("no.nav.security:mock-oauth2-server:$mockoauth_version")
     testImplementation("io.ktor:ktor-client-mock:$ktor_version")
     testImplementation("io.zonky.test:embedded-postgres:$embedded_postgres_version")
-    implementation("io.zonky.test.postgres:embedded-postgres-binaries-bom:$embeddedPostgresBinaries_version")
 }
