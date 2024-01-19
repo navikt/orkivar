@@ -12,6 +12,8 @@ import io.ktor.server.testing.*
 import io.ktor.utils.io.*
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import no.nav.security.mock.oauth2.MockOAuth2Server
+import no.nav.security.mock.oauth2.OAuth2Config
+import no.nav.security.mock.oauth2.token.OAuth2TokenProvider
 import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.test.*
@@ -84,6 +86,7 @@ class ApplicationTest {
 
 fun getAzureToken(navIdent: String) = ApplicationTest.server
     .issueToken(
+        issuerId = "AzureAD",
         subject = navIdent,
         claims = mapOf("NAVident" to navIdent, "oid" to UUID.randomUUID())
     )
