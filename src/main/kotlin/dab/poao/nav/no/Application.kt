@@ -2,6 +2,7 @@ package dab.poao.nav.no
 
 import configureAuthentication
 import dab.poao.nav.no.plugins.configureHikariDataSource
+import dab.poao.nav.no.plugins.configureFlyway
 import dab.poao.nav.no.plugins.configureMonitoring
 import dab.poao.nav.no.plugins.configureRouting
 import io.ktor.client.*
@@ -18,8 +19,9 @@ fun Application.module(httpClientEngine: HttpClientEngine = HttpClient().engine)
     install(ContentNegotiation) {
         json()
     }
-    configureHikariDataSource()
+    val datasource = configureHikariDataSource()
     configureAuthentication()
     configureMonitoring()
     configureRouting(httpClientEngine)
+    configureFlyway(datasource)
 }
