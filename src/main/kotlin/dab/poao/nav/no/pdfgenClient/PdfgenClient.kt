@@ -1,24 +1,23 @@
 package dab.poao.nav.no.pdfgenClient
 
-import dab.poao.nav.no.azureAuth.logger
 import dab.poao.nav.no.pdfgenClient.dto.PdfgenPayload
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.engine.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.config.*
-import kotlin.io.encoding.Base64
+import no.nav.poao.dab.ktor_oauth_client.logger
 
 sealed interface PdfgenResult
 data class FailedPdfGen(val message: String) : PdfgenResult
 data class PdfSuccess(val pdfByteString: ByteArray) : PdfgenResult
 
-class PdfgenClient(config: ApplicationConfig) {
+class PdfgenClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine) {
     val pdfgenUrl = config.property("orkivar-pdfgen.url").getString()
-    var client = HttpClient {
+    val client = HttpClient(httpClientEngine) {
         install(ContentNegotiation) {
             json()
         }
