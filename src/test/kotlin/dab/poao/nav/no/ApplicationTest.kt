@@ -77,7 +77,6 @@ class ApplicationTest {
                 "postgres.database-name" to "postgres",
                 "postgres.username" to "postgres",
                 "postgres.password" to "postgres"
-
             )
         }
     }
