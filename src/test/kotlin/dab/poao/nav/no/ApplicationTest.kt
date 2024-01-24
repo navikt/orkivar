@@ -12,8 +12,6 @@ import io.ktor.server.testing.*
 import io.ktor.utils.io.*
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import no.nav.security.mock.oauth2.MockOAuth2Server
-import no.nav.security.mock.oauth2.OAuth2Config
-import no.nav.security.mock.oauth2.token.OAuth2TokenProvider
 import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.test.*
@@ -44,7 +42,46 @@ class ApplicationTest {
                   "metadata": {
                     "navn": "TRIVIELL SKILPADDE",
                     "fnr": "01015450300"
-                  }
+                  },
+                  "aktiviteter": [
+                        {
+                          "tittel": "tittel",
+                          "type": "Jobb jeg har nå",
+                          "status": "Planlagt",
+                          "detaljer": [
+                            {
+                              "stil": "HALV_LINJE",
+                              "tittel": "Fra dato",
+                              "tekst": "05 mars 2020"
+                            },
+                            {
+                              "stil": "HALV_LINJE",
+                              "tittel": "Til dato",
+                              "tekst": "05 mars 2021"
+                            },
+                            {
+                              "stil": "HALV_LINJE",
+                              "tittel": "Stillingsandel",
+                              "tekst": "HELTID"
+                            },
+                            {
+                              "stil": "HALV_LINJE",
+                              "tittel": "Arbeidsgiver",
+                              "tekst": "Vikar"
+                            },
+                            {
+                              "stil": "HALV_LINJE",
+                              "tittel": "Ansettelsesforhold",
+                              "tekst": "7,5 timer"
+                            },
+                            {
+                              "stil": "PARAGRAF",
+                              "tittel": "Beskrivelse",
+                              "tekst": "beskrivelse"
+                            }
+                          ]
+                        }
+                      ]
                 }
             """.trimIndent())
         }.apply {

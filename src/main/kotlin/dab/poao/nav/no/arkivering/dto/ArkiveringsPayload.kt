@@ -7,15 +7,38 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ArkiveringsPayload(
     val metadata: ArkiveringsMetadata,
-//    val aktivitesplan: Aktivitetsplan,
-//    val dialoger: Dialoger
+    val aktiviteter: List<ArkivAktivitet>
 )
 
 @Serializable
 data class ArkiveringsMetadata (
     val fnr: Fnr,
     val navn: Navn,
-//    val snapshotTidspunkt: String,
 )
+
+@Serializable
+data class ArkivAktivitet(
+    val tittel: String,
+    val type: String,
+    val status: String,
+    val detaljer: List<Detalj>,
+//    val tags: List<Tag>
+)
+
+@Serializable
+enum class Stil {
+    HEL_LINJE,
+    HALV_LINJE,
+    PARAGRAF,
+    LENKE
+}
+
+@Serializable
+data class Detalj(
+    val stil: Stil,
+    val tittel: String,
+    val tekst: String?
+)
+
 
 
