@@ -12,6 +12,7 @@ val postgres_driver_version: String by project
 val flyway_version: String by project
 val embeddedPostgresBinaries_version: String by project
 val exposed_version: String by project
+val kotest_version: String by project
 
 val prometeus_version: String by project
 plugins {
@@ -68,8 +69,11 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
-    implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:$exposed_version")
 
+    testImplementation("io.kotest:kotest-runner-junit5:$kotest_version")
+    testImplementation("io.kotest:kotest-assertions-core:$kotest_version")
+    testImplementation("io.kotest:kotest-assertions-json:$kotest_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testImplementation("no.nav.security:mock-oauth2-server:$mockoauth_version")
     testImplementation("io.ktor:ktor-client-mock:$ktor_version")

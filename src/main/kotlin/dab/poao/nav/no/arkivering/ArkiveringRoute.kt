@@ -18,13 +18,13 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import no.nav.security.token.support.v2.TokenValidationContextPrincipal
 import java.lang.IllegalArgumentException
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 
 fun Route.arkiveringRoutes(
     dokarkClient: DokarkClient,
     pdfgenClient: PdfgenClient,
-    lagreJournalfoering: (navIdent: String, fnr: Fnr) -> Unit
+    lagreJournalfoering: suspend (navIdent: String, fnr: Fnr, opprettet: LocalDateTime) -> Unit
 ) {
     fun ApplicationCall.getClaim(name: String): String? {
         return authentication.principal<TokenValidationContextPrincipal>()?.context
@@ -39,11 +39,11 @@ fun Route.arkiveringRoutes(
 
         val (metadata) = call.receive<ArkiveringsPayload>()
         val (fnr, navn) = metadata
-        val tidspunkt = ZonedDateTime.now().toString()
+        val tidspunkt = LocalDateTime.now()
         val navIdent = call.getClaim("NAVident") ?: throw RuntimeException("Klarte ikke å hente NAVident claim fra tokenet")
 
         val dokarkResult = runCatching {
-            val pdfResult = pdfgenClient.generatePdf(payload = PdfgenPayload(navn, fnr, tidspunkt))
+            val pdfResult = pdfgenClient.generatePdf(payload = PdfgenPayload(navn, fnr, tidspunkt.toString()))
             when (pdfResult) {
                 is PdfSuccess -> dokarkClient.opprettJournalpost(token, pdfResult, navn, fnr)
                 is FailedPdfGen -> DokarkFail(pdfResult.message)
@@ -54,7 +54,7 @@ fun Route.arkiveringRoutes(
         when (dokarkResult) {
             is DokarkFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)
             is DokarkSuccess -> {
-                lagreJournalfoering(navIdent.toString(), fnr)
+                lagreJournalfoering(navIdent, fnr, tidspunkt)
                 call.respond("OK")
             }
         }

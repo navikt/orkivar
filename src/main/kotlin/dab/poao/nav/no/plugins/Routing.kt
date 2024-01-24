@@ -10,12 +10,13 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.time.LocalDateTime
 
 fun Application.configureRouting(
     httpClientEngine: HttpClientEngine,
     dokarkClient: DokarkClient = DokarkClient(environment.config, httpClientEngine),
     pdfgenClient: PdfgenClient = PdfgenClient(environment.config, httpClientEngine),
-    lagreJournalfoering: (navIdent: String, fnr: Fnr) -> Unit
+    lagreJournalfoering: suspend (navIdent: String, fnr: Fnr, opprettet: LocalDateTime) -> Unit
 ) {
     routing {
         healthEndpoints()

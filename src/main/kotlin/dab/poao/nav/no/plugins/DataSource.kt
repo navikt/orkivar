@@ -3,11 +3,13 @@ package dab.poao.nav.no.plugins
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.server.application.*
+import io.ktor.server.config.*
 import javax.sql.DataSource
 
 fun Application.configureHikariDataSource(): DataSource {
-
-    val config = environment.config
+    return configureHikariDataSource(environment.config)
+}
+fun configureHikariDataSource(config: ApplicationConfig): DataSource {
     val host = config.property("postgres.host").getString()
     val port = config.property("postgres.port").getString()
     val databaseName = config.property("postgres.database-name").getString()

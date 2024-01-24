@@ -1,0 +1,1 @@
+ALTER TABLE journalfoering RENAME TO journalfoeringer;
