@@ -102,7 +102,12 @@ class ApplicationTest {
             mockEngine.requestHistory shouldHaveSize 2
             mockEngine.requestHistory
                 .first { pdfURL.contains(it.url.host) }.body.asString() shouldEqualJson """
-                   {"navn":"TRIVIELL SKILPADDE","fnr":"01015450300","journalfoeringstidspunkt":"${opprettet}"}
+                {
+                    "navn": "TRIVIELL SKILPADDE",
+                    "fnr": "$fnr",
+                    "journalfoeringstidspunkt":"${opprettet}",
+                    "aktiviteter": $arkivAktiviteterJson
+                }
                """.trimMargin()
         }
     }
@@ -172,5 +177,47 @@ val mockEngine = MockEngine { request ->
         )
     }
 }
+
+val arkivAktiviteterJson = """
+  [
+    {
+      "tittel": "tittel",
+      "type": "Jobb jeg har nå",
+      "status": "Planlagt",
+      "detaljer": [
+        {
+          "stil": "HALV_LINJE",
+          "tittel": "Fra dato",
+          "tekst": "05 mars 2020"
+        },
+        {
+          "stil": "HALV_LINJE",
+          "tittel": "Til dato",
+          "tekst": "05 mars 2021"
+        },
+        {
+          "stil": "HALV_LINJE",
+          "tittel": "Stillingsandel",
+          "tekst": "HELTID"
+        },
+        {
+          "stil": "HALV_LINJE",
+          "tittel": "Arbeidsgiver",
+          "tekst": "Vikar"
+        },
+        {
+          "stil": "HALV_LINJE",
+          "tittel": "Ansettelsesforhold",
+          "tekst": "7,5 timer"
+        },
+        {
+          "stil": "PARAGRAF",
+          "tittel": "Beskrivelse",
+          "tekst": "beskrivelse"
+        }
+      ]
+    }
+  ]
+""".trimIndent()
 
 suspend fun OutgoingContent.asString() = this.toByteArray().decodeToString()

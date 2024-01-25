@@ -37,13 +37,13 @@ fun Route.arkiveringRoutes(
             ?.split(" ")
             ?.lastOrNull() ?: throw IllegalArgumentException("No token found")
 
-        val (metadata) = call.receive<ArkiveringsPayload>()
-        val (fnr, navn) = metadata
+        val arkiveringsPayload = call.receive<ArkiveringsPayload>()
+        val (fnr, navn) = arkiveringsPayload.metadata
         val tidspunkt = LocalDateTime.now()
         val navIdent = call.getClaim("NAVident") ?: throw RuntimeException("Klarte ikke å hente NAVident claim fra tokenet")
 
         val dokarkResult = runCatching {
-            val pdfResult = pdfgenClient.generatePdf(payload = PdfgenPayload(navn, fnr, tidspunkt.toString()))
+            val pdfResult = pdfgenClient.generatePdf(payload = PdfgenPayload(navn, fnr, tidspunkt.toString(), arkiveringsPayload.aktiviteter))
             when (pdfResult) {
                 is PdfSuccess -> dokarkClient.opprettJournalpost(token, pdfResult, navn, fnr)
                 is FailedPdfGen -> DokarkFail(pdfResult.message)
