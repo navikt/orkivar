@@ -55,45 +55,8 @@ class ApplicationTest {
                     "navn": "TRIVIELL SKILPADDE",
                     "fnr": "$fnr"
                   },
-                  "aktiviteter": [
-                        {
-                          "tittel": "tittel",
-                          "type": "Jobb jeg har nå",
-                          "status": "Planlagt",
-                          "detaljer": [
-                            {
-                              "stil": "HALV_LINJE",
-                              "tittel": "Fra dato",
-                              "tekst": "05 mars 2020"
-                            },
-                            {
-                              "stil": "HALV_LINJE",
-                              "tittel": "Til dato",
-                              "tekst": "05 mars 2021"
-                            },
-                            {
-                              "stil": "HALV_LINJE",
-                              "tittel": "Stillingsandel",
-                              "tekst": "HELTID"
-                            },
-                            {
-                              "stil": "HALV_LINJE",
-                              "tittel": "Arbeidsgiver",
-                              "tekst": "Vikar"
-                            },
-                            {
-                              "stil": "HALV_LINJE",
-                              "tittel": "Ansettelsesforhold",
-                              "tekst": "7,5 timer"
-                            },
-                            {
-                              "stil": "PARAGRAF",
-                              "tittel": "Beskrivelse",
-                              "tekst": "beskrivelse"
-                            }
-                          ]
-                        }
-                      ]
+                  "aktiviteter": $arkivAktiviteterJson
+
                 }
             """.trimIndent())
         }.apply {
