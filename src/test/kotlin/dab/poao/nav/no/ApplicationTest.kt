@@ -30,8 +30,9 @@ class ApplicationTest {
     @Test
     fun `skal lage pdf og arkivere i joark`() = testApplication {
         lateinit var dataSource: DataSource
+        val postgres = EmbeddedPostgres.start()
         environment {
-            val config = doConfig()
+            val config = doConfig(postgresPort = postgres.port.toString())
             dataSource = configureHikariDataSource(config)
         }
         application {
@@ -80,11 +81,11 @@ class ApplicationTest {
             MockOAuth2Server()
                 .also { it.start() }
         }
-        val postgres = EmbeddedPostgres.start()
 
         private fun ApplicationEngineEnvironmentBuilder.doConfig(
             acceptedIssuer: String = "AzureAD",
-            acceptedAudience: String = "default"
+            acceptedAudience: String = "default",
+            postgresPort: String
         ): MapApplicationConfig {
             val testConfig = MapApplicationConfig(
                 "no.nav.security.jwt.issuers.size" to "1",
@@ -98,7 +99,7 @@ class ApplicationTest {
                 "dokark.client-scope" to "dok.scope",
                 "orkivar-pdfgen.url" to pdfURL,
                 "postgres.host" to "localhost",
-                "postgres.port" to postgres.port.toString(),
+                "postgres.port" to postgresPort,
                 "postgres.database-name" to "postgres",
                 "postgres.user" to "postgres",
                 "postgres.password" to "postgres"
