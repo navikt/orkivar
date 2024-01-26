@@ -71,15 +71,18 @@ class ApplicationTest : StringSpec({
             setBody(
                 """
                 {
-                  "metadata": {
-                    "navn": "TRIVIELL SKILPADDE",
-                    "fnr": "$fnr"
-                  },
-                  "aktiviteter": [
-                  ${forslagAktivitet},
-                  ${avbruttAktivitet}
-                  ]
-
+                    "metadata": {
+                        "navn": "TRIVIELL SKILPADDE",
+                        "fnr": "$fnr"
+                    },
+                    "aktiviteter": {
+                        "Planlagt": [
+                            $forslagAktivitet
+                        ],
+                        "Avbrutt": [
+                            $avbruttAktivitet
+                        ]
+                    }
                 }
             """.trimIndent()
             )
@@ -93,11 +96,14 @@ class ApplicationTest : StringSpec({
                     "navn": "TRIVIELL SKILPADDE",
                     "fnr": "$fnr",
                     "journalfoeringstidspunkt":"${opprettet}",
-                    "aktiviteterForslag": [${forslagAktivitet}],
-                    "aktiviteterPlanlegger": [],
-                    "aktiviteterGjennomforer": [], 
-                    "aktiviteterFullfort": [], 
-                    "aktiviteterAvbrutt": [${avbruttAktivitet}]
+                    "aktiviteter": {
+                        "Planlagt": [
+                            $forslagAktivitet
+                        ],
+                        "Avbrutt": [
+                            $avbruttAktivitet
+                        ]
+                    }
                 }
                """.trimMargin()
         }

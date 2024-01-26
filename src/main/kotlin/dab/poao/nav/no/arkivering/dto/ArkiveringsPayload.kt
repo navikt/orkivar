@@ -4,10 +4,12 @@ import dab.poao.nav.no.dokark.Fnr
 import dab.poao.nav.no.dokark.Navn
 import kotlinx.serialization.Serializable
 
+typealias AktivitetStatus = String
+
 @Serializable
 data class ArkiveringsPayload(
     val metadata: ArkiveringsMetadata,
-    val aktiviteter: List<ArkivAktivitet>
+    val aktiviteter: Map<AktivitetStatus, List<ArkivAktivitet>>
 )
 
 @Serializable
