@@ -27,9 +27,6 @@ fun Application.module(httpClientEngine: HttpClientEngine = HttpClient().engine)
     install(ContentNegotiation) {
         json()
     }
-    install(CallLogging) {
-        level = Level.INFO
-    }
     val datasource = configureHikariDataSource()
     val repository = Repository(datasource)
     configureAuthentication()
