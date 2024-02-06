@@ -12,10 +12,15 @@ import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.contentnegotiation.*
+import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
+    val logger = LoggerFactory.getLogger(Application::class.java)
+    Thread.setDefaultUncaughtExceptionHandler { thread, exception ->
+        logger.error("Uncaught exception i thread: ${thread.name}", exception)
+    }
 }
 
 fun Application.module(httpClientEngine: HttpClientEngine = HttpClient().engine) {
