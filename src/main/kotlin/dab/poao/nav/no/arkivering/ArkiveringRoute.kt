@@ -37,7 +37,12 @@ fun Route.arkiveringRoutes(
             ?.split(" ")
             ?.lastOrNull() ?: throw IllegalArgumentException("No token found")
 
-        val arkiveringsPayload = call.receive<ArkiveringsPayload>()
+        val arkiveringsPayload = try {
+            call.receive<ArkiveringsPayload>()
+        } catch(e: Exception) {
+            logger.error("Feil ved deserialisering", e)
+            throw e
+        }
         val (fnr, navn) = arkiveringsPayload.metadata
         val tidspunkt = LocalDateTime.now()
         val navIdent = call.getClaim("NAVident") ?: throw RuntimeException("Klarte ikke å hente NAVident claim fra tokenet")
