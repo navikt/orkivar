@@ -63,7 +63,7 @@ class ApplicationTest : StringSpec({
             .serialize()
 
         val fnr = "01015450300"
-        val forslagAktivitet = arkivAktivitet(status = "Forslag")
+        val forslagAktivitet = arkivAktivitet(status = "Forslag", meldinger = meldingerArray)
         val avbruttAktivitet = arkivAktivitet(status = "Avbrutt")
         client.post("/arkiver") {
             bearerAuth(token)
@@ -82,7 +82,8 @@ class ApplicationTest : StringSpec({
                         "Avbrutt": [
                             $avbruttAktivitet
                         ]
-                    }
+                    },
+                    $dialogTråder
                 }
             """.trimIndent()
             )
@@ -103,7 +104,8 @@ class ApplicationTest : StringSpec({
                         "Avbrutt": [
                             $avbruttAktivitet
                         ]
-                    }
+                    },
+                    $dialogTråder
                 }
                """.trimMargin()
         }
@@ -173,7 +175,7 @@ val mockEngine = MockEngine { request ->
     }
 }
 
-fun arkivAktivitet(status: String) = """
+fun arkivAktivitet(status: String, meldinger: String = "[]") = """
     {
       "tittel": "tittel",
       "type": "Jobb jeg har nå",
@@ -209,8 +211,39 @@ fun arkivAktivitet(status: String) = """
           "tittel": "Beskrivelse",
           "tekst": "beskrivelse"
         }
-      ]
+      ],
+      "meldinger" : $meldinger
     }
+""".trimIndent()
+
+val meldingerArray = """
+     [ {
+        "avsender" : "VEILEDER",
+        "sendt" : "05 februar 2024 kl. 02:31",
+        "lest" : true,
+        "viktig" : false,
+        "tekst" : "wehfuiehwf\n\nHilsen F_994188 E_994188"
+      }, {
+        "avsender" : "BRUKER",
+        "sendt" : "05 februar 2024 kl. 02:31",
+        "lest" : true,
+        "viktig" : false,
+        "tekst" : "Jada"
+     } ]
+""".trimIndent()
+
+val dialogTråder = """
+    "dialogTråder" : [ {
+        "overskrift" : "Penger",
+        "meldinger" : [ {
+          "avsender" : "BRUKER",
+          "sendt" : "05 februar 2024 kl. 02:29",
+          "lest" : true,
+          "viktig" : false,
+          "tekst" : "Jeg liker NAV. NAV er snille!"
+        } ],
+        "egenskaper" : [ ]
+    } ]
 """.trimIndent()
 
 suspend fun OutgoingContent.asString() = this.toByteArray().decodeToString()

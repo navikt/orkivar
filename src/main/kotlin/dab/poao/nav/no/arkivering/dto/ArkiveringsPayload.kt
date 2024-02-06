@@ -4,12 +4,13 @@ import dab.poao.nav.no.dokark.Fnr
 import dab.poao.nav.no.dokark.Navn
 import kotlinx.serialization.Serializable
 
-typealias AktivitetStatus = String
+typealias ArkivAktivitetStatus = String
 
 @Serializable
 data class ArkiveringsPayload(
     val metadata: ArkiveringsMetadata,
-    val aktiviteter: Map<AktivitetStatus, List<ArkivAktivitet>>
+    val aktiviteter: Map<ArkivAktivitetStatus, List<ArkivAktivitet>>,
+    val dialogTråder: List<DialogTråd>
 )
 
 @Serializable
@@ -24,6 +25,7 @@ data class ArkivAktivitet(
     val type: String,
     val status: String,
     val detaljer: List<Detalj>,
+    val meldinger: List<Melding>,
 //    val tags: List<Tag>
 )
 
@@ -40,6 +42,22 @@ data class Detalj(
     val stil: Stil,
     val tittel: String,
     val tekst: String?
+)
+
+@Serializable
+data class DialogTråd(
+    val overskrift: String,
+    val meldinger: List<Melding>,
+    val egenskaper: List<String>
+)
+
+@Serializable
+data class Melding(
+    val avsender: String,
+    val sendt: String,
+    val lest: Boolean,
+    val viktig: Boolean,
+    val tekst: String,
 )
 
 
