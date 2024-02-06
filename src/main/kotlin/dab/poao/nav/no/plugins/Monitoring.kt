@@ -21,7 +21,7 @@ fun Application.configureMonitoring() {
         level = Level.INFO
         filter { call ->
             val path = call.request.path()
-            path.startsWith("/") && !excludedPaths.contains(path)
+            !excludedPaths.contains(path)
         }
         callIdMdc("nav-call-id")
     }
