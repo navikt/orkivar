@@ -212,7 +212,8 @@ fun arkivAktivitet(status: String, meldinger: String = "[]") = """
           "tekst": "beskrivelse"
         }
       ],
-      "meldinger" : $meldinger
+      "meldinger" : $meldinger,
+      "etiketter": []
     }
 """.trimIndent()
 

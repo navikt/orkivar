@@ -26,7 +26,7 @@ data class ArkivAktivitet(
     val status: String,
     val detaljer: List<Detalj>,
     val meldinger: List<Melding>,
-//    val tags: List<Tag>
+    val etiketter: List<ArkivEtikett>
 )
 
 @Serializable
@@ -60,5 +60,17 @@ data class Melding(
     val tekst: String,
 )
 
+@Serializable
+data class ArkivEtikett(
+    val stil: ArkivEtikettStil,
+    val tekst: String
+)
 
-
+@Serializable
+enum class ArkivEtikettStil {
+    AVTALT, // Avtalt - hardkodet farge i frontend
+    // Disse kommer fra AKAAS
+    POSITIVE,
+    NEGATIVE,
+    NEUTRAL,
+}
