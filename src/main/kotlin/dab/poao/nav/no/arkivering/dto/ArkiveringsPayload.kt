@@ -10,7 +10,7 @@ typealias ArkivAktivitetStatus = String
 data class ArkiveringsPayload(
     val metadata: ArkiveringsMetadata,
     val aktiviteter: Map<ArkivAktivitetStatus, List<ArkivAktivitet>>,
-    val dialogTråder: List<DialogTråd>
+    val dialogtråder: List<ArkivDialogtråd>
 )
 
 @Serializable
@@ -45,7 +45,7 @@ data class Detalj(
 )
 
 @Serializable
-data class DialogTråd(
+data class ArkivDialogtråd(
     val overskrift: String,
     val meldinger: List<Melding>,
     val egenskaper: List<String>

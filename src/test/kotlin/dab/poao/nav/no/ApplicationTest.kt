@@ -83,7 +83,7 @@ class ApplicationTest : StringSpec({
                             $avbruttAktivitet
                         ]
                     },
-                    $dialogTråder
+                    $dialogtråder
                 }
             """.trimIndent()
             )
@@ -105,7 +105,7 @@ class ApplicationTest : StringSpec({
                             $avbruttAktivitet
                         ]
                     },
-                    $dialogTråder
+                    $dialogtråder
                 }
                """.trimMargin()
         }
@@ -232,8 +232,8 @@ val meldingerArray = """
      } ]
 """.trimIndent()
 
-val dialogTråder = """
-    "dialogTråder" : [ {
+val dialogtråder = """
+    "dialogtråder" : [ {
         "overskrift" : "Penger",
         "meldinger" : [ {
           "avsender" : "BRUKER",
