@@ -81,7 +81,7 @@ fun Route.arkiveringRoutes(
 
         val pdfResult = pdfgenClient.generatePdf(payload = PdfgenPayload(navn, fnr, tidspunkt.toString(), arkiveringsPayload.aktiviteter, arkiveringsPayload.dialogtråder))
         when (pdfResult) {
-            is PdfSuccess -> call.respond(ForhaandsvisningOutbound(UUID.randomUUID(), pdfResult.pdfByteString))
+            is PdfSuccess -> call.respond(ForhaandsvisningOutbound(UUID.randomUUID().toString(), pdfResult.pdfByteString))
             is FailedPdfGen -> DokarkFail(pdfResult.message)
         }
     }

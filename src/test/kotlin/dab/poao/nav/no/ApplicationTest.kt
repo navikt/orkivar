@@ -1,17 +1,23 @@
 package dab.poao.nav.no
 
 
+import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
 import dab.poao.nav.no.database.Repository
 import dab.poao.nav.no.plugins.configureHikariDataSource
 import io.kotest.assertions.json.shouldEqualJson
+import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.shouldBe
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.engine.mock.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.content.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.config.*
 import io.ktor.server.engine.*
 import io.ktor.server.testing.*
@@ -41,6 +47,9 @@ class ApplicationTest : StringSpec({
             application { module(mockEngine) }
         }
         client = testApp.createClient {
+            install(ContentNegotiation) {
+                json()
+            }
             install(WebSockets)
         }
     }
@@ -65,7 +74,7 @@ class ApplicationTest : StringSpec({
         val fnr = "01015450300"
         val forslagAktivitet = arkivAktivitet(status = "Forslag", meldinger = meldingerArray)
         val avbruttAktivitet = arkivAktivitet(status = "Avbrutt")
-        client.post("/arkiver") {
+        val response = client.post("/forhaandsvisning") {
             bearerAuth(token)
             contentType(ContentType.Application.Json)
             setBody(
@@ -87,28 +96,11 @@ class ApplicationTest : StringSpec({
                 }
             """.trimIndent()
             )
-        }.apply {
-            assertEquals(HttpStatusCode.OK, status)
-            val opprettet = repository.hentJournalposter(fnr).first().opprettetTidspunkt
-            mockEngine.requestHistory shouldHaveSize 2
-            mockEngine.requestHistory
-                .first { pdfURL.contains(it.url.host) }.body.asString() shouldEqualJson """
-                {
-                    "navn": "TRIVIELL SKILPADDE",
-                    "fnr": "$fnr",
-                    "journalfoeringstidspunkt":"${opprettet}",
-                    "aktiviteter": {
-                        "Planlagt": [
-                            $forslagAktivitet
-                        ],
-                        "Avbrutt": [
-                            $avbruttAktivitet
-                        ]
-                    },
-                    $dialogtråder
-                }
-               """.trimMargin()
         }
+        response.status shouldBe HttpStatusCode.OK
+        response.body<ForhaandsvisningOutbound>()
+        repository.hentJournalposter(fnr) shouldHaveSize 0
+        mockEngine.requestHistory.filter { pdfURL.contains(it.url.host) } shouldHaveSize 1
     }
 }) {
 
