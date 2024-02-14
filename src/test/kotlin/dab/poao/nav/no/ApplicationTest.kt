@@ -117,7 +117,7 @@ class ApplicationTest : StringSpec({
         val forslagAktivitet = arkivAktivitet(status = "Forslag", meldinger = meldingerArray)
         val avbruttAktivitet = arkivAktivitet(status = "Avbrutt")
 
-        val response = client.post("/arkivering") {
+        val response = client.post("/arkiver") {
             bearerAuth(token)
             contentType(ContentType.Application.Json)
             setBody(

@@ -76,10 +76,8 @@ fun Route.arkiveringRoutes(
         }
 
         val (fnr, navn) = arkiveringsPayload.metadata
-        val tidspunkt = LocalDateTime.now()
-        val navIdent = call.getClaim("NAVident") ?: throw RuntimeException("Klarte ikke å hente NAVident claim fra tokenet")
 
-        val pdfResult = pdfgenClient.generatePdf(payload = PdfgenPayload(navn, fnr, tidspunkt.toString(), arkiveringsPayload.aktiviteter, arkiveringsPayload.dialogtråder))
+        val pdfResult = pdfgenClient.generatePdf(payload = PdfgenPayload(navn, fnr, LocalDateTime.now().toString(), arkiveringsPayload.aktiviteter, arkiveringsPayload.dialogtråder))
         when (pdfResult) {
             is PdfSuccess -> call.respond(ForhaandsvisningOutbound(UUID.randomUUID().toString(), pdfResult.pdfByteString))
             is FailedPdfGen -> DokarkFail(pdfResult.message)
