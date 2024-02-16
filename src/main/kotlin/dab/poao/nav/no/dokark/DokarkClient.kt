@@ -4,7 +4,6 @@ import dab.poao.nav.no.azureAuth.logger
 import dab.poao.nav.no.pdfgenClient.PdfSuccess
 import io.ktor.client.*
 import io.ktor.client.engine.*
-import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
@@ -15,6 +14,7 @@ import io.ktor.server.config.*
 import no.nav.poao.dab.ktor_oauth_client.AzureClient
 import no.nav.poao.dab.ktor_oauth_client.IncomingToken
 import no.nav.poao.dab.ktor_oauth_client.OauthClientCredentialsConfig
+import java.time.LocalDateTime
 
 class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine) {
     val clientScope = config.property("dokark.client-scope").getString()
@@ -30,11 +30,11 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         }
     }
 
-    suspend fun opprettJournalpost(token: IncomingToken, pdfResult: PdfSuccess, navn: String, fnr: String): DokarkResult {
+    suspend fun opprettJournalpost(token: IncomingToken, pdfResult: PdfSuccess, navn: String, fnr: String, tidspunkt: LocalDateTime): DokarkResult {
         val res = runCatching {  client.post("$clientUrl/rest/journalpostapi/v1/journalpost") {
             header("authorization", "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}")
             contentType(ContentType.Application.Json)
-            setBody(dummyJournalpost(pdfResult.pdfByteString, navn, fnr))
+            setBody(lagJournalpost(pdfResult.pdfByteString, navn, fnr, tidspunkt))
         } }
             .onFailure { logger.error("Noe gikk galt", it) }
             .getOrElse { return DokarkFail("Kunne ikke poste til joark") }

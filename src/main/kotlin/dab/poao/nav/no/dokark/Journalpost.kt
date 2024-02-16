@@ -1,6 +1,59 @@
 package dab.poao.nav.no.dokark
 
 import kotlinx.serialization.Serializable
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
+import java.util.*
+
+
+typealias Fnr = String
+typealias Navn = String
+
+fun lagJournalpost(fysiskPdf: ByteArray, navn: Navn, fnr: Fnr, datoDokument: LocalDateTime) =
+    Journalpost(
+        avsenderMottaker = AvsenderMottaker(
+            id = fnr,
+            navn = navn,
+            idType = "FNR"
+        ),
+        tema = "OPP",
+        behandlingstema = "ab0001",
+        bruker = Bruker(
+            fnr,
+            "FNR"
+        ),
+        datoDokument = datoDokument.toString(),
+        datoMottatt = datoDokument.toString(),
+        dokumenter = listOf(
+            Dokument(
+                brevkode = "NAV 04-01.04",
+                tittel = "Aktivitetsplan og dialog 20.01.2023-01.01.2024",
+                dokumentvarianter = listOf(
+                    Dokumentvariant(
+                        "PDFA",
+                        fysiskPdf,
+                        "ARKIV"
+                    )
+                )
+            )
+        ),
+        eksternReferanseId = UUID.randomUUID().toString(),
+        journalfoerendeEnhet = "0701",
+        journalposttype = "INNGAAENDE",
+        kanal = "NAV_NO",
+        sak = Sak(
+            fagsakId = "10695768",
+            fagsaksystem = "AO01",
+            sakstype = "FAGSAK"
+        ),
+        tilleggsopplysninger = listOf(
+            Tilleggsopplysninger(
+                nokkel = "orkivar",
+                verdi = "12345"
+            )
+        ),
+        tittel = "Søknad om dagpenger ved permittering"
+    )
 
 @Serializable
 data class Journalpost(

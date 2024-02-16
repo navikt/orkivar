@@ -5,7 +5,6 @@ import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
 import dab.poao.nav.no.database.Repository
 import dab.poao.nav.no.plugins.configureHikariDataSource
 import io.kotest.assertions.json.shouldEqualJson
-import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -26,7 +25,6 @@ import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import java.util.*
 import javax.sql.DataSource
-import kotlin.test.assertEquals
 
 class ApplicationTest : StringSpec({
     lateinit var testApp: TestApplication
@@ -145,9 +143,9 @@ class ApplicationTest : StringSpec({
         repository.hentJournalposter(fnr) shouldHaveSize 1
 
         val opprettet = repository.hentJournalposter(fnr).first().opprettetTidspunkt
-        mockEngine.requestHistory.filter { pdfURL.contains(it.url.host) } shouldHaveSize 1
-        mockEngine.requestHistory
-            .first { pdfURL.contains(it.url.host) }.body.asString() shouldEqualJson """
+        val requestsTilPdfgen = mockEngine.requestHistory.filter { pdfURL.contains(it.url.host) }
+        requestsTilPdfgen shouldHaveSize 1
+        requestsTilPdfgen.first().body.asString() shouldEqualJson """
                 {
                     "navn": "TRIVIELL SKILPADDE",
                     "fnr": "$fnr",
@@ -163,8 +161,8 @@ class ApplicationTest : StringSpec({
                     $dialogtråder
                 }
                """.trimMargin()
-
-        mockEngine.requestHistory.filter { joarkUrl.contains(it.url.host) } shouldHaveSize 1
+        val requestsTilJoark = mockEngine.requestHistory.filter { joarkUrl.contains(it.url.host) }
+        requestsTilJoark shouldHaveSize 1
     }
 }) {
 

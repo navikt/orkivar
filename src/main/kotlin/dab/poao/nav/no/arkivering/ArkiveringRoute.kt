@@ -52,7 +52,7 @@ fun Route.arkiveringRoutes(
         val dokarkResult = runCatching {
             val pdfResult = pdfgenClient.generatePdf(payload = PdfgenPayload(navn, fnr, tidspunkt.toString(), arkiveringsPayload.aktiviteter, arkiveringsPayload.dialogtråder))
             when (pdfResult) {
-                is PdfSuccess -> dokarkClient.opprettJournalpost(token, pdfResult, navn, fnr)
+                is PdfSuccess -> dokarkClient.opprettJournalpost(token, pdfResult, navn, fnr, tidspunkt)
                 is FailedPdfGen -> DokarkFail(pdfResult.message)
             }
         }
