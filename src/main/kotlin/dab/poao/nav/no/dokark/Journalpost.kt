@@ -1,16 +1,16 @@
 package dab.poao.nav.no.dokark
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.time.LocalDateTime
-import java.time.ZonedDateTime
-import java.util.*
 
 
 typealias Fnr = String
 typealias Navn = String
 
-fun lagJournalpost(fysiskPdf: ByteArray, navn: Navn, fnr: Fnr, datoDokument: LocalDateTime) =
-    Journalpost(
+fun lagJournalpost(fysiskPdf: ByteArray, navn: Navn, fnr: Fnr, datoDokument: LocalDateTime, eksternReferanseId: String): String =
+    Json.encodeToString(Journalpost(
         avsenderMottaker = AvsenderMottaker(
             id = fnr,
             navn = navn,
@@ -37,7 +37,7 @@ fun lagJournalpost(fysiskPdf: ByteArray, navn: Navn, fnr: Fnr, datoDokument: Loc
                 )
             )
         ),
-        eksternReferanseId = UUID.randomUUID().toString(),
+        eksternReferanseId = eksternReferanseId,
         journalfoerendeEnhet = "0701",
         journalposttype = "INNGAAENDE",
         kanal = "NAV_NO",
@@ -53,7 +53,7 @@ fun lagJournalpost(fysiskPdf: ByteArray, navn: Navn, fnr: Fnr, datoDokument: Loc
             )
         ),
         tittel = "Søknad om dagpenger ved permittering"
-    )
+    ))
 
 @Serializable
 data class Journalpost(

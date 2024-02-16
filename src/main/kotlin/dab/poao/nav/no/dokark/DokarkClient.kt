@@ -34,7 +34,7 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         val res = runCatching {  client.post("$clientUrl/rest/journalpostapi/v1/journalpost") {
             header("authorization", "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}")
             contentType(ContentType.Application.Json)
-            setBody(lagJournalpost(pdfResult.pdfByteString, navn, fnr, tidspunkt))
+            setBody(lagJournalpost(pdfResult.pdfByteString, navn, fnr, tidspunkt, eksternReferanseId = "dummy"))
         } }
             .onFailure { logger.error("Noe gikk galt", it) }
             .getOrElse { return DokarkFail("Kunne ikke poste til joark") }
