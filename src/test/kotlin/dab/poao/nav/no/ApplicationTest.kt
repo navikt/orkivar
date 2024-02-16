@@ -163,6 +163,8 @@ class ApplicationTest : StringSpec({
                """.trimMargin()
         val requestsTilJoark = mockEngine.requestHistory.filter { joarkUrl.contains(it.url.host) }
         requestsTilJoark shouldHaveSize 1
+
+        // TODO: Hent ut JSON og sjekk at vi kan mappe til Journalpost
     }
 }) {
 
