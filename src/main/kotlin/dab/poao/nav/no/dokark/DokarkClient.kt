@@ -15,6 +15,7 @@ import no.nav.poao.dab.ktor_oauth_client.AzureClient
 import no.nav.poao.dab.ktor_oauth_client.IncomingToken
 import no.nav.poao.dab.ktor_oauth_client.OauthClientCredentialsConfig
 import java.time.LocalDateTime
+import java.util.*
 
 class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine) {
     val clientScope = config.property("dokark.client-scope").getString()
@@ -34,7 +35,7 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         val res = runCatching {  client.post("$clientUrl/rest/journalpostapi/v1/journalpost") {
             header("authorization", "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}")
             contentType(ContentType.Application.Json)
-            setBody(lagJournalpost(pdfResult.pdfByteString, navn, fnr, tidspunkt, eksternReferanseId = "dummy"))
+            setBody(lagJournalpost(pdfResult.pdfByteString, navn, fnr, tidspunkt, eksternReferanseId = UUID.randomUUID().toString()))
         } }
             .onFailure { logger.error("Noe gikk galt", it) }
             .getOrElse { return DokarkFail("Kunne ikke poste til joark") }
