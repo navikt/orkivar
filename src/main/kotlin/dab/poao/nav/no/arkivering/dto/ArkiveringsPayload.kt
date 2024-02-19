@@ -17,6 +17,8 @@ data class ArkiveringsPayload(
 data class ArkiveringsMetadata (
     val fnr: Fnr,
     val navn: Navn,
+    val oppfølgingsperiodeStart: String,
+    val oppfølgingsperiodeSlutt: String?
 )
 
 @Serializable

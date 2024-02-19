@@ -20,7 +20,6 @@ import io.ktor.server.routing.*
 import no.nav.security.token.support.v2.TokenValidationContextPrincipal
 import java.lang.IllegalArgumentException
 import java.time.LocalDateTime
-import java.util.*
 
 
 fun Route.arkiveringRoutes(
@@ -41,16 +40,27 @@ fun Route.arkiveringRoutes(
 
         val arkiveringsPayload = try {
             call.receive<ArkiveringsPayload>()
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             logger.error("Feil ved deserialisering", e)
             throw e
         }
         val (fnr, navn) = arkiveringsPayload.metadata
         val tidspunkt = LocalDateTime.now()
-        val navIdent = call.getClaim("NAVident") ?: throw RuntimeException("Klarte ikke å hente NAVident claim fra tokenet")
+        val navIdent =
+            call.getClaim("NAVident") ?: throw RuntimeException("Klarte ikke å hente NAVident claim fra tokenet")
 
         val dokarkResult = runCatching {
-            val pdfResult = pdfgenClient.generatePdf(payload = PdfgenPayload(navn, fnr, tidspunkt.toString(), arkiveringsPayload.aktiviteter, arkiveringsPayload.dialogtråder))
+            val pdfResult = pdfgenClient.generatePdf(
+                payload = PdfgenPayload(
+                    navn,
+                    fnr,
+                    arkiveringsPayload.metadata.oppfølgingsperiodeStart,
+                    arkiveringsPayload.metadata.oppfølgingsperiodeSlutt,
+                    tidspunkt.toString(),
+                    arkiveringsPayload.aktiviteter,
+                    arkiveringsPayload.dialogtråder
+                )
+            )
             when (pdfResult) {
                 is PdfSuccess -> dokarkClient.opprettJournalpost(token, pdfResult, navn, fnr, tidspunkt)
                 is FailedPdfGen -> DokarkFail(pdfResult.message)
@@ -70,14 +80,24 @@ fun Route.arkiveringRoutes(
     post("/forhaandsvisning") {
         val arkiveringsPayload = try {
             call.receive<ArkiveringsPayload>()
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             logger.error("Feil ved deserialisering", e)
             throw e
         }
 
         val (fnr, navn) = arkiveringsPayload.metadata
 
-        val pdfResult = pdfgenClient.generatePdf(payload = PdfgenPayload(navn, fnr, LocalDateTime.now().toString(), arkiveringsPayload.aktiviteter, arkiveringsPayload.dialogtråder))
+        val pdfResult = pdfgenClient.generatePdf(
+            payload = PdfgenPayload(
+                navn,
+                fnr,
+                arkiveringsPayload.metadata.oppfølgingsperiodeStart,
+                arkiveringsPayload.metadata.oppfølgingsperiodeSlutt,
+                LocalDateTime.now().toString(),
+                arkiveringsPayload.aktiviteter,
+                arkiveringsPayload.dialogtråder
+            )
+        )
         when (pdfResult) {
             is PdfSuccess -> call.respond(ForhaandsvisningOutbound(pdfResult.pdfByteString))
             is FailedPdfGen -> DokarkFail(pdfResult.message)

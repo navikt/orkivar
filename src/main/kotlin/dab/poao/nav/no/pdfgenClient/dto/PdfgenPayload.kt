@@ -9,6 +9,8 @@ import kotlinx.serialization.Serializable
 data class PdfgenPayload(
     val navn: String,
     val fnr: String,
+    val oppfølgingsperiodeStart: String,
+    val oppfølgingsperiodeSlutt: String?,
     val journalfoeringstidspunkt: String,
     val aktiviteter: Map<ArkivAktivitetStatus, List<ArkivAktivitet>>,
     val dialogtråder: List<ArkivDialogtråd>
