@@ -18,7 +18,8 @@ data class ArkiveringsMetadata (
     val fnr: Fnr,
     val navn: Navn,
     val oppfølgingsperiodeStart: String,
-    val oppfølgingsperiodeSlutt: String?
+    val oppfølgingsperiodeSlutt: String?,
+    val sakId: Long,
 )
 
 @Serializable

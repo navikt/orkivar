@@ -14,8 +14,9 @@ class JournalpostTest: StringSpec({
         val fnr = "10022884722"
         val tidspunkt = LocalDateTime.now()
         val eksternReferanseId = UUID.randomUUID().toString()
+        val sakId = 2000L
 
-        val json = lagJournalpost(byteArray, navn, fnr, tidspunkt, eksternReferanseId)
+        val json = lagJournalpost(byteArray, navn, fnr, tidspunkt, eksternReferanseId, sakId)
         json shouldEqualJson """
             {
               "avsenderMottaker": {
@@ -58,7 +59,7 @@ class JournalpostTest: StringSpec({
               "journalposttype": "INNGAAENDE",
               "kanal": "NAV_NO",
               "sak": {
-                "fagsakId": "10695768",
+                "fagsakId": "$sakId",
                 "fagsaksystem": "AO01",
                 "sakstype": "FAGSAK"
               },

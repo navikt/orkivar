@@ -178,7 +178,7 @@ class ApplicationTest : StringSpec({
         val requestsTilJoark = mockEngine.requestHistory.filter { joarkUrl.contains(it.url.host) }
         requestsTilJoark shouldHaveSize 1
         val bodyTilJoark = requestsTilJoark.first().body.asString()
-        bodyTilJoark.shouldContainJsonKeyValue("sak.fagsakId", sakId)
+        bodyTilJoark.shouldContainJsonKeyValue("sak.fagsakId", sakId.toString())
         bodyTilJoark.shouldContainJsonKeyValue("sak.fagsaksystem", "ARBEIDSOPPFØLGING")
     }
 }) {

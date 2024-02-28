@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 typealias Fnr = String
 typealias Navn = String
 
-fun lagJournalpost(fysiskPdf: ByteArray, navn: Navn, fnr: Fnr, datoDokument: LocalDateTime, eksternReferanseId: String): String =
+fun lagJournalpost(fysiskPdf: ByteArray, navn: Navn, fnr: Fnr, datoDokument: LocalDateTime, eksternReferanseId: String, sakId: Long): String =
     Json.encodeToString(Journalpost(
         avsenderMottaker = AvsenderMottaker(
             id = fnr,
@@ -42,8 +42,8 @@ fun lagJournalpost(fysiskPdf: ByteArray, navn: Navn, fnr: Fnr, datoDokument: Loc
         journalposttype = "INNGAAENDE",
         kanal = "NAV_NO",
         sak = Sak(
-            fagsakId = "10695768",
-            fagsaksystem = "AO01",
+            fagsakId = sakId.toString(),
+            fagsaksystem = "ARBEIDSOPPFØLGING",
             sakstype = "FAGSAK"
         ),
         tilleggsopplysninger = listOf(

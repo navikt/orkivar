@@ -44,7 +44,7 @@ fun Route.arkiveringRoutes(
             logger.error("Feil ved deserialisering", e)
             throw e
         }
-        val (fnr, navn) = arkiveringsPayload.metadata
+        val (fnr, navn, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt, sakId) = arkiveringsPayload.metadata
         val tidspunkt = LocalDateTime.now()
         val navIdent =
             call.getClaim("NAVident") ?: throw RuntimeException("Klarte ikke å hente NAVident claim fra tokenet")
@@ -54,15 +54,15 @@ fun Route.arkiveringRoutes(
                 payload = PdfgenPayload(
                     navn,
                     fnr,
-                    arkiveringsPayload.metadata.oppfølgingsperiodeStart,
-                    arkiveringsPayload.metadata.oppfølgingsperiodeSlutt,
+                    oppfølgingsperiodeStart,
+                    oppfølgingsperiodeSlutt,
                     tidspunkt.toString(),
                     arkiveringsPayload.aktiviteter,
                     arkiveringsPayload.dialogtråder
                 )
             )
             when (pdfResult) {
-                is PdfSuccess -> dokarkClient.opprettJournalpost(token, pdfResult, navn, fnr, tidspunkt)
+                is PdfSuccess -> dokarkClient.opprettJournalpost(token, pdfResult, navn, fnr, tidspunkt, sakId)
                 is FailedPdfGen -> DokarkFail(pdfResult.message)
             }
         }
