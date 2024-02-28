@@ -43,7 +43,7 @@ fun lagJournalpost(fysiskPdf: ByteArray, navn: Navn, fnr: Fnr, datoDokument: Loc
         kanal = "NAV_NO",
         sak = Sak(
             fagsakId = sakId.toString(),
-            fagsaksystem = "ARBEIDSOPPFØLGING",
+            fagsaksystem = "AO01",
             sakstype = "FAGSAK"
         ),
         tilleggsopplysninger = listOf(
