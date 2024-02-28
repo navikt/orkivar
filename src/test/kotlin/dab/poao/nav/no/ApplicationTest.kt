@@ -4,6 +4,7 @@ package dab.poao.nav.no
 import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
 import dab.poao.nav.no.database.Repository
 import dab.poao.nav.no.plugins.configureHikariDataSource
+import io.kotest.assertions.json.shouldContainJsonKeyValue
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
@@ -85,7 +86,8 @@ class ApplicationTest : StringSpec({
                         "navn": "TRIVIELL SKILPADDE",
                         "fnr": "$fnr",
                         "oppfølgingsperiodeStart": "19 oktober 2021",
-                        "oppfølgingsperiodeSlutt": null
+                        "oppfølgingsperiodeSlutt": null,
+                        "sakId": 1000
                     },
                     "aktiviteter": {
                         "Planlagt": [
@@ -119,6 +121,7 @@ class ApplicationTest : StringSpec({
         val fnr = "01015450300"
         val forslagAktivitet = arkivAktivitet(status = "Forslag", meldinger = meldingerArray)
         val avbruttAktivitet = arkivAktivitet(status = "Avbrutt")
+        val sakId = 1000
 
         val response = client.post("/arkiver") {
             bearerAuth(token)
@@ -130,7 +133,8 @@ class ApplicationTest : StringSpec({
                         "navn": "TRIVIELL SKILPADDE",
                         "fnr": "$fnr",
                         "oppfølgingsperiodeStart": "19 oktober 2021",
-                        "oppfølgingsperiodeSlutt": null
+                        "oppfølgingsperiodeSlutt": null,
+                        "sakId": $sakId
                     },
                     "aktiviteter": {
                         "Planlagt": [
@@ -170,8 +174,12 @@ class ApplicationTest : StringSpec({
                     $dialogtråder
                 }
                """.trimMargin()
+
         val requestsTilJoark = mockEngine.requestHistory.filter { joarkUrl.contains(it.url.host) }
         requestsTilJoark shouldHaveSize 1
+        val bodyTilJoark = requestsTilJoark.first().body.asString()
+        bodyTilJoark.shouldContainJsonKeyValue("sak.fagsakId", sakId)
+        bodyTilJoark.shouldContainJsonKeyValue("sak.fagsaksystem", "ARBEIDSOPPFØLGING")
     }
 }) {
 
