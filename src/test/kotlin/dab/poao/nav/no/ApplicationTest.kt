@@ -153,7 +153,7 @@ class ApplicationTest : StringSpec({
 
         val journalposterIDatabasen = repository.hentJournalposter(fnr)
         journalposterIDatabasen shouldHaveSize 1
-        val journalpostUuid = journalposterIDatabasen.first().uuid
+        val journalpostUuid = journalposterIDatabasen.first().referanse
 
         val opprettet = repository.hentJournalposter(fnr).first().opprettetTidspunkt
         val requestsTilPdfgen = mockEngine.requestHistory.filter { pdfgenUrl.contains(it.url.host) }

@@ -1,0 +1,1 @@
+alter table journalfoeringer rename column uuid to referanse;
