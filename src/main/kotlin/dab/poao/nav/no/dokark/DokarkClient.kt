@@ -1,7 +1,6 @@
 package dab.poao.nav.no.dokark
 
 import dab.poao.nav.no.azureAuth.logger
-import dab.poao.nav.no.pdfgenClient.PdfSuccess
 import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -31,11 +30,11 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         }
     }
 
-    suspend fun opprettJournalpost(token: IncomingToken, pdfResult: PdfSuccess, navn: String, fnr: String, tidspunkt: LocalDateTime, sakId: Long, eksternReferanse: UUID): DokarkResult {
+    suspend fun opprettJournalpost(token: IncomingToken, journalpostData: JournalpostData): DokarkResult {
         val res = runCatching {  client.post("$clientUrl/rest/journalpostapi/v1/journalpost") {
             header("authorization", "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}")
             contentType(ContentType.Application.Json)
-            setBody(lagJournalpost(pdfResult.pdfByteString, navn, fnr, tidspunkt, eksternReferanse, sakId))
+            setBody(lagJournalpost(journalpostData))
         } }
             .onFailure { logger.error("Noe gikk galt", it) }
             .getOrElse { return DokarkFail("Kunne ikke poste til joark") }
@@ -57,6 +56,17 @@ fun ApplicationConfig.toOauthConfig(): OauthClientCredentialsConfig {
         tokenEndpoint = tokenEndpoint
     )
 }
+
+data class JournalpostData(
+    val pdf: ByteArray,
+    val navn: String,
+    val fnr: String,
+    val tidspunkt: LocalDateTime,
+    val sakId: Long,
+    val eksternReferanse: UUID,
+    val oppfølgingsperiodeStart: String,
+    val oppfølgingsperiodeSlutt: String?
+)
 
 sealed interface DokarkResult
 data object DokarkSuccess: DokarkResult

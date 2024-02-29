@@ -3,47 +3,46 @@ package dab.poao.nav.no.dokark
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.time.LocalDateTime
 import java.util.*
 
 
 typealias Fnr = String
 typealias Navn = String
 
-fun lagJournalpost(fysiskPdf: ByteArray, navn: Navn, fnr: Fnr, datoDokument: LocalDateTime, eksternReferanseId: UUID, sakId: Long): String =
+fun lagJournalpost(journalpostData: JournalpostData): String =
     Json.encodeToString(Journalpost(
         avsenderMottaker = AvsenderMottaker(
-            id = fnr,
-            navn = navn,
+            id = journalpostData.fnr,
+            navn = journalpostData.navn,
             idType = "FNR"
         ),
         tema = "OPP",
         behandlingstema = "ab0001",
         bruker = Bruker(
-            fnr,
+            journalpostData.fnr,
             "FNR"
         ),
-        datoDokument = datoDokument.toString(),
-        datoMottatt = datoDokument.toString(),
+        datoDokument = journalpostData.tidspunkt.toString(),
+        datoMottatt = journalpostData.tidspunkt.toString(),
         dokumenter = listOf(
             Dokument(
                 brevkode = "NAV 04-01.04",
-                tittel = "Aktivitetsplan og dialog 20.01.2023-01.01.2024",
+                tittel = "Aktivitetsplan og dialog ${journalpostData.oppfølgingsperiodeStart} - ${journalpostData.oppfølgingsperiodeSlutt?.let { it }?: ""}",
                 dokumentvarianter = listOf(
                     Dokumentvariant(
                         "PDFA",
-                        fysiskPdf,
+                        journalpostData.pdf,
                         "ARKIV"
                     )
                 )
             )
         ),
-        eksternReferanseId = eksternReferanseId.toString(),
+        eksternReferanseId = journalpostData.eksternReferanse.toString(),
         journalfoerendeEnhet = "0701",
         journalposttype = "INNGAAENDE",
         kanal = "NAV_NO",
         sak = Sak(
-            fagsakId = sakId.toString(),
+            fagsakId = journalpostData.sakId.toString(),
             fagsaksystem = "AO01",
             sakstype = "FAGSAK"
         ),

@@ -3,10 +3,7 @@ package dab.poao.nav.no.arkivering
 import dab.poao.nav.no.arkivering.dto.ArkiveringsPayload
 import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
 import dab.poao.nav.no.azureAuth.logger
-import dab.poao.nav.no.dokark.DokarkClient
-import dab.poao.nav.no.dokark.DokarkFail
-import dab.poao.nav.no.dokark.DokarkSuccess
-import dab.poao.nav.no.dokark.Fnr
+import dab.poao.nav.no.dokark.*
 import dab.poao.nav.no.pdfgenClient.FailedPdfGen
 import dab.poao.nav.no.pdfgenClient.PdfSuccess
 import dab.poao.nav.no.pdfgenClient.PdfgenClient
@@ -35,7 +32,7 @@ fun Route.arkiveringRoutes(
 
         val tidspunkt = LocalDateTime.now()
         val pdfGenPayload = lagPdfgenPayload(arkiveringsPayload, tidspunkt)
-        val uuid = UUID.randomUUID()
+        val referanse = UUID.randomUUID()
         val (fnr, navn, sakId) = arkiveringsPayload.metadata
 
         val dokarkResult = runCatching {
@@ -43,7 +40,7 @@ fun Route.arkiveringRoutes(
                 payload = pdfGenPayload
             )
             when (pdfResult) {
-                is PdfSuccess -> dokarkClient.opprettJournalpost(token, pdfResult, navn, fnr, tidspunkt, sakId, uuid)
+                is PdfSuccess -> dokarkClient.opprettJournalpost(token, lagJournalpostData(pdfResult.pdfByteString, arkiveringsPayload, referanse, tidspunkt))
                 is FailedPdfGen -> DokarkFail(pdfResult.message)
             }
         }
@@ -53,7 +50,7 @@ fun Route.arkiveringRoutes(
         when (dokarkResult) {
             is DokarkFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)
             is DokarkSuccess -> {
-                lagreJournalfoering(navIdent, fnr, tidspunkt, uuid)
+                lagreJournalfoering(navIdent, fnr, tidspunkt, referanse)
                 call.respond("OK")
             }
         }
@@ -104,5 +101,20 @@ private fun lagPdfgenPayload(arkiveringsPayload: ArkiveringsPayload, tidspunkt: 
         aktiviteter = arkiveringsPayload.aktiviteter,
         dialogtråder = arkiveringsPayload.dialogtråder,
         journalfoeringstidspunkt = tidspunkt.toString()
+    )
+}
+
+private fun lagJournalpostData(pdf: ByteArray, arkiveringsPayload: ArkiveringsPayload, referanse: UUID, tidspunkt: LocalDateTime): JournalpostData {
+    val (fnr, navn, sakId, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt) = arkiveringsPayload.metadata
+
+    return JournalpostData(
+        pdf = pdf,
+        navn = navn,
+        fnr = fnr,
+        tidspunkt = tidspunkt,
+        sakId = sakId,
+        eksternReferanse = referanse,
+        oppfølgingsperiodeStart = oppfølgingsperiodeStart,
+        oppfølgingsperiodeSlutt = oppfølgingsperiodeSlutt
     )
 }

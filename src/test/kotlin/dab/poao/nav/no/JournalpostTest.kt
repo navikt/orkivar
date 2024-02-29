@@ -1,5 +1,6 @@
 package dab.poao.nav.no
 
+import dab.poao.nav.no.dokark.JournalpostData
 import dab.poao.nav.no.dokark.lagJournalpost
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.StringSpec
@@ -15,8 +16,10 @@ class JournalpostTest: StringSpec({
         val tidspunkt = LocalDateTime.now()
         val eksternReferanseId = UUID.randomUUID()
         val sakId = 2000L
+        val oppfølgingsperiodeStart = "10. juni 2023"
+        val oppfølgingsperiodeSlutt = null
 
-        val json = lagJournalpost(byteArray, navn, fnr, tidspunkt, eksternReferanseId, sakId)
+        val json = lagJournalpost(JournalpostData(byteArray, navn, fnr, tidspunkt, sakId, eksternReferanseId, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt))
         json shouldEqualJson """
             {
               "avsenderMottaker": {
@@ -51,7 +54,7 @@ class JournalpostTest: StringSpec({
                       "variantformat": "ARKIV"
                     }
                   ],
-                  "tittel": "Aktivitetsplan og dialog 20.01.2023-01.01.2024"
+                  "tittel": "Aktivitetsplan og dialog $oppfølgingsperiodeStart - "
                 }
               ],
               "eksternReferanseId": "$eksternReferanseId",
