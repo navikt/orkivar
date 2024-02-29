@@ -31,11 +31,11 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         }
     }
 
-    suspend fun opprettJournalpost(token: IncomingToken, pdfResult: PdfSuccess, navn: String, fnr: String, tidspunkt: LocalDateTime, sakId: Long): DokarkResult {
+    suspend fun opprettJournalpost(token: IncomingToken, pdfResult: PdfSuccess, navn: String, fnr: String, tidspunkt: LocalDateTime, sakId: Long, eksternReferanse: UUID): DokarkResult {
         val res = runCatching {  client.post("$clientUrl/rest/journalpostapi/v1/journalpost") {
             header("authorization", "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}")
             contentType(ContentType.Application.Json)
-            setBody(lagJournalpost(pdfResult.pdfByteString, navn, fnr, tidspunkt, eksternReferanseId = UUID.randomUUID().toString(), sakId))
+            setBody(lagJournalpost(pdfResult.pdfByteString, navn, fnr, tidspunkt, eksternReferanse, sakId))
         } }
             .onFailure { logger.error("Noe gikk galt", it) }
             .getOrElse { return DokarkFail("Kunne ikke poste til joark") }

@@ -4,12 +4,13 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.time.LocalDateTime
+import java.util.*
 
 
 typealias Fnr = String
 typealias Navn = String
 
-fun lagJournalpost(fysiskPdf: ByteArray, navn: Navn, fnr: Fnr, datoDokument: LocalDateTime, eksternReferanseId: String, sakId: Long): String =
+fun lagJournalpost(fysiskPdf: ByteArray, navn: Navn, fnr: Fnr, datoDokument: LocalDateTime, eksternReferanseId: UUID, sakId: Long): String =
     Json.encodeToString(Journalpost(
         avsenderMottaker = AvsenderMottaker(
             id = fnr,
@@ -37,7 +38,7 @@ fun lagJournalpost(fysiskPdf: ByteArray, navn: Navn, fnr: Fnr, datoDokument: Loc
                 )
             )
         ),
-        eksternReferanseId = eksternReferanseId,
+        eksternReferanseId = eksternReferanseId.toString(),
         journalfoerendeEnhet = "0701",
         journalposttype = "INNGAAENDE",
         kanal = "NAV_NO",

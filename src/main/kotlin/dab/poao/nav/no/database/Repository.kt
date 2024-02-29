@@ -10,6 +10,7 @@ import kotlinx.datetime.LocalDateTime as KotlinxLocalDateTime
 import java.time.LocalDateTime
 import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.util.UUID
 import javax.sql.DataSource
 
 class Repository(dataSource: DataSource) {
@@ -22,6 +23,7 @@ class Repository(dataSource: DataSource) {
         val navIdent = varchar("navident", 7)
         val fnr = varchar("foedselsnummer", 11)
         val opprettetTidspunkt = datetime("opprettet_tidspunkt")
+        val uuid = uuid("uuid")
     }
 
     class Journalfoering(id: EntityID<Int>) : IntEntity(id) {
@@ -29,14 +31,16 @@ class Repository(dataSource: DataSource) {
         val opprettetTidspunkt by Journalfoeringer.opprettetTidspunkt
         val fnr by Journalfoeringer.fnr
         val navIdent by Journalfoeringer.navIdent
+        val uuid by Journalfoeringer.uuid
     }
 
-    suspend fun lagreJournalfoering(navIdent: String, fnr: Fnr, opprettetTidspunkt: LocalDateTime) {
+    suspend fun lagreJournalfoering(navIdent: String, fnr: Fnr, opprettetTidspunkt: LocalDateTime, uuid: UUID) {
         transaction {
             Journalfoeringer.insert {
                 it[Journalfoeringer.navIdent] = navIdent
                 it[Journalfoeringer.fnr] = fnr
                 it[Journalfoeringer.opprettetTidspunkt] = KotlinxLocalDateTime.parse(opprettetTidspunkt.toString())
+                it[Journalfoeringer.uuid] = uuid
             }
         }
     }

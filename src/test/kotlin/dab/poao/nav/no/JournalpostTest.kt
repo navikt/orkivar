@@ -13,7 +13,7 @@ class JournalpostTest: StringSpec({
         val navn = "Per Persen"
         val fnr = "10022884722"
         val tidspunkt = LocalDateTime.now()
-        val eksternReferanseId = UUID.randomUUID().toString()
+        val eksternReferanseId = UUID.randomUUID()
         val sakId = 2000L
 
         val json = lagJournalpost(byteArray, navn, fnr, tidspunkt, eksternReferanseId, sakId)

@@ -108,7 +108,7 @@ class ApplicationTest : StringSpec({
         mockEngine.requestHistory.filter { pdfgenUrl.contains(it.url.host) } shouldHaveSize 1
     }
 
-    "Journalføring skal generere PDF og sende til Joark" {
+    "Journalføring skal generere PDF, sende til Joark og lagre referanse til journalføringen i egen database" {
         val repository by lazy { Repository(dataSource) }
 
         val token = mockOAuth2Server.issueToken(
@@ -151,7 +151,9 @@ class ApplicationTest : StringSpec({
         }
         response.status shouldBe HttpStatusCode.OK
 
-        repository.hentJournalposter(fnr) shouldHaveSize 1
+        val journalposterIDatabasen = repository.hentJournalposter(fnr)
+        journalposterIDatabasen shouldHaveSize 1
+        val journalpostUuid = journalposterIDatabasen.first().uuid
 
         val opprettet = repository.hentJournalposter(fnr).first().opprettetTidspunkt
         val requestsTilPdfgen = mockEngine.requestHistory.filter { pdfgenUrl.contains(it.url.host) }
@@ -179,10 +181,9 @@ class ApplicationTest : StringSpec({
         requestsTilJoark shouldHaveSize 1
         val bodyTilJoark = requestsTilJoark.first().body.asString()
         bodyTilJoark.shouldContainJsonKeyValue("sak.fagsakId", sakId.toString())
-//        bodyTilJoark.shouldContainJsonKeyValue("sak.fagsaksystem", "ARBEIDSOPPFØLGING")
+        bodyTilJoark.shouldContainJsonKeyValue("eksternReferanseId", journalpostUuid.toString())
     }
 }) {
-
     companion object {
         private fun ApplicationEngineEnvironmentBuilder.doConfig(
             mockOAuth2Server: MockOAuth2Server,
