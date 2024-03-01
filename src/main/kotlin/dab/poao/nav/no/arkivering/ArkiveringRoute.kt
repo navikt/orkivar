@@ -33,7 +33,6 @@ fun Route.arkiveringRoutes(
         val tidspunkt = LocalDateTime.now()
         val pdfGenPayload = lagPdfgenPayload(arkiveringsPayload, tidspunkt)
         val referanse = UUID.randomUUID()
-        val (fnr, navn, sakId) = arkiveringsPayload.metadata
 
         val dokarkResult = runCatching {
             val pdfResult = pdfgenClient.generatePdf(
@@ -50,7 +49,7 @@ fun Route.arkiveringRoutes(
         when (dokarkResult) {
             is DokarkFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)
             is DokarkSuccess -> {
-                lagreJournalfoering(navIdent, fnr, tidspunkt, referanse)
+                lagreJournalfoering(navIdent, arkiveringsPayload.metadata.fnr, tidspunkt, referanse)
                 call.respond("OK")
             }
         }
