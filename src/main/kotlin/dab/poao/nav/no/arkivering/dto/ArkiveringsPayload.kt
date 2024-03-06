@@ -18,6 +18,7 @@ data class ArkiveringsMetadata (
     val fnr: Fnr,
     val navn: Navn,
     val sakId: Long,
+    val fagsaksystem: String,
     val oppfølgingsperiodeStart: String,
     val oppfølgingsperiodeSlutt: String?,
 )

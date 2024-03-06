@@ -43,7 +43,7 @@ fun lagJournalpost(journalpostData: JournalpostData): String =
         kanal = "NAV_NO",
         sak = Sak(
             fagsakId = journalpostData.sakId.toString(),
-            fagsaksystem = "AO01",
+            fagsaksystem = journalpostData.fagsaksystem,
             sakstype = "FAGSAK"
         ),
         tilleggsopplysninger = listOf(
