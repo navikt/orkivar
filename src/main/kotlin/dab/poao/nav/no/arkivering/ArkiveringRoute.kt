@@ -90,7 +90,7 @@ private suspend fun ApplicationCall.arkiveringspayload(): ArkiveringsPayload {
 }
 
 private fun lagPdfgenPayload(arkiveringsPayload: ArkiveringsPayload, tidspunkt: LocalDateTime): PdfgenPayload {
-    val (fnr, navn, sakId, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt) = arkiveringsPayload.metadata
+    val (fnr, navn, _, _, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt) = arkiveringsPayload.metadata
 
     return PdfgenPayload(
         navn = navn,
@@ -104,7 +104,7 @@ private fun lagPdfgenPayload(arkiveringsPayload: ArkiveringsPayload, tidspunkt: 
 }
 
 private fun lagJournalpostData(pdf: ByteArray, arkiveringsPayload: ArkiveringsPayload, referanse: UUID, tidspunkt: LocalDateTime): JournalpostData {
-    val (fnr, navn, sakId, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt) = arkiveringsPayload.metadata
+    val (fnr, navn, sakId, fagsaksystem, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt) = arkiveringsPayload.metadata
 
     return JournalpostData(
         pdf = pdf,
@@ -112,6 +112,7 @@ private fun lagJournalpostData(pdf: ByteArray, arkiveringsPayload: ArkiveringsPa
         fnr = fnr,
         tidspunkt = tidspunkt,
         sakId = sakId,
+        fagsaksystem = fagsaksystem,
         eksternReferanse = referanse,
         oppfølgingsperiodeStart = oppfølgingsperiodeStart,
         oppfølgingsperiodeSlutt = oppfølgingsperiodeSlutt

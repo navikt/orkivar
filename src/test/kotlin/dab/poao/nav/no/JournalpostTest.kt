@@ -16,10 +16,11 @@ class JournalpostTest: StringSpec({
         val tidspunkt = LocalDateTime.now()
         val eksternReferanseId = UUID.randomUUID()
         val sakId = 2000L
+        val fagsaksystem = "ARBEIDSOPPFOLGING"
         val oppfølgingsperiodeStart = "10. juni 2023"
         val oppfølgingsperiodeSlutt = null
 
-        val json = lagJournalpost(JournalpostData(byteArray, navn, fnr, tidspunkt, sakId, eksternReferanseId, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt))
+        val json = lagJournalpost(JournalpostData(byteArray, navn, fnr, tidspunkt, sakId, fagsaksystem, eksternReferanseId, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt))
         json shouldEqualJson """
             {
               "avsenderMottaker": {
@@ -63,7 +64,7 @@ class JournalpostTest: StringSpec({
               "kanal": "NAV_NO",
               "sak": {
                 "fagsakId": "$sakId",
-                "fagsaksystem": "AO01",
+                "fagsaksystem": "$fagsaksystem",
                 "sakstype": "FAGSAK"
               },
               "tema": "OPP",

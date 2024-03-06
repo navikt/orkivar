@@ -87,7 +87,8 @@ class ApplicationTest : StringSpec({
                         "fnr": "$fnr",
                         "oppfølgingsperiodeStart": "19 oktober 2021",
                         "oppfølgingsperiodeSlutt": null,
-                        "sakId": 1000
+                        "sakId": 1000,
+                        "fagsaksystem": "ARBEIDSOPPFOLGING"
                     },
                     "aktiviteter": {
                         "Planlagt": [
@@ -122,6 +123,7 @@ class ApplicationTest : StringSpec({
         val forslagAktivitet = arkivAktivitet(status = "Forslag", meldinger = meldingerArray)
         val avbruttAktivitet = arkivAktivitet(status = "Avbrutt")
         val sakId = 1000
+        val fagsaksystem = "ARBEIDSOPPFOLGING"
 
         val response = client.post("/arkiver") {
             bearerAuth(token)
@@ -134,7 +136,8 @@ class ApplicationTest : StringSpec({
                         "fnr": "$fnr",
                         "oppfølgingsperiodeStart": "19 oktober 2021",
                         "oppfølgingsperiodeSlutt": null,
-                        "sakId": $sakId
+                        "sakId": $sakId, 
+                        "fagsaksystem": $fagsaksystem
                     },
                     "aktiviteter": {
                         "Planlagt": [
@@ -182,6 +185,7 @@ class ApplicationTest : StringSpec({
         val bodyTilJoark = requestsTilJoark.first().body.asString()
         bodyTilJoark.shouldContainJsonKeyValue("sak.fagsakId", sakId.toString())
         bodyTilJoark.shouldContainJsonKeyValue("eksternReferanseId", journalpostUuid.toString())
+        bodyTilJoark.shouldContainJsonKeyValue("sak.fagsaksystem", fagsaksystem)
     }
 }) {
     companion object {

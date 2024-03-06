@@ -63,6 +63,7 @@ data class JournalpostData(
     val fnr: String,
     val tidspunkt: LocalDateTime,
     val sakId: Long,
+    val fagsaksystem: String,
     val eksternReferanse: UUID,
     val oppfølgingsperiodeStart: String,
     val oppfølgingsperiodeSlutt: String?
