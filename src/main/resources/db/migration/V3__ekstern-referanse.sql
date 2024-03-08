@@ -1,1 +1,0 @@
-alter table journalfoeringer add column uuid UUID unique;
