@@ -2,6 +2,7 @@ package dab.poao.nav.no.dokark
 
 import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
 import dab.poao.nav.no.azureAuth.logger
+import dab.poao.nav.no.dokark.DokarkResponseDokument
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.*
@@ -80,9 +81,15 @@ data class JournalpostData(
 @Serializable
 data class DokarkResponse(
     val journalpostId: String,
-    val melding: String,
+    val journalstatus: String,
+    val melding: String?,
     val journalpostferdigstilt: Boolean,
-    val dokumenter: List<String>
+    val dokumenter: List<DokarkResponseDokument>
+)
+
+@Serializable
+data class DokarkResponseDokument(
+    val dokumentInfoId: String
 )
 
 sealed interface DokarkResult

@@ -330,11 +330,13 @@ private val dialogtråder = """
 private fun dokarkRespons(ferdigstilt: Boolean) = """
     {
         "journalpostId": "12345",
-        "melding": "melding",
+        "journalstatus":"ENDELIG",
+        "melding": null,
         "journalpostferdigstilt": $ferdigstilt,
-        "dokumenter": ["enDokumentInfoId"]  
+        "dokumenter": [{"dokumentInfoId": "12345"}]  
     }
 """.trimIndent()
+
 
 suspend fun OutgoingContent.asString() = this.toByteArray().decodeToString()
 

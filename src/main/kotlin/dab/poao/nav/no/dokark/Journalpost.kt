@@ -90,7 +90,7 @@ data class Bruker(
 data class Dokument(
     val brevkode: String,
     val dokumentvarianter: List<Dokumentvariant>,
-    val tittel: String,
+    val tittel: String?,
 )
 
 @Serializable
