@@ -3,7 +3,6 @@ package dab.poao.nav.no
 
 import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
 import dab.poao.nav.no.database.Repository
-import dab.poao.nav.no.dokark.DokarkResponse
 import dab.poao.nav.no.dokark.Journalpost
 import dab.poao.nav.no.plugins.configureHikariDataSource
 import io.kotest.assertions.json.*
@@ -146,7 +145,8 @@ class ApplicationTest : StringSpec({
 
         val journalposterIDatabasen = repository.hentJournalposter(fnr)
         journalposterIDatabasen shouldHaveSize 1
-        val journalpostUuid = journalposterIDatabasen.first().referanse
+        val referanse = journalposterIDatabasen.first().referanse
+        journalposterIDatabasen.first().journalpostId shouldBe journalpostId
 
         val opprettet = repository.hentJournalposter(fnr).first().opprettetTidspunkt
         val requestsTilPdfgen = mockEngine.requestHistory.filter { pdfgenUrl.contains(it.url.host) }
@@ -174,7 +174,7 @@ class ApplicationTest : StringSpec({
         requestsTilJoark shouldHaveSize 1
         val bodyTilJoark = requestsTilJoark.first().body.asString()
         bodyTilJoark.shouldContainJsonKeyValue("sak.fagsakId", sakId.toString())
-        bodyTilJoark.shouldContainJsonKeyValue("eksternReferanseId", journalpostUuid.toString())
+        bodyTilJoark.shouldContainJsonKeyValue("eksternReferanseId", referanse.toString())
         bodyTilJoark.shouldContainJsonKeyValue("sak.fagsaksystem", fagsaksystem)
     }
 }) {
@@ -327,9 +327,11 @@ private val dialogtråder = """
     } ]
 """.trimIndent()
 
+private val journalpostId = "12345"
+
 private fun dokarkRespons(ferdigstilt: Boolean) = """
     {
-        "journalpostId": "12345",
+        "journalpostId": "$journalpostId",
         "journalstatus":"ENDELIG",
         "melding": null,
         "journalpostferdigstilt": $ferdigstilt,

@@ -24,6 +24,7 @@ class Repository(dataSource: DataSource) {
         val fnr = varchar("foedselsnummer", 11)
         val opprettetTidspunkt = datetime("opprettet_tidspunkt")
         val referanse = uuid("referanse")
+        val journalpostId = text("journalpost_id")
     }
 
     class Journalfoering(id: EntityID<Int>) : IntEntity(id) {
@@ -32,15 +33,17 @@ class Repository(dataSource: DataSource) {
         val fnr by Journalfoeringer.fnr
         val navIdent by Journalfoeringer.navIdent
         val referanse by Journalfoeringer.referanse
+        val journalpostId by Journalfoeringer.journalpostId
     }
 
-    suspend fun lagreJournalfoering(navIdent: String, fnr: Fnr, opprettetTidspunkt: LocalDateTime, referanse: UUID) {
+    suspend fun lagreJournalfoering(navIdent: String, fnr: Fnr, opprettetTidspunkt: LocalDateTime, referanse: UUID, journalpostId: String) {
         transaction {
             Journalfoeringer.insert {
                 it[Journalfoeringer.navIdent] = navIdent
                 it[Journalfoeringer.fnr] = fnr
                 it[Journalfoeringer.opprettetTidspunkt] = KotlinxLocalDateTime.parse(opprettetTidspunkt.toString())
                 it[Journalfoeringer.referanse] = referanse
+                it[Journalfoeringer.journalpostId] = journalpostId
             }
         }
     }

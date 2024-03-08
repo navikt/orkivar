@@ -1,8 +1,6 @@
 package dab.poao.nav.no.dokark
 
-import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
 import dab.poao.nav.no.azureAuth.logger
-import dab.poao.nav.no.dokark.DokarkResponseDokument
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.*
@@ -51,7 +49,7 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         if (!dokarkresponse.journalpostferdigstilt) {
             logger.warn("Opprettet journalpost, men den kunne ikke bli ferdigstilt automatisk")
         }
-        return DokarkSuccess
+        return DokarkSuccess(journalpostId = dokarkresponse.journalpostId)
     }
 }
 
@@ -93,5 +91,5 @@ data class DokarkResponseDokument(
 )
 
 sealed interface DokarkResult
-data object DokarkSuccess: DokarkResult
+data class DokarkSuccess(val journalpostId: String): DokarkResult
 data class DokarkFail(val message: String): DokarkResult

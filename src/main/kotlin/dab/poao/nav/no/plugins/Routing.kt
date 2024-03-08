@@ -17,7 +17,7 @@ fun Application.configureRouting(
     httpClientEngine: HttpClientEngine,
     dokarkClient: DokarkClient = DokarkClient(environment.config, httpClientEngine),
     pdfgenClient: PdfgenClient = PdfgenClient(environment.config, httpClientEngine),
-    lagreJournalfoering: suspend (navIdent: String, fnr: Fnr, opprettet: LocalDateTime, uuid: UUID) -> Unit
+    lagreJournalfoering: suspend (navIdent: String, fnr: Fnr, opprettet: LocalDateTime, uuid: UUID, journalpostId: String) -> Unit
 ) {
     routing {
         healthEndpoints()

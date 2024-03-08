@@ -23,7 +23,7 @@ import java.util.UUID
 fun Route.arkiveringRoutes(
     dokarkClient: DokarkClient,
     pdfgenClient: PdfgenClient,
-    lagreJournalfoering: suspend (navIdent: String, fnr: Fnr, opprettet: LocalDateTime, referanse: UUID) -> Unit
+    lagreJournalfoering: suspend (navIdent: String, fnr: Fnr, opprettet: LocalDateTime, referanse: UUID, journalpostId: String) -> Unit
 ) {
     post("/arkiver") {
         val token = call.hentUtBearerToken()
@@ -49,7 +49,7 @@ fun Route.arkiveringRoutes(
         when (dokarkResult) {
             is DokarkFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)
             is DokarkSuccess -> {
-                lagreJournalfoering(navIdent, arkiveringsPayload.metadata.fnr, tidspunkt, referanse)
+                lagreJournalfoering(navIdent, arkiveringsPayload.metadata.fnr, tidspunkt, referanse, dokarkResult.journalpostId)
                 call.respond("OK")
             }
         }
