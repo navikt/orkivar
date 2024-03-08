@@ -1,7 +1,9 @@
 package dab.poao.nav.no.dokark
 
+import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
 import dab.poao.nav.no.azureAuth.logger
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.engine.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
@@ -10,6 +12,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.config.*
+import kotlinx.serialization.Serializable
 import no.nav.poao.dab.ktor_oauth_client.AzureClient
 import no.nav.poao.dab.ktor_oauth_client.IncomingToken
 import no.nav.poao.dab.ktor_oauth_client.OauthClientCredentialsConfig
@@ -31,7 +34,7 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
     }
 
     suspend fun opprettJournalpost(token: IncomingToken, journalpostData: JournalpostData): DokarkResult {
-        val res = runCatching {  client.post("$clientUrl/rest/journalpostapi/v1/journalpost") {
+        val res = runCatching {  client.post("$clientUrl/rest/journalpostapi/v1/journalpost?forsoekFerdigstill=true") {
             header("authorization", "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}")
             contentType(ContentType.Application.Json)
             setBody(lagJournalpost(journalpostData))
@@ -41,6 +44,11 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         if (!res.status.isSuccess()) {
             logger.warn("Feilet å opprette journalpost:", res.bodyAsText())
             return DokarkFail("Feilet å laste opp til joark")
+        }
+
+        val dokarkresponse = res.body<DokarkResponse>()
+        if (!dokarkresponse.journalpostferdigstilt) {
+            logger.warn("Opprettet journalpost, men den kunne ikke bli ferdigstilt automatisk")
         }
         return DokarkSuccess
     }
@@ -67,6 +75,14 @@ data class JournalpostData(
     val eksternReferanse: UUID,
     val oppfølgingsperiodeStart: String,
     val oppfølgingsperiodeSlutt: String?
+)
+
+@Serializable
+data class DokarkResponse(
+    val journalpostId: String,
+    val melding: String,
+    val journalpostferdigstilt: Boolean,
+    val dokumenter: List<String>
 )
 
 sealed interface DokarkResult

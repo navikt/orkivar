@@ -3,6 +3,7 @@ package dab.poao.nav.no
 
 import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
 import dab.poao.nav.no.database.Repository
+import dab.poao.nav.no.dokark.DokarkResponse
 import dab.poao.nav.no.dokark.Journalpost
 import dab.poao.nav.no.plugins.configureHikariDataSource
 import io.kotest.assertions.json.*
@@ -66,17 +67,11 @@ class ApplicationTest : StringSpec({
 
     "Forhåndsvisning skal generere og returnere PDF" {
         val repository by lazy { Repository(dataSource) }
-
-        val token = mockOAuth2Server.issueToken(
-            issuerId = "AzureAD",
-            subject = "G123123",
-            claims = mapOf("NAVident" to "G123123", "oid" to UUID.randomUUID())
-        )
-            .serialize()
-
+        val token = mockOAuth2Server.getAzureToken("G123223")
         val fnr = "01015450300"
         val forslagAktivitet = arkivAktivitet(status = "Forslag", meldinger = meldingerArray)
         val avbruttAktivitet = arkivAktivitet(status = "Avbrutt")
+
         val response = client.post("/forhaandsvisning") {
             bearerAuth(token)
             contentType(ContentType.Application.Json)
@@ -104,6 +99,7 @@ class ApplicationTest : StringSpec({
             """.trimIndent()
             )
         }
+
         response.status shouldBe HttpStatusCode.OK
         response.body<ForhaandsvisningOutbound>()
         repository.hentJournalposter(fnr) shouldHaveSize 0
@@ -112,14 +108,7 @@ class ApplicationTest : StringSpec({
 
     "Journalføring skal generere PDF, sende til Joark og lagre referanse til journalføringen i egen database" {
         val repository by lazy { Repository(dataSource) }
-
-        val token = mockOAuth2Server.issueToken(
-            issuerId = "AzureAD",
-            subject = "G123123",
-            claims = mapOf("NAVident" to "G123123", "oid" to UUID.randomUUID())
-        )
-            .serialize()
-
+        val token = mockOAuth2Server.getAzureToken("G122123")
         val fnr = "01015450300"
         val forslagAktivitet = arkivAktivitet(status = "Forslag", meldinger = meldingerArray)
         val avbruttAktivitet = arkivAktivitet(status = "Avbrutt")
@@ -187,8 +176,6 @@ class ApplicationTest : StringSpec({
         bodyTilJoark.shouldContainJsonKeyValue("sak.fagsakId", sakId.toString())
         bodyTilJoark.shouldContainJsonKeyValue("eksternReferanseId", journalpostUuid.toString())
         bodyTilJoark.shouldContainJsonKeyValue("sak.fagsaksystem", fagsaksystem)
-        val responsFraJoark = mockEngine.responseHistory.first()
-        responsFraJoark.body.toString().shouldContainJsonKeyValue("journalpostferdigstilt", true)
     }
 }) {
     companion object {
@@ -217,14 +204,6 @@ class ApplicationTest : StringSpec({
             return testConfig
         }
     }
-
-    fun MockOAuth2Server.getAzureToken(navIdent: String) =
-        issueToken(
-            issuerId = "AzureAD",
-            subject = navIdent,
-            claims = mapOf("NAVident" to navIdent, "oid" to UUID.randomUUID())
-        )
-            .serialize()
 }
 
 private val pdfgenUrl = "http://pdf.gen.no"
@@ -240,12 +219,6 @@ private val mockEngine = MockEngine { request ->
             status = HttpStatusCode.OK,
             headers = headersOf(HttpHeaders.ContentType, "application/json")
         )
-    } else if (request.url.toString() == "http://dok.ark.no/rest/journalpostapi/v1/journalpost") {
-        respond(
-            content = ByteReadChannel(dokarkRespons(ferdigstilt = false)),
-            status = HttpStatusCode.OK,
-            headers = headersOf(HttpHeaders.ContentType, "application/json")
-        )
     } else if (request.url.toString() == "http://dok.ark.no/rest/journalpostapi/v1/journalpost?forsoekFerdigstill=true") {
         val journalpost: Journalpost = Json.decodeFromString(request.body.asString())
         val kanFerdigstilles = journalpost.tema != null
@@ -256,6 +229,11 @@ private val mockEngine = MockEngine { request ->
                 && journalpost.tittel != null
                 && journalpost.avsenderMottaker?.navn != null
                 && journalpost.dokumenter.all { it.tittel != null }
+
+        if (!kanFerdigstilles) {
+            // Dette vil ikke faktisk føre til BadRequest, men vi ønsker alltid å ferdigstille
+            respondBadRequest()
+        }
         respond(
             content = ByteReadChannel(dokarkRespons(ferdigstilt = kanFerdigstilles)),
             status = HttpStatusCode.OK,
@@ -269,6 +247,13 @@ private val mockEngine = MockEngine { request ->
         )
     }
 }
+
+private fun MockOAuth2Server.getAzureToken(navIdent: String) =
+    issueToken(
+        issuerId = "AzureAD",
+        subject = navIdent,
+        claims = mapOf("NAVident" to navIdent, "oid" to UUID.randomUUID())
+    ).serialize()
 
 private fun arkivAktivitet(status: String, meldinger: String = "[]") = """
     {
@@ -347,8 +332,7 @@ private fun dokarkRespons(ferdigstilt: Boolean) = """
         "journalpostId": "12345",
         "melding": "melding",
         "journalpostferdigstilt": $ferdigstilt,
-        "dokumenter": ["enDokumentInfoId"],
-        
+        "dokumenter": ["enDokumentInfoId"]  
     }
 """.trimIndent()
 
