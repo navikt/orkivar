@@ -21,6 +21,7 @@ data class ArkiveringsMetadata (
     val fagsaksystem: String,
     val oppfølgingsperiodeStart: String,
     val oppfølgingsperiodeSlutt: String?,
+    val oppfølgingsperiodeId: String,
 )
 
 @Serializable

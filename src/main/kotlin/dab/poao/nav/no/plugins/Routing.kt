@@ -1,6 +1,7 @@
 package dab.poao.nav.no.plugins
 
 import dab.poao.nav.no.arkivering.arkiveringRoutes
+import dab.poao.nav.no.database.Repository
 import dab.poao.nav.no.dokark.DokarkClient
 import dab.poao.nav.no.dokark.Fnr
 import dab.poao.nav.no.health.healthEndpoints
@@ -17,7 +18,7 @@ fun Application.configureRouting(
     httpClientEngine: HttpClientEngine,
     dokarkClient: DokarkClient = DokarkClient(environment.config, httpClientEngine),
     pdfgenClient: PdfgenClient = PdfgenClient(environment.config, httpClientEngine),
-    lagreJournalfoering: suspend (navIdent: String, fnr: Fnr, opprettet: LocalDateTime, uuid: UUID, journalpostId: String) -> Unit
+    lagreJournalfoering: suspend (Repository.NyJournalføring) -> Unit
 ) {
     routing {
         healthEndpoints()

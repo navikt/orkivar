@@ -3,6 +3,7 @@ package dab.poao.nav.no.arkivering
 import dab.poao.nav.no.arkivering.dto.ArkiveringsPayload
 import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
 import dab.poao.nav.no.azureAuth.logger
+import dab.poao.nav.no.database.Repository
 import dab.poao.nav.no.dokark.*
 import dab.poao.nav.no.pdfgenClient.FailedPdfGen
 import dab.poao.nav.no.pdfgenClient.PdfSuccess
@@ -23,7 +24,7 @@ import java.util.UUID
 fun Route.arkiveringRoutes(
     dokarkClient: DokarkClient,
     pdfgenClient: PdfgenClient,
-    lagreJournalfoering: suspend (navIdent: String, fnr: Fnr, opprettet: LocalDateTime, referanse: UUID, journalpostId: String) -> Unit
+    lagreJournalfoering: suspend (Repository.NyJournalføring) -> Unit
 ) {
     post("/arkiver") {
         val token = call.hentUtBearerToken()
@@ -49,7 +50,16 @@ fun Route.arkiveringRoutes(
         when (dokarkResult) {
             is DokarkFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)
             is DokarkSuccess -> {
-                lagreJournalfoering(navIdent, arkiveringsPayload.metadata.fnr, tidspunkt, referanse, dokarkResult.journalpostId)
+                lagreJournalfoering(
+                    Repository.NyJournalføring(
+                        navIdent = navIdent,
+                        fnr = arkiveringsPayload.metadata.fnr,
+                        opprettetTidspunkt = tidspunkt,
+                        referanse = referanse,
+                        journalpostId = dokarkResult.journalpostId,
+                        oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.metadata.oppfølgingsperiodeId)
+                    )
+                )
                 call.respond("OK")
             }
         }

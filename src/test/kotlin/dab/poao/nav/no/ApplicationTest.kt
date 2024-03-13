@@ -70,6 +70,7 @@ class ApplicationTest : StringSpec({
         val fnr = "01015450300"
         val forslagAktivitet = arkivAktivitet(status = "Forslag", meldinger = meldingerArray)
         val avbruttAktivitet = arkivAktivitet(status = "Avbrutt")
+        val oppfølgingsperiodeId = UUID.randomUUID().toString()
 
         val response = client.post("/forhaandsvisning") {
             bearerAuth(token)
@@ -83,7 +84,8 @@ class ApplicationTest : StringSpec({
                         "oppfølgingsperiodeStart": "19 oktober 2021",
                         "oppfølgingsperiodeSlutt": null,
                         "sakId": 1000,
-                        "fagsaksystem": "ARBEIDSOPPFOLGING"
+                        "fagsaksystem": "ARBEIDSOPPFOLGING",
+                        "oppfølgingsperiodeId": "$oppfølgingsperiodeId"
                     },
                     "aktiviteter": {
                         "Planlagt": [
@@ -113,6 +115,7 @@ class ApplicationTest : StringSpec({
         val avbruttAktivitet = arkivAktivitet(status = "Avbrutt")
         val sakId = 1000
         val fagsaksystem = "ARBEIDSOPPFOLGING"
+        val oppfølgingsperiodeId = UUID.randomUUID()
 
         val response = client.post("/arkiver") {
             bearerAuth(token)
@@ -126,7 +129,8 @@ class ApplicationTest : StringSpec({
                         "oppfølgingsperiodeStart": "19 oktober 2021",
                         "oppfølgingsperiodeSlutt": null,
                         "sakId": $sakId, 
-                        "fagsaksystem": $fagsaksystem
+                        "fagsaksystem": $fagsaksystem,
+                        "oppfølgingsperiodeId": "$oppfølgingsperiodeId"
                     },
                     "aktiviteter": {
                         "Planlagt": [
@@ -145,8 +149,9 @@ class ApplicationTest : StringSpec({
 
         val journalposterIDatabasen = repository.hentJournalposter(fnr)
         journalposterIDatabasen shouldHaveSize 1
-        val referanse = journalposterIDatabasen.first().referanse
-        journalposterIDatabasen.first().journalpostId shouldBe journalpostId
+        val journalPost = journalposterIDatabasen.first()
+        journalPost.journalpostId shouldBe journalpostId
+        journalPost.oppfølgingsperiodeId shouldBe oppfølgingsperiodeId
 
         val opprettet = repository.hentJournalposter(fnr).first().opprettetTidspunkt
         val requestsTilPdfgen = mockEngine.requestHistory.filter { pdfgenUrl.contains(it.url.host) }
@@ -174,7 +179,7 @@ class ApplicationTest : StringSpec({
         requestsTilJoark shouldHaveSize 1
         val bodyTilJoark = requestsTilJoark.first().body.asString()
         bodyTilJoark.shouldContainJsonKeyValue("sak.fagsakId", sakId.toString())
-        bodyTilJoark.shouldContainJsonKeyValue("eksternReferanseId", referanse.toString())
+        bodyTilJoark.shouldContainJsonKeyValue("eksternReferanseId", journalPost.referanse.toString())
         bodyTilJoark.shouldContainJsonKeyValue("sak.fagsaksystem", fagsaksystem)
     }
 }) {

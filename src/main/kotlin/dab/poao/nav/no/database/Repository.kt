@@ -25,6 +25,7 @@ class Repository(dataSource: DataSource) {
         val opprettetTidspunkt = datetime("opprettet_tidspunkt")
         val referanse = uuid("referanse")
         val journalpostId = text("journalpost_id")
+        val oppfølgingsperiodeId = uuid("oppfølgingsperiode_id")
     }
 
     class Journalfoering(id: EntityID<Int>) : IntEntity(id) {
@@ -34,16 +35,18 @@ class Repository(dataSource: DataSource) {
         val navIdent by Journalfoeringer.navIdent
         val referanse by Journalfoeringer.referanse
         val journalpostId by Journalfoeringer.journalpostId
+        val oppfølgingsperiodeId by Journalfoeringer.oppfølgingsperiodeId
     }
 
-    suspend fun lagreJournalfoering(navIdent: String, fnr: Fnr, opprettetTidspunkt: LocalDateTime, referanse: UUID, journalpostId: String) {
+    suspend fun lagreJournalfoering(nyJournalføring: NyJournalføring) {
         transaction {
             Journalfoeringer.insert {
-                it[Journalfoeringer.navIdent] = navIdent
-                it[Journalfoeringer.fnr] = fnr
-                it[Journalfoeringer.opprettetTidspunkt] = KotlinxLocalDateTime.parse(opprettetTidspunkt.toString())
-                it[Journalfoeringer.referanse] = referanse
-                it[Journalfoeringer.journalpostId] = journalpostId
+                it[navIdent] = nyJournalføring.navIdent
+                it[fnr] = nyJournalføring.fnr
+                it[opprettetTidspunkt] = KotlinxLocalDateTime.parse(nyJournalføring.opprettetTidspunkt.toString())
+                it[referanse] = nyJournalføring.referanse
+                it[journalpostId] = nyJournalføring.journalpostId
+                it[oppfølgingsperiodeId] = nyJournalføring.oppfølgingsperiodeId
             }
         }
     }
@@ -56,4 +59,12 @@ class Repository(dataSource: DataSource) {
         }
     }
 
+    data class NyJournalføring(
+        val navIdent: String,
+        val fnr: Fnr,
+        val opprettetTidspunkt: LocalDateTime,
+        val referanse: UUID,
+        val journalpostId: String,
+        val oppfølgingsperiodeId: UUID
+    )
 }
