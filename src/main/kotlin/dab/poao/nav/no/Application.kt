@@ -10,10 +10,8 @@ import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
-import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.contentnegotiation.*
 import org.slf4j.LoggerFactory
-import org.slf4j.event.Level
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
@@ -31,6 +29,6 @@ fun Application.module(httpClientEngine: HttpClientEngine = HttpClient().engine)
     val repository = Repository(datasource)
     configureAuthentication()
     configureMonitoring()
-    configureRouting(httpClientEngine = httpClientEngine, lagreJournalfoering = repository::lagreJournalfoering)
+    configureRouting(httpClientEngine = httpClientEngine, lagreJournalføring = repository::lagreJournalfoering, hentJournalføringer = repository::hentJournalposter)
     configureFlyway(datasource)
 }

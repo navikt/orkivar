@@ -2,7 +2,9 @@ package dab.poao.nav.no.arkivering
 
 import dab.poao.nav.no.arkivering.dto.ArkiveringsPayload
 import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
+import dab.poao.nav.no.arkivering.dto.SistJournalFørtOutboundDto
 import dab.poao.nav.no.azureAuth.logger
+import dab.poao.nav.no.database.OppfølgingsperiodeId
 import dab.poao.nav.no.database.Repository
 import dab.poao.nav.no.dokark.*
 import dab.poao.nav.no.pdfgenClient.FailedPdfGen
@@ -24,7 +26,8 @@ import java.util.UUID
 fun Route.arkiveringRoutes(
     dokarkClient: DokarkClient,
     pdfgenClient: PdfgenClient,
-    lagreJournalfoering: suspend (Repository.NyJournalføring) -> Unit
+    lagreJournalfoering: suspend (Repository.NyJournalføring) -> Unit,
+    hentJournalføringer: suspend (OppfølgingsperiodeId) -> List<Repository.Journalfoering>
 ) {
     post("/arkiver") {
         val token = call.hentUtBearerToken()
@@ -72,6 +75,21 @@ fun Route.arkiveringRoutes(
         when (pdfResult) {
             is PdfSuccess -> call.respond(ForhaandsvisningOutbound(pdfResult.pdfByteString))
             is FailedPdfGen -> DokarkFail(pdfResult.message)
+        }
+    }
+
+    get("/sistJournalført/{oppfølgingsperiodeId}") {
+        val oppfølgingsperiodeId = UUID.fromString(call.parameters["oppfølgingsperiodeId"])
+        val journalføringer = hentJournalføringer(oppfølgingsperiodeId).sortedByDescending { it.opprettetTidspunkt }
+
+        when {
+            journalføringer.isEmpty() -> call.respond(HttpStatusCode.NotFound)
+            else -> {
+                call.respond(SistJournalFørtOutboundDto(
+                    oppfølgingsperiodeId = oppfølgingsperiodeId.toString(),
+                    sistJournalført = journalføringer.first().opprettetTidspunkt
+                ))
+            }
         }
     }
 }

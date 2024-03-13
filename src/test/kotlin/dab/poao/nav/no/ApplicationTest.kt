@@ -2,6 +2,7 @@ package dab.poao.nav.no
 
 
 import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
+import dab.poao.nav.no.arkivering.dto.SistJournalFørtOutboundDto
 import dab.poao.nav.no.database.Repository
 import dab.poao.nav.no.dokark.Journalpost
 import dab.poao.nav.no.plugins.configureHikariDataSource
@@ -23,8 +24,10 @@ import io.ktor.server.engine.*
 import io.ktor.server.testing.*
 import io.ktor.utils.io.*
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
+import kotlinx.datetime.toKotlinLocalDateTime
 import kotlinx.serialization.json.Json
 import no.nav.security.mock.oauth2.MockOAuth2Server
+import java.time.LocalDateTime
 import java.util.*
 import javax.sql.DataSource
 
@@ -182,6 +185,79 @@ class ApplicationTest : StringSpec({
         bodyTilJoark.shouldContainJsonKeyValue("eksternReferanseId", journalPost.referanse.toString())
         bodyTilJoark.shouldContainJsonKeyValue("sak.fagsaksystem", fagsaksystem)
     }
+
+    "Henting av sistJournalført skal returnere tidspunkt for når journalføring ble opprettet"() {
+        val repository by lazy { Repository(dataSource) }
+        val navIdent = "G122123"
+        val token = mockOAuth2Server.getAzureToken(navIdent)
+        val fnr = "01015450300"
+        val oppfølgingsperiodeId = UUID.randomUUID()
+        val nyJournalføring = Repository.NyJournalføring(
+            navIdent = navIdent,
+            fnr = fnr,
+            opprettetTidspunkt = LocalDateTime.now(),
+            referanse = UUID.randomUUID(),
+            journalpostId = "dummy",
+            oppfølgingsperiodeId = oppfølgingsperiodeId
+        )
+        repository.lagreJournalfoering(nyJournalføring)
+
+        val response = client.get("/sistJournalført/$oppfølgingsperiodeId") {
+            bearerAuth(token)
+            contentType(ContentType.Application.Json)
+        }
+
+        response.status shouldBe HttpStatusCode.OK
+        val sistJournalført = response.body<SistJournalFørtOutboundDto>()
+        sistJournalført.sistJournalført shouldBe nyJournalføring.opprettetTidspunkt.toKotlinLocalDateTime()
+        sistJournalført.oppfølgingsperiodeId shouldBe oppfølgingsperiodeId.toString()
+    }
+
+    "Henting av sistJournalført skal returnere siste tidspunkt hvis en oppfølgingsperiode har blitt journalført flere ganger"() {
+        val repository by lazy { Repository(dataSource) }
+        val navIdent = "G122123"
+        val token = mockOAuth2Server.getAzureToken(navIdent)
+        val fnr = "01015450300"
+        val oppfølgingsperiodeId = UUID.randomUUID()
+        val førsteJournalføring = Repository.NyJournalføring(
+            navIdent = navIdent,
+            fnr = fnr,
+            opprettetTidspunkt = LocalDateTime.now().minusMinutes(1),
+            referanse = UUID.randomUUID(),
+            journalpostId = "dummy1",
+            oppfølgingsperiodeId = oppfølgingsperiodeId
+        )
+        val andreJournalføring = førsteJournalføring.copy(
+            opprettetTidspunkt = LocalDateTime.now(),
+            journalpostId = "dummy2",
+            referanse = UUID.randomUUID()
+        )
+        repository.lagreJournalfoering(førsteJournalføring)
+        repository.lagreJournalfoering(andreJournalføring)
+
+        val response = client.get("/sistJournalført/$oppfølgingsperiodeId") {
+            bearerAuth(token)
+            contentType(ContentType.Application.Json)
+        }
+
+        response.status shouldBe HttpStatusCode.OK
+        val sistJournalført = response.body<SistJournalFørtOutboundDto>()
+        sistJournalført.sistJournalført shouldBe andreJournalføring.opprettetTidspunkt.toKotlinLocalDateTime()
+    }
+
+    "Henting av sistJournalført skal returnere 404 når det ikke finnes en journalføring for en oppfølgingsperiode"() {
+        val navIdent = "G122123"
+        val token = mockOAuth2Server.getAzureToken(navIdent)
+        val oppfølgingsperiodeId = UUID.randomUUID()
+
+        val response = client.get("/sistJournalført/$oppfølgingsperiodeId") {
+            bearerAuth(token)
+            contentType(ContentType.Application.Json)
+        }
+
+        response.status shouldBe HttpStatusCode.NotFound
+    }
+
 }) {
     companion object {
         private fun ApplicationEngineEnvironmentBuilder.doConfig(

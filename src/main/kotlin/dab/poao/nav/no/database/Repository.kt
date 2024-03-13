@@ -59,12 +59,22 @@ class Repository(dataSource: DataSource) {
         }
     }
 
+    suspend fun hentJournalposter(oppfølgingsperiodeId: OppfølgingsperiodeId): List<Journalfoering> {
+        return transaction {
+            Journalfoering
+                .find { Journalfoeringer.oppfølgingsperiodeId eq oppfølgingsperiodeId}
+                .toList()
+        }
+    }
+
     data class NyJournalføring(
         val navIdent: String,
         val fnr: Fnr,
         val opprettetTidspunkt: LocalDateTime,
         val referanse: UUID,
         val journalpostId: String,
-        val oppfølgingsperiodeId: UUID
+        val oppfølgingsperiodeId: OppfølgingsperiodeId
     )
 }
+
+typealias OppfølgingsperiodeId = UUID
