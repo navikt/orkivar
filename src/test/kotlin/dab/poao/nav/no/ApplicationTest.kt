@@ -16,6 +16,7 @@ import io.ktor.client.engine.mock.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.serialization.kotlinx.json.*
@@ -213,7 +214,7 @@ class ApplicationTest : StringSpec({
         sistJournalført.oppfølgingsperiodeId shouldBe oppfølgingsperiodeId.toString()
     }
 
-    "Henting av sistJournalført skal returnere siste tidspunkt hvis en oppfølgingsperiode har blitt journalført flere ganger"() {
+    "Henting av sistJournalført skal returnere siste tidspunkt hvis en oppfølgingsperiode har blitt journalført flere ganger" {
         val repository by lazy { Repository(dataSource) }
         val navIdent = "G122123"
         val token = mockOAuth2Server.getAzureToken(navIdent)
@@ -245,7 +246,7 @@ class ApplicationTest : StringSpec({
         sistJournalført.sistJournalført shouldBe andreJournalføring.opprettetTidspunkt.toKotlinLocalDateTime()
     }
 
-    "Henting av sistJournalført skal returnere 404 når det ikke finnes en journalføring for en oppfølgingsperiode"() {
+    "Henting av sistJournalført skal returnere 404 når det ikke finnes en journalføring for en oppfølgingsperiode" {
         val navIdent = "G122123"
         val token = mockOAuth2Server.getAzureToken(navIdent)
         val oppfølgingsperiodeId = UUID.randomUUID()
