@@ -203,7 +203,7 @@ class ApplicationTest : StringSpec({
         )
         repository.lagreJournalfoering(nyJournalføring)
 
-        val response = client.get("/sistJournalført/$oppfølgingsperiodeId") {
+        val response = client.get("/sistJournalfort/$oppfølgingsperiodeId") {
             bearerAuth(token)
             contentType(ContentType.Application.Json)
         }
@@ -236,7 +236,7 @@ class ApplicationTest : StringSpec({
         repository.lagreJournalfoering(førsteJournalføring)
         repository.lagreJournalfoering(andreJournalføring)
 
-        val response = client.get("/sistJournalført/$oppfølgingsperiodeId") {
+        val response = client.get("/sistJournalfort/$oppfølgingsperiodeId") {
             bearerAuth(token)
             contentType(ContentType.Application.Json)
         }
@@ -251,7 +251,7 @@ class ApplicationTest : StringSpec({
         val token = mockOAuth2Server.getAzureToken(navIdent)
         val oppfølgingsperiodeId = UUID.randomUUID()
 
-        val response = client.get("/sistJournalført/$oppfølgingsperiodeId") {
+        val response = client.get("/sistJournalfort/$oppfølgingsperiodeId") {
             bearerAuth(token)
             contentType(ContentType.Application.Json)
         }

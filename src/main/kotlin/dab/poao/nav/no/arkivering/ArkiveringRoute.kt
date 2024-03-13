@@ -78,7 +78,7 @@ fun Route.arkiveringRoutes(
         }
     }
 
-    get("/sistJournalført/{oppfølgingsperiodeId}") {
+    get("/sistJournalfort/{oppfølgingsperiodeId}") {
         val oppfølgingsperiodeId = UUID.fromString(call.parameters["oppfølgingsperiodeId"])
         val journalføringer = hentJournalføringer(oppfølgingsperiodeId).sortedByDescending { it.opprettetTidspunkt }
 
