@@ -2,11 +2,14 @@ package dab.poao.nav.no.arkivering
 
 import dab.poao.nav.no.arkivering.dto.ArkiveringsPayload
 import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
-import dab.poao.nav.no.arkivering.dto.SistJournalFørtOutboundDto
+import dab.poao.nav.no.arkivering.dto.JournalføringOutbound
 import dab.poao.nav.no.azureAuth.logger
 import dab.poao.nav.no.database.OppfølgingsperiodeId
 import dab.poao.nav.no.database.Repository
-import dab.poao.nav.no.dokark.*
+import dab.poao.nav.no.dokark.DokarkClient
+import dab.poao.nav.no.dokark.DokarkFail
+import dab.poao.nav.no.dokark.DokarkSuccess
+import dab.poao.nav.no.dokark.JournalpostData
 import dab.poao.nav.no.pdfgenClient.FailedPdfGen
 import dab.poao.nav.no.pdfgenClient.PdfSuccess
 import dab.poao.nav.no.pdfgenClient.PdfgenClient
@@ -17,10 +20,10 @@ import io.ktor.server.auth.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.datetime.toKotlinLocalDateTime
 import no.nav.security.token.support.v2.TokenValidationContextPrincipal
-import java.lang.IllegalArgumentException
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 
 fun Route.arkiveringRoutes(
@@ -63,7 +66,7 @@ fun Route.arkiveringRoutes(
                         oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.metadata.oppfølgingsperiodeId)
                     )
                 )
-                call.respond("OK")
+                call.respond(JournalføringOutbound(tidspunkt.toKotlinLocalDateTime()))
             }
         }
     }
@@ -72,24 +75,11 @@ fun Route.arkiveringRoutes(
         val arkiveringsPayload = call.arkiveringspayload()
         val pdfgenPayload = lagPdfgenPayload(arkiveringsPayload, LocalDateTime.now())
         val pdfResult = pdfgenClient.generatePdf(pdfgenPayload)
+        val oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.metadata.oppfølgingsperiodeId)
+        val sisteJournalføring = hentJournalføringer(oppfølgingsperiodeId).sortedByDescending { it.opprettetTidspunkt }.firstOrNull()
         when (pdfResult) {
-            is PdfSuccess -> call.respond(ForhaandsvisningOutbound(pdfResult.pdfByteString))
+            is PdfSuccess -> call.respond(ForhaandsvisningOutbound(pdfResult.pdfByteString, sisteJournalføring?.opprettetTidspunkt))
             is FailedPdfGen -> DokarkFail(pdfResult.message)
-        }
-    }
-
-    get("/sistJournalfort/{oppfølgingsperiodeId}") {
-        val oppfølgingsperiodeId = UUID.fromString(call.parameters["oppfølgingsperiodeId"])
-        val journalføringer = hentJournalføringer(oppfølgingsperiodeId).sortedByDescending { it.opprettetTidspunkt }
-
-        when {
-            journalføringer.isEmpty() -> call.respond(HttpStatusCode.NotFound)
-            else -> {
-                call.respond(SistJournalFørtOutboundDto(
-                    oppfølgingsperiodeId = oppfølgingsperiodeId.toString(),
-                    sistJournalført = journalføringer.first().opprettetTidspunkt
-                ))
-            }
         }
     }
 }

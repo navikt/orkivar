@@ -4,7 +4,6 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SistJournalFørtOutboundDto(
-    val oppfølgingsperiodeId: String,
+data class JournalføringOutbound(
     val sistJournalført: LocalDateTime
 )
