@@ -117,6 +117,7 @@ private fun lagPdfgenPayload(arkiveringsPayload: ArkiveringsPayload, tidspunkt: 
         oppfølgingsperiodeSlutt = oppfølgingsperiodeSlutt,
         aktiviteter = arkiveringsPayload.aktiviteter,
         dialogtråder = arkiveringsPayload.dialogtråder,
+        mål = arkiveringsPayload.mål,
         journalfoeringstidspunkt = tidspunkt.toString()
     )
 }

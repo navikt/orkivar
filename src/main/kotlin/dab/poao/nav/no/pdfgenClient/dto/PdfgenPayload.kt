@@ -13,5 +13,6 @@ data class PdfgenPayload(
     val oppfølgingsperiodeSlutt: String?,
     val journalfoeringstidspunkt: String,
     val aktiviteter: Map<ArkivAktivitetStatus, List<ArkivAktivitet>>,
-    val dialogtråder: List<ArkivDialogtråd>
+    val dialogtråder: List<ArkivDialogtråd>,
+    val mål: String?,
 )
