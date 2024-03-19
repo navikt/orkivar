@@ -96,7 +96,8 @@ class ApplicationTest : StringSpec({
                             $avbruttAktivitet
                         ]
                     },
-                    $dialogtråder
+                    $dialogtråder,
+                    $mål
                 }
             """.trimIndent()
             )
@@ -141,7 +142,8 @@ class ApplicationTest : StringSpec({
                             $avbruttAktivitet
                         ]
                     },
-                    $dialogtråder
+                    $dialogtråder,
+                    $mål
                 }
             """.trimIndent()
             )
@@ -172,7 +174,8 @@ class ApplicationTest : StringSpec({
                             $avbruttAktivitet
                         ]
                     },
-                    $dialogtråder
+                    $dialogtråder,
+                    $mål
                 }
                """.trimMargin()
 
@@ -335,6 +338,10 @@ private val dialogtråder = """
 """.trimIndent()
 
 private val journalpostId = "12345"
+
+private val mål = """
+    "mål" : "Å få meg jobb"
+""".trimIndent()
 
 private fun dokarkRespons(ferdigstilt: Boolean) = """
     {
