@@ -97,7 +97,7 @@ class ApplicationTest : StringSpec({
                         ]
                     },
                     $dialogtråder,
-                    "mål": $mål
+                    $mål
                 }
             """.trimIndent()
             )
@@ -143,7 +143,7 @@ class ApplicationTest : StringSpec({
                         ]
                     },
                     $dialogtråder,
-                    "mål": $mål,
+                    $mål
                 }
             """.trimIndent()
             )
@@ -175,7 +175,7 @@ class ApplicationTest : StringSpec({
                         ]
                     },
                     $dialogtråder,
-                    "mål": $mål,
+                    $mål
                 }
                """.trimMargin()
 
@@ -339,7 +339,9 @@ private val dialogtråder = """
 
 private val journalpostId = "12345"
 
-private val mål = "Å få meg jobb"
+private val mål = """
+    "mål" : "Å få meg jobb"
+""".trimIndent()
 
 private fun dokarkRespons(ferdigstilt: Boolean) = """
     {
