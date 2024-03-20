@@ -87,5 +87,4 @@ data class EksternHandling(
     val tekst: String,
     val subtekst: String?,
     val url: String,
-    val klikkbar: Boolean,
 )

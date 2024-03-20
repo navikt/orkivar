@@ -308,8 +308,7 @@ private fun arkivAktivitet(status: String, meldinger: String = "[]") = """
         {
           "tekst": "Tekst",
           "subtekst": null,
-          "url": "http://localhost:8080",
-          "klikkbar": false
+          "url": "http://localhost:8080"
         }
       ]
     }
