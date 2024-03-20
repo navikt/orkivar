@@ -303,7 +303,15 @@ private fun arkivAktivitet(status: String, meldinger: String = "[]") = """
         }
       ],
       "meldinger" : $meldinger,
-      "etiketter": []
+      "etiketter": [],
+      "eksterneHandlinger": [
+        {
+          "tekst": "Tekst",
+          "subtekst": null,
+          "url": "http://localhost:8080",
+          "klikkbar": false
+        }
+      ]
     }
 """.trimIndent()
 

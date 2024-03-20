@@ -32,7 +32,8 @@ data class ArkivAktivitet(
     val status: String,
     val detaljer: List<Detalj>,
     val meldinger: List<Melding>,
-    val etiketter: List<ArkivEtikett>
+    val etiketter: List<ArkivEtikett>,
+    val eksterneHandlinger: List<EksternHandling>
 )
 
 @Serializable
@@ -80,3 +81,11 @@ enum class ArkivEtikettStil {
     NEGATIVE,
     NEUTRAL,
 }
+
+@Serializable
+data class EksternHandling(
+    val tekst: String,
+    val subtekst: String?,
+    val url: String,
+    val klikkbar: Boolean,
+)
