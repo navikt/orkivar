@@ -310,7 +310,16 @@ private fun arkivAktivitet(status: String, meldinger: String = "[]") = """
           "subtekst": null,
           "url": "http://localhost:8080"
         }
-      ]
+      ],
+      "historikk" : {
+        "endringer" : [ 
+          {
+            "formattertTidspunkt" : "25. mars 2024 kl. 08:00",
+            "beskrivelseForVeileder" : "Bruker opprettet aktiviteten",
+            "beskrivelseForBruker" : "Du opprettet aktiviteten"
+          } 
+        ]
+      }
     }
 """.trimIndent()
 

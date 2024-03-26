@@ -33,7 +33,8 @@ data class ArkivAktivitet(
     val detaljer: List<Detalj>,
     val meldinger: List<Melding>,
     val etiketter: List<ArkivEtikett>,
-    val eksterneHandlinger: List<EksternHandling>
+    val eksterneHandlinger: List<EksternHandling>,
+    val historikk: Historikk,
 )
 
 @Serializable
@@ -87,4 +88,16 @@ data class EksternHandling(
     val tekst: String,
     val subtekst: String?,
     val url: String,
+)
+
+@Serializable
+data class Historikk(
+    val endringer: List<Endring>
+)
+
+@Serializable
+data class Endring(
+    val formattertTidspunkt: String,
+    val beskrivelseForVeileder: String,
+    val beskrivelseForBruker: String,
 )
