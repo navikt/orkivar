@@ -23,6 +23,7 @@ import io.ktor.server.routing.*
 import kotlinx.datetime.toKotlinLocalDateTime
 import no.nav.security.token.support.v2.TokenValidationContextPrincipal
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
@@ -110,6 +111,10 @@ private suspend fun ApplicationCall.arkiveringspayload(): ArkiveringsPayload {
 private fun lagPdfgenPayload(arkiveringsPayload: ArkiveringsPayload, tidspunkt: LocalDateTime): PdfgenPayload {
     val (fnr, navn, _, _, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt) = arkiveringsPayload.metadata
 
+    val norskDatoKlokkeslettFormat = DateTimeFormatter.ofPattern("d. MMMM uuuu 'kl.' HH:mm", Locale.forLanguageTag("no"))
+
+    val formatertTidspunkt = tidspunkt.format(norskDatoKlokkeslettFormat)
+
     return PdfgenPayload(
         navn = navn,
         fnr = fnr,
@@ -118,7 +123,7 @@ private fun lagPdfgenPayload(arkiveringsPayload: ArkiveringsPayload, tidspunkt: 
         aktiviteter = arkiveringsPayload.aktiviteter,
         dialogtråder = arkiveringsPayload.dialogtråder,
         mål = arkiveringsPayload.mål,
-        journalfoeringstidspunkt = tidspunkt.toString()
+        journalfoeringstidspunkt = formatertTidspunkt
     )
 }
 
