@@ -1,8 +1,7 @@
 package dab.poao.nav.no.arkivering
 
-import dab.poao.nav.no.arkivering.dto.ArkiveringsPayload
-import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
-import dab.poao.nav.no.arkivering.dto.JournalføringOutbound
+import dab.poao.nav.no.arkivering.dto.*
+import dab.poao.nav.no.arkivering.dto.Metadata
 import dab.poao.nav.no.azureAuth.logger
 import dab.poao.nav.no.database.OppfølgingsperiodeId
 import dab.poao.nav.no.database.Repository
@@ -36,10 +35,11 @@ fun Route.arkiveringRoutes(
     post("/arkiver") {
         val token = call.hentUtBearerToken()
         val navIdent = call.hentNavIdentClaim()
-        val arkiveringsPayload = call.arkiveringspayload()
+        val arkiveringsPayload = call.hentPayload<JournalføringsPayload>()
 
         val tidspunkt = LocalDateTime.now()
-        val pdfGenPayload = lagPdfgenPayload(arkiveringsPayload, tidspunkt)
+        val pdfGenPayload =
+            lagPdfgenPayload(arkiveringsPayload.metadata, arkiveringsPayload.aktivitetsplanInnhold, tidspunkt)
         val referanse = UUID.randomUUID()
 
         val dokarkResult = runCatching {
@@ -47,7 +47,17 @@ fun Route.arkiveringRoutes(
                 payload = pdfGenPayload
             )
             when (pdfResult) {
-                is PdfSuccess -> dokarkClient.opprettJournalpost(token, lagJournalpostData(pdfResult.pdfByteString, arkiveringsPayload, referanse, tidspunkt))
+                is PdfSuccess -> dokarkClient.opprettJournalpost(
+                    token,
+                    lagJournalpostData(
+                        pdfResult.pdfByteString,
+                        arkiveringsPayload.metadata,
+                        arkiveringsPayload.journalføringsMetadata,
+                        referanse,
+                        tidspunkt
+                    )
+                )
+
                 is FailedPdfGen -> DokarkFail(pdfResult.message)
             }
         }
@@ -73,13 +83,24 @@ fun Route.arkiveringRoutes(
     }
 
     post("/forhaandsvisning") {
-        val arkiveringsPayload = call.arkiveringspayload()
-        val pdfgenPayload = lagPdfgenPayload(arkiveringsPayload, LocalDateTime.now())
+        val forhåndsvisningsPayload = call.hentPayload<ForhåndsvisningPayload>()
+        val pdfgenPayload = lagPdfgenPayload(
+            forhåndsvisningsPayload.metadata,
+            forhåndsvisningsPayload.aktivitetsplanInnhold,
+            LocalDateTime.now()
+        )
         val pdfResult = pdfgenClient.generatePdf(pdfgenPayload)
-        val oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.metadata.oppfølgingsperiodeId)
-        val sisteJournalføring = hentJournalføringer(oppfølgingsperiodeId).sortedByDescending { it.opprettetTidspunkt }.firstOrNull()
+        val oppfølgingsperiodeId = UUID.fromString(forhåndsvisningsPayload.metadata.oppfølgingsperiodeId)
+        val sisteJournalføring =
+            hentJournalføringer(oppfølgingsperiodeId).sortedByDescending { it.opprettetTidspunkt }.firstOrNull()
         when (pdfResult) {
-            is PdfSuccess -> call.respond(ForhaandsvisningOutbound(pdfResult.pdfByteString, sisteJournalføring?.opprettetTidspunkt))
+            is PdfSuccess -> call.respond(
+                ForhaandsvisningOutbound(
+                    pdfResult.pdfByteString,
+                    sisteJournalføring?.opprettetTidspunkt
+                )
+            )
+
             is FailedPdfGen -> DokarkFail(pdfResult.message)
         }
     }
@@ -97,49 +118,56 @@ private fun ApplicationCall.hentNavIdentClaim(): String {
         ?: throw RuntimeException("Klarte ikke å hente NAVident claim fra tokenet")
 }
 
-private suspend fun ApplicationCall.arkiveringspayload(): ArkiveringsPayload {
+private suspend inline fun <reified T : Any> ApplicationCall.hentPayload(): T {
     // Eksplisitt kasting av exception for å sikre at stacktrace kommer til loggen
     // Kan fjernes når feature er ferdig, og alt kan da gjøres inline der denne funksjonen brukes
     return try {
-        this.receive<ArkiveringsPayload>()
+        this.receive<T>()
     } catch (e: Exception) {
         logger.error("Feil ved deserialisering", e)
         throw e
     }
 }
 
-private fun lagPdfgenPayload(arkiveringsPayload: ArkiveringsPayload, tidspunkt: LocalDateTime): PdfgenPayload {
-    val (fnr, navn, _, _, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt) = arkiveringsPayload.metadata
-
-    val norskDatoKlokkeslettFormat = DateTimeFormatter.ofPattern("d. MMMM uuuu 'kl.' HH:mm", Locale.forLanguageTag("no"))
-
+private fun lagPdfgenPayload(
+    metadata: Metadata,
+    aktivitetsplanInnhold: AktivitetsplanInnhold,
+    tidspunkt: LocalDateTime
+): PdfgenPayload {
+    val norskDatoKlokkeslettFormat =
+        DateTimeFormatter.ofPattern("d. MMMM uuuu 'kl.' HH:mm", Locale.forLanguageTag("no"))
     val formatertTidspunkt = tidspunkt.format(norskDatoKlokkeslettFormat)
 
     return PdfgenPayload(
-        navn = navn,
-        fnr = fnr,
-        oppfølgingsperiodeStart = oppfølgingsperiodeStart,
-        oppfølgingsperiodeSlutt = oppfølgingsperiodeSlutt,
-        aktiviteter = arkiveringsPayload.aktiviteter,
-        dialogtråder = arkiveringsPayload.dialogtråder,
-        mål = arkiveringsPayload.mål,
+        navn = metadata.navn,
+        fnr = metadata.fnr,
+        oppfølgingsperiodeStart = metadata.oppfølgingsperiodeStart,
+        oppfølgingsperiodeSlutt = metadata.oppfølgingsperiodeSlutt,
+        aktiviteter = aktivitetsplanInnhold.aktiviteter,
+        dialogtråder = aktivitetsplanInnhold.dialogtråder,
+        mål = aktivitetsplanInnhold.mål,
         journalfoeringstidspunkt = formatertTidspunkt
     )
 }
 
-private fun lagJournalpostData(pdf: ByteArray, arkiveringsPayload: ArkiveringsPayload, referanse: UUID, tidspunkt: LocalDateTime): JournalpostData {
-    val (fnr, navn, sakId, fagsaksystem, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt, journalførendeEnhet) = arkiveringsPayload.metadata
+private fun lagJournalpostData(
+    pdf: ByteArray,
+    metadata: Metadata,
+    journalføringsMetadata: JournalføringsMetadata,
+    referanse: UUID,
+    tidspunkt: LocalDateTime
+): JournalpostData {
 
     return JournalpostData(
         pdf = pdf,
-        navn = navn,
-        fnr = fnr,
+        navn = metadata.navn,
+        fnr = metadata.fnr,
         tidspunkt = tidspunkt,
-        sakId = sakId,
-        fagsaksystem = fagsaksystem,
+        sakId = journalføringsMetadata.sakId,
+        fagsaksystem = journalføringsMetadata.fagsaksystem,
         eksternReferanse = referanse,
-        oppfølgingsperiodeStart = oppfølgingsperiodeStart,
-        oppfølgingsperiodeSlutt = oppfølgingsperiodeSlutt,
-        journalførendeEnhet = journalførendeEnhet
+        oppfølgingsperiodeStart = metadata.oppfølgingsperiodeStart,
+        oppfølgingsperiodeSlutt = metadata.oppfølgingsperiodeSlutt,
+        journalførendeEnhet = journalføringsMetadata.journalførendeEnhet
     )
 }
