@@ -38,7 +38,7 @@ fun lagJournalpost(journalpostData: JournalpostData): String =
             )
         ),
         eksternReferanseId = journalpostData.eksternReferanse.toString(),
-        journalfoerendeEnhet = "0701",
+        journalfoerendeEnhet = journalpostData.journalførendeEnhet,
         journalposttype = "INNGAAENDE",
         kanal = "NAV_NO",
         sak = Sak(

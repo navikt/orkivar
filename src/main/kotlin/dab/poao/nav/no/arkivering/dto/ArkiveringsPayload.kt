@@ -22,6 +22,7 @@ data class ArkiveringsMetadata (
     val fagsaksystem: String,
     val oppfølgingsperiodeStart: String,
     val oppfølgingsperiodeSlutt: String?,
+    val journalførendeEnhet: String,
     val oppfølgingsperiodeId: String,
 )
 

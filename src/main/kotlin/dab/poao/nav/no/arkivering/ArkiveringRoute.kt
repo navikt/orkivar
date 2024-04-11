@@ -128,7 +128,7 @@ private fun lagPdfgenPayload(arkiveringsPayload: ArkiveringsPayload, tidspunkt: 
 }
 
 private fun lagJournalpostData(pdf: ByteArray, arkiveringsPayload: ArkiveringsPayload, referanse: UUID, tidspunkt: LocalDateTime): JournalpostData {
-    val (fnr, navn, sakId, fagsaksystem, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt) = arkiveringsPayload.metadata
+    val (fnr, navn, sakId, fagsaksystem, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt, journalførendeEnhet) = arkiveringsPayload.metadata
 
     return JournalpostData(
         pdf = pdf,
@@ -139,6 +139,7 @@ private fun lagJournalpostData(pdf: ByteArray, arkiveringsPayload: ArkiveringsPa
         fagsaksystem = fagsaksystem,
         eksternReferanse = referanse,
         oppfølgingsperiodeStart = oppfølgingsperiodeStart,
-        oppfølgingsperiodeSlutt = oppfølgingsperiodeSlutt
+        oppfølgingsperiodeSlutt = oppfølgingsperiodeSlutt,
+        journalførendeEnhet = journalførendeEnhet
     )
 }

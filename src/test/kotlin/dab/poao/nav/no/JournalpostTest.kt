@@ -19,8 +19,9 @@ class JournalpostTest: StringSpec({
         val fagsaksystem = "ARBEIDSOPPFOLGING"
         val oppfølgingsperiodeStart = "10. juni 2023"
         val oppfølgingsperiodeSlutt = null
+        val journalførendeEnhet = "0303"
 
-        val json = lagJournalpost(JournalpostData(byteArray, navn, fnr, tidspunkt, sakId, fagsaksystem, eksternReferanseId, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt))
+        val json = lagJournalpost(JournalpostData(byteArray, navn, fnr, tidspunkt, sakId, fagsaksystem, eksternReferanseId, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt, journalførendeEnhet))
         json shouldEqualJson """
             {
               "avsenderMottaker": {
@@ -59,7 +60,7 @@ class JournalpostTest: StringSpec({
                 }
               ],
               "eksternReferanseId": "$eksternReferanseId",
-              "journalfoerendeEnhet": "0701",
+              "journalfoerendeEnhet": "$journalførendeEnhet",
               "journalposttype": "INNGAAENDE",
               "kanal": "NAV_NO",
               "sak": {

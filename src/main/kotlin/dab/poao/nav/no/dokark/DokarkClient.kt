@@ -73,7 +73,8 @@ data class JournalpostData(
     val fagsaksystem: String,
     val eksternReferanse: UUID,
     val oppfølgingsperiodeStart: String,
-    val oppfølgingsperiodeSlutt: String?
+    val oppfølgingsperiodeSlutt: String?,
+    val journalførendeEnhet: String,
 )
 
 @Serializable

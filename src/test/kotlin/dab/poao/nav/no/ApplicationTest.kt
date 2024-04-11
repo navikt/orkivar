@@ -24,8 +24,10 @@ import io.ktor.server.engine.*
 import io.ktor.server.testing.*
 import io.ktor.utils.io.*
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
+import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.serialization.json.Json
 import no.nav.security.mock.oauth2.MockOAuth2Server
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.sql.DataSource
 
@@ -72,6 +74,7 @@ class ApplicationTest : StringSpec({
         val forslagAktivitet = arkivAktivitet(status = "Forslag", meldinger = meldingerArray)
         val avbruttAktivitet = arkivAktivitet(status = "Avbrutt")
         val oppfølgingsperiodeId = UUID.randomUUID().toString()
+        val journalførendeEnhet = "0303"
 
         val response = client.post("/forhaandsvisning") {
             bearerAuth(token)
@@ -86,7 +89,8 @@ class ApplicationTest : StringSpec({
                         "oppfølgingsperiodeSlutt": null,
                         "sakId": 1000,
                         "fagsaksystem": "ARBEIDSOPPFOLGING",
-                        "oppfølgingsperiodeId": "$oppfølgingsperiodeId"
+                        "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
+                        "journalførendeEnhet": "$journalførendeEnhet"
                     },
                     "aktiviteter": {
                         "Planlagt": [
@@ -118,6 +122,7 @@ class ApplicationTest : StringSpec({
         val sakId = 1000
         val fagsaksystem = "ARBEIDSOPPFOLGING"
         val oppfølgingsperiodeId = UUID.randomUUID()
+        val journalførendeEnhet = "0303"
 
         val response = client.post("/arkiver") {
             bearerAuth(token)
@@ -132,7 +137,8 @@ class ApplicationTest : StringSpec({
                         "oppfølgingsperiodeSlutt": null,
                         "sakId": $sakId, 
                         "fagsaksystem": $fagsaksystem,
-                        "oppfølgingsperiodeId": "$oppfølgingsperiodeId"
+                        "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
+                        "journalførendeEnhet": "$journalførendeEnhet"
                     },
                     "aktiviteter": {
                         "Planlagt": [
@@ -157,15 +163,17 @@ class ApplicationTest : StringSpec({
         journalPost.oppfølgingsperiodeId shouldBe oppfølgingsperiodeId
 
         val opprettet = repository.hentJournalposter(fnr).first().opprettetTidspunkt
+        val opprettetFormatert = opprettet.toJavaLocalDateTime().format(norskDatoKlokkeslettFormat)
         val requestsTilPdfgen = mockEngine.requestHistory.filter { pdfgenUrl.contains(it.url.host) }
         requestsTilPdfgen shouldHaveSize 1
+
         requestsTilPdfgen.first().body.asString() shouldEqualJson """
                 {
                     "navn": "TRIVIELL SKILPADDE",
                     "fnr": "$fnr",
                     "oppfølgingsperiodeStart": "19 oktober 2021",
                     "oppfølgingsperiodeSlutt": null,
-                    "journalfoeringstidspunkt":"${opprettet}",
+                    "journalfoeringstidspunkt":"$opprettetFormatert",
                     "aktiviteter": {
                         "Planlagt": [
                             $forslagAktivitet
@@ -185,6 +193,7 @@ class ApplicationTest : StringSpec({
         bodyTilJoark.shouldContainJsonKeyValue("sak.fagsakId", sakId.toString())
         bodyTilJoark.shouldContainJsonKeyValue("eksternReferanseId", journalPost.referanse.toString())
         bodyTilJoark.shouldContainJsonKeyValue("sak.fagsaksystem", fagsaksystem)
+        bodyTilJoark.shouldContainJsonKeyValue("journalfoerendeEnhet", journalførendeEnhet)
     }
 
 }) {
@@ -377,3 +386,5 @@ private fun MockEngine.resetRequestHistory() {
         requestHistory.removeFirst()
     }
 }
+
+private val norskDatoKlokkeslettFormat = DateTimeFormatter.ofPattern("d. MMMM uuuu 'kl.' HH:mm", Locale.forLanguageTag("no"))
