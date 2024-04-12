@@ -243,7 +243,6 @@ private val mockEngine = MockEngine { request ->
         val kanFerdigstilles = journalpost.tema != null
                 && journalpost.bruker != null
                 && journalpost.sak != null
-                && journalpost.kanal != null
                 && journalpost.journalfoerendeEnhet != null
                 && journalpost.tittel != null
                 && journalpost.avsenderMottaker?.navn != null

@@ -17,7 +17,6 @@ fun lagJournalpost(journalpostData: JournalpostData): String =
             idType = "FNR"
         ),
         tema = "OPP",
-        behandlingstema = "ab0001",
         bruker = Bruker(
             journalpostData.fnr,
             "FNR"
@@ -26,7 +25,6 @@ fun lagJournalpost(journalpostData: JournalpostData): String =
         datoMottatt = journalpostData.tidspunkt.toString(),
         dokumenter = listOf(
             Dokument(
-                brevkode = "NAV 04-01.04",
                 tittel = "Aktivitetsplan og dialog ${journalpostData.oppfølgingsperiodeStart} - ${journalpostData.oppfølgingsperiodeSlutt?.let { it }?: ""}",
                 dokumentvarianter = listOf(
                     Dokumentvariant(
@@ -39,26 +37,18 @@ fun lagJournalpost(journalpostData: JournalpostData): String =
         ),
         eksternReferanseId = journalpostData.eksternReferanse.toString(),
         journalfoerendeEnhet = journalpostData.journalførendeEnhet,
-        journalposttype = "INNGAAENDE",
-        kanal = "NAV_NO",
+        journalposttype = "NOTAT",
         sak = Sak(
             fagsakId = journalpostData.sakId.toString(),
             fagsaksystem = journalpostData.fagsaksystem,
             sakstype = "FAGSAK"
         ),
-        tilleggsopplysninger = listOf(
-            Tilleggsopplysninger(
-                nokkel = "orkivar",
-                verdi = "12345"
-            )
-        ),
-        tittel = "Søknad om dagpenger ved permittering"
+        tittel = "Aktivitetsplan og dialog"
     ))
 
 @Serializable
 data class Journalpost(
     val avsenderMottaker: AvsenderMottaker? = null,
-    val behandlingstema: String? = null,
     val bruker: Bruker? = null,
     val datoDokument: String? = null,
     val datoMottatt: String? = null,
@@ -66,10 +56,8 @@ data class Journalpost(
     val eksternReferanseId: String? = null,
     val journalfoerendeEnhet: String? = null,
     val journalposttype: String,
-    val kanal: String? = null,
     val sak: Sak? = null,
     val tema: String? = null,
-    val tilleggsopplysninger: List<Tilleggsopplysninger>? = null,
     val tittel: String? = null,
 )
 
@@ -88,7 +76,6 @@ data class Bruker(
 
 @Serializable
 data class Dokument(
-    val brevkode: String,
     val dokumentvarianter: List<Dokumentvariant>,
     val tittel: String?,
 )
