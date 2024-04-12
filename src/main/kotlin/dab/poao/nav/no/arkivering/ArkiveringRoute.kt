@@ -1,8 +1,6 @@
 package dab.poao.nav.no.arkivering
 
-import dab.poao.nav.no.arkivering.dto.ArkiveringsPayload
-import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
-import dab.poao.nav.no.arkivering.dto.JournalføringOutbound
+import dab.poao.nav.no.arkivering.dto.*
 import dab.poao.nav.no.azureAuth.logger
 import dab.poao.nav.no.database.OppfølgingsperiodeId
 import dab.poao.nav.no.database.Repository
@@ -36,7 +34,7 @@ fun Route.arkiveringRoutes(
     post("/arkiver") {
         val token = call.hentUtBearerToken()
         val navIdent = call.hentNavIdentClaim()
-        val arkiveringsPayload = call.arkiveringspayload()
+        val arkiveringsPayload = call.hentPayload<JournalføringPayload>()
 
         val tidspunkt = LocalDateTime.now()
         val pdfGenPayload = lagPdfgenPayload(arkiveringsPayload, tidspunkt)
@@ -60,11 +58,11 @@ fun Route.arkiveringRoutes(
                 lagreJournalfoering(
                     Repository.NyJournalføring(
                         navIdent = navIdent,
-                        fnr = arkiveringsPayload.metadata.fnr,
+                        fnr = arkiveringsPayload.fnr,
                         opprettetTidspunkt = tidspunkt,
                         referanse = referanse,
                         journalpostId = dokarkResult.journalpostId,
-                        oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.metadata.oppfølgingsperiodeId)
+                        oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.oppfølgingsperiodeId)
                     )
                 )
                 call.respond(JournalføringOutbound(tidspunkt.toKotlinLocalDateTime()))
@@ -73,10 +71,10 @@ fun Route.arkiveringRoutes(
     }
 
     post("/forhaandsvisning") {
-        val arkiveringsPayload = call.arkiveringspayload()
-        val pdfgenPayload = lagPdfgenPayload(arkiveringsPayload, LocalDateTime.now())
+        val forhåndsvisningPayload = call.hentPayload<ForhåndsvisningPayload>()
+        val pdfgenPayload = lagPdfgenPayload(forhåndsvisningPayload, LocalDateTime.now())
         val pdfResult = pdfgenClient.generatePdf(pdfgenPayload)
-        val oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.metadata.oppfølgingsperiodeId)
+        val oppfølgingsperiodeId = UUID.fromString(forhåndsvisningPayload.oppfølgingsperiodeId)
         val sisteJournalføring = hentJournalføringer(oppfølgingsperiodeId).sortedByDescending { it.opprettetTidspunkt }.firstOrNull()
         when (pdfResult) {
             is PdfSuccess -> call.respond(ForhaandsvisningOutbound(pdfResult.pdfByteString, sisteJournalføring?.opprettetTidspunkt))
@@ -97,11 +95,11 @@ private fun ApplicationCall.hentNavIdentClaim(): String {
         ?: throw RuntimeException("Klarte ikke å hente NAVident claim fra tokenet")
 }
 
-private suspend fun ApplicationCall.arkiveringspayload(): ArkiveringsPayload {
+private suspend inline fun <reified T: Any> ApplicationCall.hentPayload(): T {
     // Eksplisitt kasting av exception for å sikre at stacktrace kommer til loggen
     // Kan fjernes når feature er ferdig, og alt kan da gjøres inline der denne funksjonen brukes
     return try {
-        this.receive<ArkiveringsPayload>()
+        this.receive()
     } catch (e: Exception) {
         logger.error("Feil ved deserialisering", e)
         throw e

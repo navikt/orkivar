@@ -7,22 +7,29 @@ import kotlinx.serialization.Serializable
 typealias ArkivAktivitetStatus = String
 
 @Serializable
-data class ArkiveringsPayload(
-    val metadata: ArkiveringsMetadata,
+data class JournalføringPayload(
+    val fnr: Fnr,
+    val navn: Navn,
+    val oppfølgingsperiodeStart: String,
+    val oppfølgingsperiodeSlutt: String?,
     val aktiviteter: Map<ArkivAktivitetStatus, List<ArkivAktivitet>>,
     val dialogtråder: List<ArkivDialogtråd>,
     val mål: String?,
+    val journalførendeEnhet: String,
+    val sakId: Long,
+    val fagsaksystem: String,
+    val oppfølgingsperiodeId: String,
 )
 
 @Serializable
-data class ArkiveringsMetadata (
+data class ForhåndsvisningPayload(
     val fnr: Fnr,
     val navn: Navn,
-    val sakId: Long,
-    val fagsaksystem: String,
     val oppfølgingsperiodeStart: String,
     val oppfølgingsperiodeSlutt: String?,
-    val journalførendeEnhet: String,
+    val aktiviteter: Map<ArkivAktivitetStatus, List<ArkivAktivitet>>,
+    val dialogtråder: List<ArkivDialogtråd>,
+    val mål: String?,
     val oppfølgingsperiodeId: String,
 )
 
