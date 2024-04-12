@@ -48,17 +48,17 @@ fun lagJournalpost(journalpostData: JournalpostData): String =
 
 @Serializable
 data class Journalpost(
-    val avsenderMottaker: AvsenderMottaker? = null,
-    val bruker: Bruker? = null,
-    val datoDokument: String? = null,
-    val datoMottatt: String? = null,
+    val avsenderMottaker: AvsenderMottaker,
+    val bruker: Bruker,
+    val datoDokument: String,
+    val datoMottatt: String,
     val dokumenter: List<Dokument>,
-    val eksternReferanseId: String? = null,
-    val journalfoerendeEnhet: String? = null,
+    val eksternReferanseId: String,
+    val journalfoerendeEnhet: String,
     val journalposttype: String,
-    val sak: Sak? = null,
-    val tema: String? = null,
-    val tittel: String? = null,
+    val sak: Sak,
+    val tema: String,
+    val tittel: String,
 )
 
 @Serializable
@@ -77,7 +77,7 @@ data class Bruker(
 @Serializable
 data class Dokument(
     val dokumentvarianter: List<Dokumentvariant>,
-    val tittel: String?,
+    val tittel: String,
 )
 
 @Serializable
@@ -93,10 +93,3 @@ data class Sak(
     val fagsaksystem: String,
     val sakstype: String,
 )
-
-@Serializable
-data class Tilleggsopplysninger(
-    val nokkel: String,
-    val verdi: String,
-)
-

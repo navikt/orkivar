@@ -194,6 +194,7 @@ class ApplicationTest : StringSpec({
         bodyTilJoark.shouldContainJsonKeyValue("eksternReferanseId", journalPost.referanse.toString())
         bodyTilJoark.shouldContainJsonKeyValue("sak.fagsaksystem", fagsaksystem)
         bodyTilJoark.shouldContainJsonKeyValue("journalfoerendeEnhet", journalførendeEnhet)
+        bodyTilJoark.shouldContainJsonKeyValue("tittel", "Aktivitetsplan og dialog")
     }
 
 }) {
