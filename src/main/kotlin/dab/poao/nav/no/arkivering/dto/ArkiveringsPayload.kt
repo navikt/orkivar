@@ -6,25 +6,43 @@ import kotlinx.serialization.Serializable
 
 typealias ArkivAktivitetStatus = String
 
-@Serializable
-data class ArkiveringsPayload(
-    val metadata: ArkiveringsMetadata,
-    val aktiviteter: Map<ArkivAktivitetStatus, List<ArkivAktivitet>>,
-    val dialogtråder: List<ArkivDialogtråd>,
-    val mål: String?,
-)
+sealed interface PdfData {
+    val fnr: Fnr
+    val navn: Navn
+    val oppfølgingsperiodeStart: String
+    val oppfølgingsperiodeSlutt: String?
+    val aktiviteter: Map<ArkivAktivitetStatus, List<ArkivAktivitet>>
+    val dialogtråder: List<ArkivDialogtråd>
+    val mål: String?
+    val oppfølgingsperiodeId: String
+}
 
 @Serializable
-data class ArkiveringsMetadata (
-    val fnr: Fnr,
-    val navn: Navn,
+data class JournalføringPayload(
+    override val fnr: Fnr,
+    override val navn: Navn,
+    override val oppfølgingsperiodeStart: String,
+    override val oppfølgingsperiodeSlutt: String?,
+    override val aktiviteter: Map<ArkivAktivitetStatus, List<ArkivAktivitet>>,
+    override val dialogtråder: List<ArkivDialogtråd>,
+    override val mål: String?,
+    override val oppfølgingsperiodeId: String,
+    val journalførendeEnhet: String,
     val sakId: Long,
     val fagsaksystem: String,
-    val oppfølgingsperiodeStart: String,
-    val oppfølgingsperiodeSlutt: String?,
-    val journalførendeEnhet: String,
-    val oppfølgingsperiodeId: String,
-)
+): PdfData
+
+@Serializable
+data class ForhåndsvisningPayload(
+    override val fnr: Fnr,
+    override val navn: Navn,
+    override val oppfølgingsperiodeStart: String,
+    override val oppfølgingsperiodeSlutt: String?,
+    override val aktiviteter: Map<ArkivAktivitetStatus, List<ArkivAktivitet>>,
+    override val dialogtråder: List<ArkivDialogtråd>,
+    override val mål: String?,
+    override val oppfølgingsperiodeId: String,
+): PdfData
 
 @Serializable
 data class ArkivAktivitet(
