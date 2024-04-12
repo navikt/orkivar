@@ -74,7 +74,6 @@ class ApplicationTest : StringSpec({
         val forslagAktivitet = arkivAktivitet(status = "Forslag", meldinger = meldingerArray)
         val avbruttAktivitet = arkivAktivitet(status = "Avbrutt")
         val oppfølgingsperiodeId = UUID.randomUUID().toString()
-        val journalførendeEnhet = "0303"
 
         val response = client.post("/forhaandsvisning") {
             bearerAuth(token)
@@ -82,16 +81,11 @@ class ApplicationTest : StringSpec({
             setBody(
                 """
                 {
-                    "metadata": {
-                        "navn": "TRIVIELL SKILPADDE",
-                        "fnr": "$fnr",
-                        "oppfølgingsperiodeStart": "19 oktober 2021",
-                        "oppfølgingsperiodeSlutt": null,
-                        "sakId": 1000,
-                        "fagsaksystem": "ARBEIDSOPPFOLGING",
-                        "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
-                        "journalførendeEnhet": "$journalførendeEnhet"
-                    },
+                    "navn": "TRIVIELL SKILPADDE",
+                    "fnr": "$fnr",
+                    "oppfølgingsperiodeStart": "19 oktober 2021",
+                    "oppfølgingsperiodeSlutt": null,
+                    "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
                     "aktiviteter": {
                         "Planlagt": [
                             $forslagAktivitet
@@ -130,16 +124,14 @@ class ApplicationTest : StringSpec({
             setBody(
                 """
                 {
-                    "metadata": {
-                        "navn": "TRIVIELL SKILPADDE",
-                        "fnr": "$fnr",
-                        "oppfølgingsperiodeStart": "19 oktober 2021",
-                        "oppfølgingsperiodeSlutt": null,
-                        "sakId": $sakId, 
-                        "fagsaksystem": $fagsaksystem,
-                        "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
-                        "journalførendeEnhet": "$journalførendeEnhet"
-                    },
+                    "navn": "TRIVIELL SKILPADDE",
+                    "fnr": "$fnr",
+                    "oppfølgingsperiodeStart": "19 oktober 2021",
+                    "oppfølgingsperiodeSlutt": null,
+                    "sakId": $sakId, 
+                    "fagsaksystem": $fagsaksystem,
+                    "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
+                    "journalførendeEnhet": "$journalførendeEnhet",
                     "aktiviteter": {
                         "Planlagt": [
                             $forslagAktivitet

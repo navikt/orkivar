@@ -106,38 +106,34 @@ private suspend inline fun <reified T: Any> ApplicationCall.hentPayload(): T {
     }
 }
 
-private fun lagPdfgenPayload(arkiveringsPayload: ArkiveringsPayload, tidspunkt: LocalDateTime): PdfgenPayload {
-    val (fnr, navn, _, _, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt) = arkiveringsPayload.metadata
-
+private fun lagPdfgenPayload(pdfData: PdfData, tidspunkt: LocalDateTime): PdfgenPayload {
     val norskDatoKlokkeslettFormat = DateTimeFormatter.ofPattern("d. MMMM uuuu 'kl.' HH:mm", Locale.forLanguageTag("no"))
 
     val formatertTidspunkt = tidspunkt.format(norskDatoKlokkeslettFormat)
 
     return PdfgenPayload(
-        navn = navn,
-        fnr = fnr,
-        oppfølgingsperiodeStart = oppfølgingsperiodeStart,
-        oppfølgingsperiodeSlutt = oppfølgingsperiodeSlutt,
-        aktiviteter = arkiveringsPayload.aktiviteter,
-        dialogtråder = arkiveringsPayload.dialogtråder,
-        mål = arkiveringsPayload.mål,
+        navn = pdfData.navn,
+        fnr = pdfData.fnr,
+        oppfølgingsperiodeStart = pdfData.oppfølgingsperiodeStart,
+        oppfølgingsperiodeSlutt = pdfData.oppfølgingsperiodeSlutt,
+        aktiviteter = pdfData.aktiviteter,
+        dialogtråder = pdfData.dialogtråder,
+        mål = pdfData.mål,
         journalfoeringstidspunkt = formatertTidspunkt
     )
 }
 
-private fun lagJournalpostData(pdf: ByteArray, arkiveringsPayload: ArkiveringsPayload, referanse: UUID, tidspunkt: LocalDateTime): JournalpostData {
-    val (fnr, navn, sakId, fagsaksystem, oppfølgingsperiodeStart, oppfølgingsperiodeSlutt, journalførendeEnhet) = arkiveringsPayload.metadata
-
+private fun lagJournalpostData(pdf: ByteArray, journalføringsPayload: JournalføringPayload, referanse: UUID, tidspunkt: LocalDateTime): JournalpostData {
     return JournalpostData(
         pdf = pdf,
-        navn = navn,
-        fnr = fnr,
+        navn = journalføringsPayload.navn,
+        fnr = journalføringsPayload.fnr,
         tidspunkt = tidspunkt,
-        sakId = sakId,
-        fagsaksystem = fagsaksystem,
+        sakId = journalføringsPayload.sakId,
+        fagsaksystem = journalføringsPayload.fagsaksystem,
         eksternReferanse = referanse,
-        oppfølgingsperiodeStart = oppfølgingsperiodeStart,
-        oppfølgingsperiodeSlutt = oppfølgingsperiodeSlutt,
-        journalførendeEnhet = journalførendeEnhet
+        oppfølgingsperiodeStart = journalføringsPayload.oppfølgingsperiodeStart,
+        oppfølgingsperiodeSlutt = journalføringsPayload.oppfølgingsperiodeSlutt,
+        journalførendeEnhet = journalføringsPayload.journalførendeEnhet
     )
 }
