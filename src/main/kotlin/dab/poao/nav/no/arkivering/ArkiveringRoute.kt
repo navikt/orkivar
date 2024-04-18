@@ -131,6 +131,7 @@ private fun lagJournalpostData(pdf: ByteArray, journalføringsPayload: Journalf�
         tidspunkt = tidspunkt,
         sakId = journalføringsPayload.sakId,
         fagsaksystem = journalføringsPayload.fagsaksystem,
+        tema = journalføringsPayload.tema,
         eksternReferanse = referanse,
         oppfølgingsperiodeStart = journalføringsPayload.oppfølgingsperiodeStart,
         oppfølgingsperiodeSlutt = journalføringsPayload.oppfølgingsperiodeSlutt,

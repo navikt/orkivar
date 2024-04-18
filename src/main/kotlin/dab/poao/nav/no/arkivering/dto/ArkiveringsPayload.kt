@@ -30,6 +30,7 @@ data class JournalføringPayload(
     val journalførendeEnhet: String,
     val sakId: Long,
     val fagsaksystem: String,
+    val tema: String,
 ): PdfData
 
 @Serializable

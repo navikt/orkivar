@@ -115,6 +115,7 @@ class ApplicationTest : StringSpec({
         val avbruttAktivitet = arkivAktivitet(status = "Avbrutt")
         val sakId = 1000
         val fagsaksystem = "ARBEIDSOPPFOLGING"
+        val tema = "OPP"
         val oppfølgingsperiodeId = UUID.randomUUID()
         val journalførendeEnhet = "0303"
 
@@ -130,6 +131,7 @@ class ApplicationTest : StringSpec({
                     "oppfølgingsperiodeSlutt": null,
                     "sakId": $sakId, 
                     "fagsaksystem": $fagsaksystem,
+                    "tema": "$tema",
                     "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
                     "journalførendeEnhet": "$journalførendeEnhet",
                     "aktiviteter": {
@@ -187,6 +189,7 @@ class ApplicationTest : StringSpec({
         bodyTilJoark.shouldContainJsonKeyValue("sak.fagsaksystem", fagsaksystem)
         bodyTilJoark.shouldContainJsonKeyValue("journalfoerendeEnhet", journalførendeEnhet)
         bodyTilJoark.shouldContainJsonKeyValue("tittel", "Aktivitetsplan og dialog")
+        bodyTilJoark.shouldContainJsonKeyValue("tema", "OPP")
     }
 
 }) {

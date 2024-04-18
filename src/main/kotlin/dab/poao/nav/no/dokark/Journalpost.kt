@@ -16,7 +16,7 @@ fun lagJournalpost(journalpostData: JournalpostData): String =
             navn = journalpostData.navn,
             idType = "FNR"
         ),
-        tema = "OPP",
+        tema = journalpostData.tema,
         bruker = Bruker(
             journalpostData.fnr,
             "FNR"

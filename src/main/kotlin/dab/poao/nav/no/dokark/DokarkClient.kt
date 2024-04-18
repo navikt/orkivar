@@ -71,6 +71,7 @@ data class JournalpostData(
     val tidspunkt: LocalDateTime,
     val sakId: Long,
     val fagsaksystem: String,
+    val tema: String,
     val eksternReferanse: UUID,
     val oppfølgingsperiodeStart: String,
     val oppfølgingsperiodeSlutt: String?,
