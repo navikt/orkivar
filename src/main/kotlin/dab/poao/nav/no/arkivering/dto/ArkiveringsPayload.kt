@@ -118,6 +118,5 @@ data class Historikk(
 @Serializable
 data class Endring(
     val formattertTidspunkt: String,
-    val beskrivelseForVeileder: String,
-    val beskrivelseForBruker: String,
+    val beskrivelse: String,
 )

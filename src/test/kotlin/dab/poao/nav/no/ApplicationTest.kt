@@ -319,8 +319,7 @@ private fun arkivAktivitet(status: String, meldinger: String = "[]") = """
         "endringer" : [ 
           {
             "formattertTidspunkt" : "25. mars 2024 kl. 08:00",
-            "beskrivelseForVeileder" : "Bruker opprettet aktiviteten",
-            "beskrivelseForBruker" : "Du opprettet aktiviteten"
+            "beskrivelse" : "Bruker opprettet aktiviteten"
           } 
         ]
       }
