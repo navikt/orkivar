@@ -318,7 +318,7 @@ private fun arkivAktivitet(status: String, meldinger: String = "[]") = """
       "historikk" : {
         "endringer" : [ 
           {
-            "formattertTidspunkt" : "25. mars 2024 kl. 08:00",
+            "formattertTidspunkt" : "25. mars 2024 kl. 08.00",
             "beskrivelse" : "Bruker opprettet aktiviteten"
           } 
         ]
@@ -329,13 +329,13 @@ private fun arkivAktivitet(status: String, meldinger: String = "[]") = """
 private val meldingerArray = """
      [ {
         "avsender" : "VEILEDER",
-        "sendt" : "05 februar 2024 kl. 02:31",
+        "sendt" : "05 februar 2024 kl. 02.31",
         "lest" : true,
         "viktig" : false,
         "tekst" : "wehfuiehwf\n\nHilsen F_994188 E_994188"
       }, {
         "avsender" : "BRUKER",
-        "sendt" : "05 februar 2024 kl. 02:31",
+        "sendt" : "05 februar 2024 kl. 02.31",
         "lest" : true,
         "viktig" : false,
         "tekst" : "Jada"
@@ -347,7 +347,7 @@ private val dialogtråder = """
         "overskrift" : "Penger",
         "meldinger" : [ {
           "avsender" : "BRUKER",
-          "sendt" : "05 februar 2024 kl. 02:29",
+          "sendt" : "05 februar 2024 kl. 02.29",
           "lest" : true,
           "viktig" : false,
           "tekst" : "Jeg liker NAV. NAV er snille!"
@@ -381,4 +381,4 @@ private fun MockEngine.resetRequestHistory() {
     }
 }
 
-private val norskDatoKlokkeslettFormat = DateTimeFormatter.ofPattern("d. MMMM uuuu 'kl.' HH:mm", Locale.forLanguageTag("no"))
+private val norskDatoKlokkeslettFormat = DateTimeFormatter.ofPattern("d. MMMM uuuu 'kl.' HH.mm", Locale.forLanguageTag("no"))

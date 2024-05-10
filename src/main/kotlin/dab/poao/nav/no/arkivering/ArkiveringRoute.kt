@@ -107,7 +107,7 @@ private suspend inline fun <reified T: Any> ApplicationCall.hentPayload(): T {
 }
 
 private fun lagPdfgenPayload(pdfData: PdfData, tidspunkt: LocalDateTime): PdfgenPayload {
-    val norskDatoKlokkeslettFormat = DateTimeFormatter.ofPattern("d. MMMM uuuu 'kl.' HH:mm", Locale.forLanguageTag("no"))
+    val norskDatoKlokkeslettFormat = DateTimeFormatter.ofPattern("d. MMMM uuuu 'kl.' HH.mm", Locale.forLanguageTag("no"))
 
     val formatertTidspunkt = tidspunkt.format(norskDatoKlokkeslettFormat)
 
