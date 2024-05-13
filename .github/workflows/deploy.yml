@@ -9,6 +9,8 @@ on:
     secrets:
       NAIS_WORKLOAD_IDENTITY_PROVIDER:
         required: true
+      SLACK_WEBHOOK:
+        required: true
 
 jobs:
   build:
