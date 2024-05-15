@@ -9,14 +9,14 @@ spec:
   image: {{ image }}
   ingresses:
     - https://orkivar.intern.dev.nav.no
-  port: 9000
+  port: 8080
   liveness:
     path: /isAlive
-    port: 9000
+    port: 8080
     initialDelay: 5
   readiness:
     path: /isReady
-    port: 9000
+    port: 8080
     initialDelay: 5
   gcp:
     sqlInstances:

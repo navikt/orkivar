@@ -9,14 +9,14 @@ spec:
   ingresses:
     - https://orkivar.intern.nav.no
   image: {{ image }}
-  port: 9000
+  port: 8080
   liveness:
     path: /isAlive
-    port: 9000
+    port: 8080
     initialDelay: 5
   readiness:
     path: /isReady
-    port: 9000
+    port: 8080
     initialDelay: 5
   prometheus:
     enabled: true

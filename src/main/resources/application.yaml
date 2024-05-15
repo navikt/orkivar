@@ -3,7 +3,7 @@ ktor:
         modules:
             - dab.poao.nav.no.ApplicationKt.module
     deployment:
-        port: 9000
+        port: 8080
 
 azure:
     client-id: "$AZURE_APP_CLIENT_ID:null"
