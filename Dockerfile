@@ -8,6 +8,6 @@ COPY --from=busybox /bin/printenv /bin/printenv
 ENV TZ="Europe/Oslo"
 WORKDIR /app
 COPY build/libs/*.jar ./
-EXPOSE 8080
+EXPOSE 9000
 USER nonroot
 CMD ["dab.poao.nav.no.orkivar-all.jar"]
