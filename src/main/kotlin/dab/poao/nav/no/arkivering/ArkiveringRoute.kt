@@ -78,7 +78,7 @@ fun Route.arkiveringRoutes(
         val sisteJournalføring = hentJournalføringer(oppfølgingsperiodeId).sortedByDescending { it.opprettetTidspunkt }.firstOrNull()
         when (pdfResult) {
             is PdfSuccess -> call.respond(ForhaandsvisningOutbound(pdfResult.pdfByteString, sisteJournalføring?.opprettetTidspunkt))
-            is FailedPdfGen -> DokarkFail(pdfResult.message)
+            is FailedPdfGen -> call.respond(HttpStatusCode.InternalServerError)
         }
     }
 }
