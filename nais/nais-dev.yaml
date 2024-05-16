@@ -63,7 +63,7 @@ spec:
           cluster: dev-fss
         - application: ida
           namespace: traktor
-          cluster: dev-fss
+          cluster: prod-fss
   env:
     - name: DOKARK_CLIENT_URL
       value: https://dokarkiv-q2.dev-fss-pub.nais.io
