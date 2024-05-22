@@ -71,7 +71,7 @@ class ApplicationTest : StringSpec({
         val repository by lazy { Repository(dataSource) }
         val token = mockOAuth2Server.getAzureToken("G123223")
         val fnr = "01015450300"
-        val forslagAktivitet = arkivAktivitet(status = "Forslag", meldinger = meldingerArray)
+        val forslagAktivitet = arkivAktivitet(status = "Forslag", dialogtråd = dialogtråd)
         val avbruttAktivitet = arkivAktivitet(status = "Avbrutt")
         val oppfølgingsperiodeId = UUID.randomUUID().toString()
 
@@ -111,7 +111,7 @@ class ApplicationTest : StringSpec({
         val repository by lazy { Repository(dataSource) }
         val token = mockOAuth2Server.getAzureToken("G122123")
         val fnr = "01015450300"
-        val forslagAktivitet = arkivAktivitet(status = "Forslag", meldinger = meldingerArray)
+        val forslagAktivitet = arkivAktivitet(status = "Forslag", dialogtråd = dialogtråd)
         val avbruttAktivitet = arkivAktivitet(status = "Avbrutt")
         val sakId = 1000
         val fagsaksystem = "ARBEIDSOPPFOLGING"
@@ -269,7 +269,7 @@ private fun MockOAuth2Server.getAzureToken(navIdent: String) =
         claims = mapOf("NAVident" to navIdent, "oid" to UUID.randomUUID())
     ).serialize()
 
-private fun arkivAktivitet(status: String, meldinger: String = "[]") = """
+private fun arkivAktivitet(status: String, dialogtråd: String? = null) = """
     {
       "tittel": "tittel",
       "type": "Jobb jeg har nå",
@@ -306,7 +306,7 @@ private fun arkivAktivitet(status: String, meldinger: String = "[]") = """
           "tekst": "beskrivelse"
         }
       ],
-      "meldinger" : $meldinger,
+      "dialogtråd" : ${if (dialogtråd != null) "$dialogtråd" else null},
       "etiketter": [],
       "eksterneHandlinger": [
         {
@@ -326,20 +326,26 @@ private fun arkivAktivitet(status: String, meldinger: String = "[]") = """
     }
 """.trimIndent()
 
-private val meldingerArray = """
-     [ {
-        "avsender" : "VEILEDER",
-        "sendt" : "05 februar 2024 kl. 02.31",
-        "lest" : true,
-        "viktig" : false,
-        "tekst" : "wehfuiehwf\n\nHilsen F_994188 E_994188"
-      }, {
-        "avsender" : "BRUKER",
-        "sendt" : "05 februar 2024 kl. 02.31",
-        "lest" : true,
-        "viktig" : false,
-        "tekst" : "Jada"
-     } ]
+private val dialogtråd = """
+    {
+        "overskrift" : "Penger",
+        "meldinger" : [{
+            "avsender" : "VEILEDER",
+            "sendt" : "05 februar 2024 kl. 02.31",
+            "lest" : true,
+            "viktig" : false,
+            "tekst" : "wehfuiehwf\n\nHilsen F_994188 E_994188"
+          }, {
+            "avsender" : "BRUKER",
+            "sendt" : "05 februar 2024 kl. 02.31",
+            "lest" : true,
+            "viktig" : false,
+            "tekst" : "Jada"
+         }],
+        "egenskaper" : [ ],
+       "indexSisteMeldingLestAvBruker" : 0,
+       "tidspunktSistLestAvBruker" : "5. mars 2024 kl. 14.31"
+    }
 """.trimIndent()
 
 private val dialogtråder = """
@@ -352,7 +358,9 @@ private val dialogtråder = """
           "viktig" : false,
           "tekst" : "Jeg liker NAV. NAV er snille!"
         } ],
-        "egenskaper" : [ ]
+        "egenskaper" : [ ],
+       "indexSisteMeldingLestAvBruker" : 0,
+       "tidspunktSistLestAvBruker" : "5. mars 2024 kl. 14.31"
     } ]
 """.trimIndent()
 
