@@ -359,8 +359,8 @@ private val dialogtråder = """
           "tekst" : "Jeg liker NAV. NAV er snille!"
         } ],
         "egenskaper" : [ ],
-       "indexSisteMeldingLestAvBruker" : 0,
-       "tidspunktSistLestAvBruker" : "5. mars 2024 kl. 14.31"
+       "indexSisteMeldingLestAvBruker" : null,
+       "tidspunktSistLestAvBruker" : null
     } ]
 """.trimIndent()
 
