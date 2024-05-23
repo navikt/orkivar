@@ -331,13 +331,13 @@ private val dialogtråd = """
         "overskrift" : "Penger",
         "meldinger" : [{
             "avsender" : "VEILEDER",
-            "sendt" : "05 februar 2024 kl. 02.31",
+            "sendt" : "5. februar 2024 kl. 02.31",
             "lest" : true,
             "viktig" : false,
             "tekst" : "wehfuiehwf\n\nHilsen F_994188 E_994188"
           }, {
             "avsender" : "BRUKER",
-            "sendt" : "05 februar 2024 kl. 02.31",
+            "sendt" : "5. februar 2024 kl. 02.31",
             "lest" : true,
             "viktig" : false,
             "tekst" : "Jada"
