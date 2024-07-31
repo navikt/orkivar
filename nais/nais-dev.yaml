@@ -59,8 +59,8 @@ spec:
     inbound:
       rules:
         - application: veilarbaktivitet
-          namespace: pto
-          cluster: dev-fss
+          namespace: dab
+          cluster: dev-gcp
         - application: ida
           namespace: traktor
           cluster: prod-fss

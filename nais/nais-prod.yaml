@@ -49,8 +49,8 @@ spec:
     inbound:
       rules:
         - application: veilarbaktivitet
-          namespace: pto
-          cluster: prod-fss
+          namespace: dab
+          cluster: prod-gcp
 
   env:
     - name: DOKARK_CLIENT_URL
