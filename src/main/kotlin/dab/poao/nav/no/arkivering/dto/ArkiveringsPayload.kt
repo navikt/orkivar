@@ -55,6 +55,7 @@ data class ArkivAktivitet(
     val etiketter: List<ArkivEtikett>,
     val eksterneHandlinger: List<EksternHandling>,
     val historikk: Historikk,
+    val avtaltMedNav: Boolean
 )
 
 @Serializable
