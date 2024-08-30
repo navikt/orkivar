@@ -192,6 +192,20 @@ class ApplicationTest : StringSpec({
         bodyTilJoark.shouldContainJsonKeyValue("tema", "OPP")
     }
 
+    "Feil i request body skal kaste 400" {
+        val response = client.post("/arkiver") {
+            bearerAuth(mockOAuth2Server.getAzureToken("G122123"))
+            contentType(ContentType.Application.Json)
+            setBody(
+                """
+                {
+                    "enHeltUventetBody": true
+                }
+            """.trimIndent()
+            )
+        }
+        response.status shouldBe HttpStatusCode.BadRequest
+    }
 }) {
     companion object {
         private fun ApplicationEngineEnvironmentBuilder.doConfig(

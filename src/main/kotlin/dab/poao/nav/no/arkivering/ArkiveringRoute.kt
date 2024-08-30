@@ -86,13 +86,13 @@ fun Route.arkiveringRoutes(
 private fun ApplicationCall.hentUtBearerToken() =
     this.request.header("Authorization")
         ?.split(" ")
-        ?.lastOrNull() ?: throw IllegalArgumentException("No token found")
+        ?.lastOrNull() ?: throw IllegalAccessException("No bearer token found")
 
 private fun ApplicationCall.hentNavIdentClaim(): String {
     return authentication.principal<TokenValidationContextPrincipal>()?.context
         ?.getClaims("AzureAD")
         ?.getStringClaim("NAVident")
-        ?: throw RuntimeException("Klarte ikke å hente NAVident claim fra tokenet")
+        ?: throw IllegalAccessException("Ingen NAVident-claim på tokenet")
 }
 
 private suspend inline fun <reified T: Any> ApplicationCall.hentPayload(): T {

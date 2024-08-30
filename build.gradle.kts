@@ -45,6 +45,7 @@ dependencies {
     implementation("io.ktor:ktor-server-auth:$ktor_version")
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
     implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-server-status-pages-jvm:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-client-logging-jvm:2.3.7")
     implementation("io.ktor:ktor-client-encoding:2.3.7")

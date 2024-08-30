@@ -2,10 +2,7 @@ package dab.poao.nav.no
 
 import configureAuthentication
 import dab.poao.nav.no.database.Repository
-import dab.poao.nav.no.plugins.configureHikariDataSource
-import dab.poao.nav.no.plugins.configureFlyway
-import dab.poao.nav.no.plugins.configureMonitoring
-import dab.poao.nav.no.plugins.configureRouting
+import dab.poao.nav.no.plugins.*
 import io.ktor.client.*
 import io.ktor.client.engine.*
 import io.ktor.serialization.kotlinx.json.*
@@ -31,4 +28,5 @@ fun Application.module(httpClientEngine: HttpClientEngine = HttpClient().engine)
     configureMonitoring()
     configureRouting(httpClientEngine = httpClientEngine, lagreJournalføring = repository::lagreJournalfoering, hentJournalføringer = repository::hentJournalposter)
     configureFlyway(datasource)
+    configureErrorHandling()
 }
