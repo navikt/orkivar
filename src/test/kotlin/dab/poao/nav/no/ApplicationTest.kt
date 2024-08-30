@@ -315,7 +315,6 @@ private fun arkivAktivitet(status: String, dialogtråd: String? = null) = """
           "url": "http://localhost:8080"
         }
       ],
-      "avtaltMedNav": true,
       "historikk" : {
         "endringer" : [ 
           {
