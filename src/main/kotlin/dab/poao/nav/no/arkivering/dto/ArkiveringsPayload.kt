@@ -55,6 +55,7 @@ data class ArkivAktivitet(
     val etiketter: List<ArkivEtikett>,
     val eksterneHandlinger: List<EksternHandling>,
     val historikk: Historikk,
+    val forhaandsorientering: ArkivFHO?
 )
 
 @Serializable
@@ -121,4 +122,10 @@ data class Historikk(
 data class Endring(
     val formattertTidspunkt: String,
     val beskrivelse: String,
+)
+
+@Serializable
+data class ArkivFHO(
+    val tekst: String,
+    val tidspunktLest: String?,
 )

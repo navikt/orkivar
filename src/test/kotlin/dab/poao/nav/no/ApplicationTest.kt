@@ -72,7 +72,7 @@ class ApplicationTest : StringSpec({
         val token = mockOAuth2Server.getAzureToken("G123223")
         val fnr = "01015450300"
         val forslagAktivitet = arkivAktivitet(status = "Forslag", dialogtråd = dialogtråd)
-        val avbruttAktivitet = arkivAktivitet(status = "Avbrutt")
+        val avbruttAktivitet = arkivAktivitet(status = "Avbrutt", forhaandsorientering = forhaandsorientering)
         val oppfølgingsperiodeId = UUID.randomUUID().toString()
 
         val response = client.post("/forhaandsvisning") {
@@ -112,7 +112,7 @@ class ApplicationTest : StringSpec({
         val token = mockOAuth2Server.getAzureToken("G122123")
         val fnr = "01015450300"
         val forslagAktivitet = arkivAktivitet(status = "Forslag", dialogtråd = dialogtråd)
-        val avbruttAktivitet = arkivAktivitet(status = "Avbrutt")
+        val avbruttAktivitet = arkivAktivitet(status = "Avbrutt", forhaandsorientering = forhaandsorientering)
         val sakId = 1000
         val fagsaksystem = "ARBEIDSOPPFOLGING"
         val tema = "OPP"
@@ -283,7 +283,7 @@ private fun MockOAuth2Server.getAzureToken(navIdent: String) =
         claims = mapOf("NAVident" to navIdent, "oid" to UUID.randomUUID())
     ).serialize()
 
-private fun arkivAktivitet(status: String, dialogtråd: String? = null) = """
+private fun arkivAktivitet(status: String, dialogtråd: String? = null, forhaandsorientering: String? = null) = """
     {
       "tittel": "tittel",
       "type": "Jobb jeg har nå",
@@ -336,7 +336,15 @@ private fun arkivAktivitet(status: String, dialogtråd: String? = null) = """
             "beskrivelse" : "Bruker opprettet aktiviteten"
           } 
         ]
-      }
+      },
+      "forhaandsorientering" :  ${if (forhaandsorientering != null) "$forhaandsorientering" else null}
+    }
+""".trimIndent()
+
+private val forhaandsorientering = """
+    {
+        "tekst" : "fho tekst",
+        "tidspunktLest" : "5. mars 2024 kl. 14.31"
     }
 """.trimIndent()
 
