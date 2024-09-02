@@ -24,6 +24,25 @@ class PdfgenClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
     }
 
     suspend fun generatePdf(payload: PdfgenPayload): PdfgenResult {
+        val timesToRetry = 1
+        var numberOfRetries = 0
+
+        val result = doGeneratePdf(payload)
+
+        when (result) {
+            is FailedPdfGen -> {
+              if (numberOfRetries < timesToRetry) {
+                  numberOfRetries++
+                  return doGeneratePdf(payload)
+              } else {
+                  return result
+              }
+            }
+            is PdfSuccess -> return PdfSuccess(result.pdfByteString)
+        }
+    }
+
+    private suspend fun doGeneratePdf(payload: PdfgenPayload): PdfgenResult {
         val response = runCatching {
             client.post("$pdfgenUrl/api/v1/genpdf/dab/aktivitetsplan") {
                 setBody(payload)
