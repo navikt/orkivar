@@ -4,6 +4,7 @@ import dab.poao.nav.no.pdfgenClient.dto.PdfgenPayload
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -18,31 +19,13 @@ data class PdfSuccess(val pdfByteString: ByteArray) : PdfgenResult
 class PdfgenClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine) {
     val pdfgenUrl = config.property("orkivar-pdfgen.url").getString()
     val client = HttpClient(httpClientEngine) {
-        install(ContentNegotiation) {
-            json()
+        install(ContentNegotiation) { json() }
+        install(HttpRequestRetry) {
+            retryOnExceptionOrServerErrors(maxRetries = 1)
         }
     }
 
     suspend fun generatePdf(payload: PdfgenPayload): PdfgenResult {
-        val timesToRetry = 1
-        var numberOfRetries = 0
-
-        val result = doGeneratePdf(payload)
-
-        when (result) {
-            is FailedPdfGen -> {
-              if (numberOfRetries < timesToRetry) {
-                  numberOfRetries++
-                  return doGeneratePdf(payload)
-              } else {
-                  return result
-              }
-            }
-            is PdfSuccess -> return PdfSuccess(result.pdfByteString)
-        }
-    }
-
-    private suspend fun doGeneratePdf(payload: PdfgenPayload): PdfgenResult {
         val response = runCatching {
             client.post("$pdfgenUrl/api/v1/genpdf/dab/aktivitetsplan") {
                 setBody(payload)
