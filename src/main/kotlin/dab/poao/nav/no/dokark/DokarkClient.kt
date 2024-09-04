@@ -12,6 +12,8 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.config.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import no.nav.poao.dab.ktor_oauth_client.AzureClient
 import no.nav.poao.dab.ktor_oauth_client.IncomingToken
 import no.nav.poao.dab.ktor_oauth_client.OauthClientCredentialsConfig
@@ -28,7 +30,6 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         }
         install(Logging) {
             logger = Logger.DEFAULT
-            level = LogLevel.BODY // TODO: Fjern etter at debugging er ferdig
         }
     }
 
@@ -36,7 +37,7 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         val res = runCatching {  client.post("$clientUrl/rest/journalpostapi/v1/journalpost?forsoekFerdigstill=true") {
             header("authorization", "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}")
             contentType(ContentType.Application.Json)
-            setBody(lagJournalpost(journalpostData))
+            setBody(Json.encodeToString(lagJournalpost(journalpostData)))
         } }
             .onFailure { logger.error("Noe gikk galt", it) }
             .getOrElse { return DokarkFail("Kunne ikke poste til joark") }

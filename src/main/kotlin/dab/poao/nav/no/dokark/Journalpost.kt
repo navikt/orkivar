@@ -9,8 +9,8 @@ import java.util.*
 typealias Fnr = String
 typealias Navn = String
 
-fun lagJournalpost(journalpostData: JournalpostData): String =
-    Json.encodeToString(Journalpost(
+fun lagJournalpost(journalpostData: JournalpostData): Journalpost =
+    Journalpost(
         avsenderMottaker = AvsenderMottaker(
             id = journalpostData.fnr,
             navn = journalpostData.navn,
@@ -23,6 +23,7 @@ fun lagJournalpost(journalpostData: JournalpostData): String =
         ),
         datoDokument = journalpostData.tidspunkt.toString(),
         datoMottatt = journalpostData.tidspunkt.toString(),
+        overstyrInnsynsregler = "VISES_MASKINELT_GODKJENT",
         dokumenter = listOf(
             Dokument(
                 tittel = "Aktivitetsplan og dialog ${journalpostData.oppfølgingsperiodeStart} - ${journalpostData.oppfølgingsperiodeSlutt?.let { it }?: ""}",
@@ -44,7 +45,7 @@ fun lagJournalpost(journalpostData: JournalpostData): String =
             sakstype = "FAGSAK"
         ),
         tittel = "Aktivitetsplan og dialog"
-    ))
+    )
 
 @Serializable
 data class Journalpost(
@@ -52,6 +53,7 @@ data class Journalpost(
     val bruker: Bruker,
     val datoDokument: String,
     val datoMottatt: String,
+    val overstyrInnsynsregler: String,
     val dokumenter: List<Dokument>,
     val eksternReferanseId: String,
     val journalfoerendeEnhet: String,
