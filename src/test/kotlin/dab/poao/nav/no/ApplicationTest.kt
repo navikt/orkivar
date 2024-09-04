@@ -190,6 +190,7 @@ class ApplicationTest : StringSpec({
         bodyTilJoark.shouldContainJsonKeyValue("journalfoerendeEnhet", journalførendeEnhet)
         bodyTilJoark.shouldContainJsonKeyValue("tittel", "Aktivitetsplan og dialog")
         bodyTilJoark.shouldContainJsonKeyValue("tema", "OPP")
+        bodyTilJoark.shouldContainJsonKeyValue("overstyrInnsynsregler", "VISES_MASKINELT_GODKJENT")
     }
 
     "Feil i request body skal kaste 400" {
