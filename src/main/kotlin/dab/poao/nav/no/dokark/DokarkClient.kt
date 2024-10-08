@@ -47,10 +47,11 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         }
 
         val dokarkresponse = res.body<DokarkResponse>()
+        val dokumentInfoId = dokarkresponse.dokumenter.first().dokumentInfoId
         if (!dokarkresponse.journalpostferdigstilt) {
             logger.warn("Opprettet journalpost, men den kunne ikke bli ferdigstilt automatisk")
         }
-        return DokarkSuccess(journalpostId = dokarkresponse.journalpostId)
+        return DokarkSuccess(journalpostId = dokarkresponse.journalpostId, dokumentInfoId = dokumentInfoId)
     }
 }
 
@@ -94,5 +95,5 @@ data class DokarkResponseDokument(
 )
 
 sealed interface DokarkResult
-data class DokarkSuccess(val journalpostId: String): DokarkResult
+data class DokarkSuccess(val journalpostId: String, val dokumentInfoId: String): DokarkResult
 data class DokarkFail(val message: String): DokarkResult

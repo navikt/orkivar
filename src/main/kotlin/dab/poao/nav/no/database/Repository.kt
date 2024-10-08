@@ -25,6 +25,7 @@ class Repository(dataSource: DataSource) {
         val opprettetTidspunkt = datetime("opprettet_tidspunkt")
         val referanse = uuid("referanse")
         val journalpostId = text("journalpost_id")
+        val dokumentInfoId = text("dokument_info_id")
         val oppfølgingsperiodeId = uuid("oppfølgingsperiode_id")
     }
 
@@ -46,6 +47,7 @@ class Repository(dataSource: DataSource) {
                 it[opprettetTidspunkt] = KotlinxLocalDateTime.parse(nyJournalføring.opprettetTidspunkt.toString())
                 it[referanse] = nyJournalføring.referanse
                 it[journalpostId] = nyJournalføring.journalpostId
+                it[dokumentInfoId] = nyJournalføring.dokumentInfoId
                 it[oppfølgingsperiodeId] = nyJournalføring.oppfølgingsperiodeId
             }
         }
@@ -73,6 +75,7 @@ class Repository(dataSource: DataSource) {
         val opprettetTidspunkt: LocalDateTime,
         val referanse: UUID,
         val journalpostId: String,
+        val dokumentInfoId: String,
         val oppfølgingsperiodeId: OppfølgingsperiodeId
     )
 }
