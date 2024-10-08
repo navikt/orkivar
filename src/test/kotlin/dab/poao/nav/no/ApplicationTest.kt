@@ -57,10 +57,6 @@ class ApplicationTest : StringSpec({
         }
     }
 
-    beforeEach {
-        mockEngine.resetRequestHistory()
-    }
-
     afterSpec {
         testApp.stop()
         mockOAuth2Server.shutdown()
@@ -70,7 +66,7 @@ class ApplicationTest : StringSpec({
     "Forhåndsvisning skal generere og returnere PDF" {
         val repository by lazy { Repository(dataSource) }
         val token = mockOAuth2Server.getAzureToken("G123223")
-        val fnr = "01015450300"
+        val fnr = "01015450301"
         val forslagAktivitet = arkivAktivitet(status = "Forslag", dialogtråd = dialogtråd)
         val avbruttAktivitet = arkivAktivitet(status = "Avbrutt", forhaandsorientering = forhaandsorientering)
         val oppfølgingsperiodeId = UUID.randomUUID().toString()
@@ -122,6 +118,7 @@ class ApplicationTest : StringSpec({
         val response = client.post("/arkiver") {
             bearerAuth(token)
             contentType(ContentType.Application.Json)
+            header("test-fnr", fnr)
             setBody(
                 """
                 {
@@ -159,6 +156,7 @@ class ApplicationTest : StringSpec({
         val opprettet = repository.hentJournalposter(fnr).first().opprettetTidspunkt
         val opprettetFormatert = opprettet.toJavaLocalDateTime().format(norskDatoKlokkeslettFormat)
         val requestsTilPdfgen = mockEngine.requestHistory.filter { pdfgenUrl.contains(it.url.host) }
+            .filter { (it.body as TextContent).text.contains(fnr) }
         requestsTilPdfgen shouldHaveSize 1
 
         requestsTilPdfgen.first().body.asString() shouldEqualJson """
@@ -405,11 +403,5 @@ private fun dokarkRespons(ferdigstilt: Boolean) = """
 
 
 suspend fun OutgoingContent.asString() = this.toByteArray().decodeToString()
-
-private fun MockEngine.resetRequestHistory() {
-    while (requestHistory.isNotEmpty()) {
-        requestHistory.removeFirst()
-    }
-}
 
 private val norskDatoKlokkeslettFormat = DateTimeFormatter.ofPattern("d. MMMM uuuu 'kl.' HH.mm", Locale.forLanguageTag("no"))

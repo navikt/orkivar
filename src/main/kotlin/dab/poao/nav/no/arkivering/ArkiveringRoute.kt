@@ -62,6 +62,7 @@ fun Route.arkiveringRoutes(
                         opprettetTidspunkt = tidspunkt,
                         referanse = referanse,
                         journalpostId = dokarkResult.journalpostId,
+                        dokumentInfoId = dokarkResult.dokumentInfoId,
                         oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.oppfølgingsperiodeId)
                     )
                 )

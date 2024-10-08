@@ -1,0 +1,1 @@
+alter table journalfoeringer add column dokument_info_id TEXT unique not null;
