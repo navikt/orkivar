@@ -1,4 +1,3 @@
-
 val ktor_version = "3.0.1"
 val kotlin_version = "2.0.21"
 val logback_version = "1.4.12"
@@ -49,7 +48,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-client-logging-jvm:2.3.7")
     implementation("io.ktor:ktor-client-encoding:2.3.7")
-    testImplementation("io.ktor:ktor-server-tests-jvm")
+    testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
 
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-auth:$ktor_version")

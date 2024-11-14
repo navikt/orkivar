@@ -57,10 +57,6 @@ class ApplicationTest : StringSpec({
         }
     }
 
-    beforeEach {
-        mockEngine.resetRequestHistory()
-    }
-
     afterSpec {
         testApp.stop()
         mockOAuth2Server.shutdown()
@@ -209,7 +205,7 @@ class ApplicationTest : StringSpec({
     }
 }) {
     companion object {
-        private fun ApplicationEngineEnvironmentBuilder.doConfig(
+        private fun ApplicationEnvironmentBuilder.doConfig(
             mockOAuth2Server: MockOAuth2Server,
             postgres: EmbeddedPostgres
         ): MapApplicationConfig {
@@ -405,11 +401,5 @@ private fun dokarkRespons(ferdigstilt: Boolean) = """
 
 
 suspend fun OutgoingContent.asString() = this.toByteArray().decodeToString()
-
-private fun MockEngine.resetRequestHistory() {
-    while (requestHistory.isNotEmpty()) {
-        requestHistory.removeFirst()
-    }
-}
 
 private val norskDatoKlokkeslettFormat = DateTimeFormatter.ofPattern("d. MMMM uuuu 'kl.' HH.mm", Locale.forLanguageTag("no"))
