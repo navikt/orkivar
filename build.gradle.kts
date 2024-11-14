@@ -1,20 +1,20 @@
 
-val ktor_version: String by project
-val kotlin_version: String by project
-val logback_version: String by project
-val logstash_encoder_version: String by project
-val tokensupport_version: String by project
-val mockoauth_version: String by project
-val dab_common_version: String by project
-val hikaricp_version: String by project
-val embedded_postgres_version: String by project
-val postgres_driver_version: String by project
-val flyway_version: String by project
-val embeddedPostgresBinaries_version: String by project
-val exposed_version: String by project
-val kotest_version: String by project
+val ktor_version = "2.3.7"
+val kotlin_version = "1.9.22"
+val logback_version = "1.4.12"
+val logstash_encoder_version = "7.4"
+val tokensupport_version = "4.0.3"
+val mockoauth_version = "1.0.0"
+val dab_common_version = "2024.01.12-12.46.9d11f9b02807"
+val hikaricp_version = "6.1.0"
+val embedded_postgres_version = "2.0.6"
+val postgres_driver_version = "42.7.4"
+val flyway_version = "9.22.3"
+val embeddedPostgresBinaries_version = "16.1.1"
+val exposed_version = "0.41.1"
+val kotest_version = "5.8.0"
+val prometeus_version = "1.6.3"
 
-val prometeus_version: String by project
 plugins {
     kotlin("jvm") version "1.9.22"
     id("io.ktor.plugin") version "2.3.7"
