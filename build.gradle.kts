@@ -1,6 +1,6 @@
 
-val ktor_version = "2.3.7"
-val kotlin_version = "1.9.22"
+val ktor_version = "3.0.1"
+val kotlin_version = "2.0.21"
 val logback_version = "1.4.12"
 val logstash_encoder_version = "7.4"
 val tokensupport_version = "4.0.3"
@@ -16,9 +16,9 @@ val kotest_version = "5.8.0"
 val prometeus_version = "1.6.3"
 
 plugins {
-    kotlin("jvm") version "1.9.22"
-    id("io.ktor.plugin") version "2.3.7"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.22"
+    kotlin("jvm") version "2.0.21"
+    id("io.ktor.plugin") version "3.0.1"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
 }
 
 group = "dab.poao.nav.no"
