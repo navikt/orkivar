@@ -11,7 +11,7 @@ val embedded_postgres_version = "2.0.7"
 val postgres_driver_version = "42.7.4"
 val flyway_version = "9.22.3"
 val embeddedPostgresBinaries_version = "16.1.1"
-val exposed_version = "0.41.1"
+val exposed_version = "0.56.0"
 val kotest_version = "5.8.0"
 val prometeus_version = "1.6.3"
 
