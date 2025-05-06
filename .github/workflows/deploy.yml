@@ -7,8 +7,6 @@ on:
         required: true
         type: string
     secrets:
-      NAIS_WORKLOAD_IDENTITY_PROVIDER:
-        required: true
       SLACK_WEBHOOK:
         required: true
 
@@ -39,8 +37,6 @@ jobs:
         with:
           docker_context: .
           team: dab
-          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }} # Provided as Organization Secret
-          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }} # Provided as Organization Variable
       - name: Slack Notification (test failure)
         if: failure() && inputs.env == 'prod'
         uses: rtCamp/action-slack-notify@v2
