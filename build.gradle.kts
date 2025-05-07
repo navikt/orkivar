@@ -20,6 +20,10 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.21"
 }
 
+kotlin {
+    jvmToolchain(21)
+}
+
 group = "dab.poao.nav.no"
 version = "0.0.1"
 
