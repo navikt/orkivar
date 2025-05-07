@@ -2,7 +2,7 @@ val ktor_version = "3.0.1"
 val kotlin_version = "2.0.21"
 val logback_version = "1.4.12"
 val logstash_encoder_version = "7.4"
-val tokensupport_version = "5.0.11"
+val tokensupport_version = "5.0.24"
 val mockoauth_version = "1.0.0"
 val dab_common_version = "2024.11.14-10.46.174740baf5c7"
 val hikaricp_version = "6.1.0"
@@ -61,7 +61,7 @@ dependencies {
 
     implementation("no.nav.poao.dab:ktor-oauth-client:$dab_common_version")
 
-    implementation("no.nav.security:token-validation-ktor-v2:$tokensupport_version")
+    implementation("no.nav.security:token-validation-ktor-v3:$tokensupport_version")
     implementation("io.micrometer:micrometer-registry-prometheus:$prometeus_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstash_encoder_version")

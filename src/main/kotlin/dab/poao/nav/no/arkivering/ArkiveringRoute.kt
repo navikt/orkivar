@@ -19,7 +19,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.datetime.toKotlinLocalDateTime
-import no.nav.security.token.support.v2.TokenValidationContextPrincipal
+import no.nav.security.token.support.v3.TokenValidationContextPrincipal
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
