@@ -9,7 +9,8 @@ fun Application.configureAuthentication() {
     install(Authentication) {
         tokenValidationSupport(
             config = config,
-            resourceRetriever = DefaultResourceRetriever()
+            resourceRetriever = DefaultResourceRetriever(),
+            name = "AzureAD"
         )
     }
 }
