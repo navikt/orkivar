@@ -57,6 +57,10 @@ class ApplicationTest : StringSpec({
         }
     }
 
+    beforeEach {
+        (mockEngine.requestHistory as MutableList).clear()
+    }
+
     afterSpec {
         testApp.stop()
         mockOAuth2Server.shutdown()
