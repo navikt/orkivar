@@ -28,7 +28,7 @@ jobs:
           java-version: 21
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
       - name: ORKIVAR - Test and build
         run: ./gradlew build
       - name: Push docker image to GAR
