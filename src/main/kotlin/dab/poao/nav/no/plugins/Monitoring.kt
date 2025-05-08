@@ -7,7 +7,7 @@ import io.ktor.server.plugins.calllogging.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.micrometer.prometheus.*
+import io.micrometer.prometheusmetrics.*
 import org.slf4j.event.*
 
 val excludedPaths = listOf("/isAlive", "/isReady", "/metrics")
