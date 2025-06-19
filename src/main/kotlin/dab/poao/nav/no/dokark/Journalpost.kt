@@ -3,11 +3,14 @@ package dab.poao.nav.no.dokark
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 
 typealias Fnr = String
 typealias Navn = String
+
+val norskDatoFormat = DateTimeFormatter.ofPattern("d. MMMM uuuu", Locale.forLanguageTag("no"))
 
 fun lagJournalpost(journalpostData: JournalpostData): Journalpost =
     Journalpost(
@@ -26,7 +29,7 @@ fun lagJournalpost(journalpostData: JournalpostData): Journalpost =
         overstyrInnsynsregler = "VISES_MASKINELT_GODKJENT",
         dokumenter = listOf(
             Dokument(
-                tittel = "Aktivitetsplan og dialog ${journalpostData.oppfølgingsperiodeStart} - ${journalpostData.oppfølgingsperiodeSlutt?.let { it }?: ""}",
+                tittel = "Aktivitetsplan og dialog ${journalpostData.oppfølgingsperiodeStart} - ${journalpostData.oppfølgingsperiodeSlutt?.let { it }?: journalpostData.tidspunkt.format(norskDatoFormat)}",
                 dokumentvarianter = listOf(
                     Dokumentvariant(
                         "PDFA",
