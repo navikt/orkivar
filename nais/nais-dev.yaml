@@ -25,7 +25,7 @@ spec:
         diskAutoresize: true
         diskType: SSD
         tier: db-custom-1-3840
-        type: POSTGRES_15
+        type: POSTGRES_16
   prometheus:
     enabled: true
     path: /metrics
