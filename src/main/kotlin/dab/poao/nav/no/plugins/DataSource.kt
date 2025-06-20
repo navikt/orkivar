@@ -17,7 +17,7 @@ fun configureHikariDataSource(config: ApplicationConfig): DataSource {
     val user = config.property("postgres.user").getString()
     val pw = config.property("postgres.password").getString()
 
-    if (env == "dev") {
+    if (env == "dev" || env == "dev-gcp") {
         return HikariDataSource(HikariConfig().apply {
             driverClassName = "org.postgresql.Driver"
             jdbcUrl = "jdbc:postgresql://$host:$port/$databaseName"
