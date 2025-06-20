@@ -228,7 +228,8 @@ class ApplicationTest : StringSpec({
                 "postgres.port" to postgres.port.toString(),
                 "postgres.database-name" to "postgres",
                 "postgres.user" to "postgres",
-                "postgres.password" to "postgres"
+                "postgres.password" to "postgres",
+                "postgres.jdbc-url" to "jdbc:postgresql://localhost:${postgres.port}/postgres?user=postgres&password=postgres",
             )
             config = testConfig
             return testConfig
