@@ -42,7 +42,7 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
             .onFailure { logger.error("Noe gikk galt", it) }
             .getOrElse { return DokarkFail("Kunne ikke poste til joark") }
         if (!res.status.isSuccess()) {
-            logger.warn("Feilet å opprette journalpost:", res.bodyAsText())
+            logger.warn("Feilet å opprette journalpost: HTTP ${res.status.value} - ", res.bodyAsText())
             return DokarkFail("Feilet å laste opp til joark")
         }
 
