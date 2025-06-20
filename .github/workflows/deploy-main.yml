@@ -23,10 +23,10 @@ jobs:
     secrets: inherit
     with:
       env: dev
-#  prod:
-#    name: Deploy to prod
-#    uses: ./.github/workflows/deploy.yml
-#    secrets: inherit
-#    with:
-#      env: prod
+  prod:
+    name: Deploy to prod
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+    with:
+      env: prod
 # TODO: Legg til secrets
