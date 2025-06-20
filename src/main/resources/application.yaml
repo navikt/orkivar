@@ -5,6 +5,8 @@ ktor:
     deployment:
         port: 8080
 
+cluster: "$NAIS_CLUSTER_NAME"
+
 azure:
     client-id: "$AZURE_APP_CLIENT_ID:null"
     token-endpoint: "$AZURE_OPENID_CONFIG_TOKEN_ENDPOINT:null"

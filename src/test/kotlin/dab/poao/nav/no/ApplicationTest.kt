@@ -230,6 +230,7 @@ class ApplicationTest : StringSpec({
                 "postgres.user" to "postgres",
                 "postgres.password" to "postgres",
                 "postgres.jdbc-url" to "jdbc:postgresql://localhost:${postgres.port}/postgres?user=postgres&password=postgres",
+                "cluster" to "local",
             )
             config = testConfig
             return testConfig
