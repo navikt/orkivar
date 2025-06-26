@@ -20,7 +20,7 @@ class PdfgenClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
     val pdfgenUrl = config.property("orkivar-pdfgen.url").getString()
     val client = HttpClient(httpClientEngine) {
         install(HttpTimeout) {
-            requestTimeoutMillis = 20000
+            requestTimeoutMillis = 30000
             connectTimeoutMillis = 10000
             socketTimeoutMillis = 30000
         }
