@@ -49,7 +49,7 @@ fun Route.arkiveringRoutes(
                 is FailedPdfGen -> DokarkFail(pdfResult.message)
             }
         }
-            .onFailure { logger.error("Noe uforventet", it) }
+            .onFailure { logger.error("Klarte ikke arkivere pdf: ${it.message}", it) }
             .getOrElse { DokarkFail("Uventet feil") }
 
         when (dokarkResult) {
@@ -78,7 +78,10 @@ fun Route.arkiveringRoutes(
         val sisteJournalføring = hentJournalføringer(oppfølgingsperiodeId).sortedByDescending { it.opprettetTidspunkt }.firstOrNull()
         when (pdfResult) {
             is PdfSuccess -> call.respond(ForhaandsvisningOutbound(pdfResult.pdfByteString, sisteJournalføring?.opprettetTidspunkt))
-            is FailedPdfGen -> call.respond(HttpStatusCode.InternalServerError)
+            is FailedPdfGen -> {
+                logger.error("Klarte ikke forhaandsvise pdf: ${pdfResult.message}")
+                call.respond(HttpStatusCode.InternalServerError)
+            }
         }
     }
 }
