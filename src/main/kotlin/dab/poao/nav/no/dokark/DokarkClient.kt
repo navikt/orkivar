@@ -30,6 +30,7 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         }
         install(Logging) {
             logger = Logger.DEFAULT
+            level = LogLevel.INFO
         }
     }
 
