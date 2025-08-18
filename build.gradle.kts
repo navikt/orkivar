@@ -11,7 +11,7 @@ val postgres_driver_version = "42.7.7"
 val flyway_version = "9.22.3"
 val embeddedPostgresBinaries_version = "17.5.0"
 val exposed_version = "0.61.0"
-val kotest_version = "5.9.1"
+val kotest_version = "6.0.0"
 val prometeus_version = "1.15.2"
 
 plugins {
