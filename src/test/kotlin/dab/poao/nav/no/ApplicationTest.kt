@@ -10,6 +10,7 @@ import io.kotest.assertions.json.shouldContainJsonKeyValue
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldHaveLength
 import io.ktor.client.*
@@ -27,6 +28,8 @@ import io.ktor.server.testing.*
 import io.ktor.utils.io.*
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import kotlinx.datetime.toJavaLocalDateTime
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import java.time.format.DateTimeFormatter
@@ -196,8 +199,11 @@ class ApplicationTest : StringSpec({
     }
 
     "skal fjerne ulovlige tegn før journalføring" {
-        "\u000B\u000B" shouldHaveLength 2
-        " \u000B\u000B".vaskStringForUgyldigeTegn() shouldBe " "
+        @Serializable
+        data class MorsomKlasse(val navn: String)
+        val morsomInstans = MorsomKlasse("Navn\u000B")
+        val morsomJson = Json.encodeToString(morsomInstans)
+        morsomJson.vaskStringForUgyldigeTegn() shouldBe """{"navn":"Navn"}"""
     }
 
     "Feil i request body skal kaste 400" {
