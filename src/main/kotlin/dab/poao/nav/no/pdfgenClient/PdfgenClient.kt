@@ -63,19 +63,19 @@ class PdfgenClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
             }
         }
     }
+}
 
-    private fun String.vaskStringForUgyldigeTegn(): String {
-        val regex = Regex("""[\p{Cc}\p{Cf}&&[^\r\n\t]]""")
-        val output = regex.replace(this, "")
+fun String.vaskStringForUgyldigeTegn(): String {
+    val regex = Regex("""[\p{Cc}\p{Cf}&&[^\r\n\t]]""")
+    val output = regex.replace(this, "")
 
-        val fjernetTegnILesbarTekst = regex.findAll(this).map { it.value[0].code }
-            .joinToString(", ") { "\\u" + it.toString(16).padStart(4, '0') }
+    val fjernetTegnILesbarTekst = regex.findAll(this).map { it.value[0].code }
+        .joinToString(", ") { "\\u" + it.toString(16).padStart(4, '0') }
 
-        val antallTegnFjernet = this.length - output.length
+    val antallTegnFjernet = this.length - output.length
 
-        if (antallTegnFjernet > 0) {
-            logger.info("Vasket inputstring og fjernet følgende: $fjernetTegnILesbarTekst (fjernet $antallTegnFjernet tegn)")
-        }
-        return output
+    if (antallTegnFjernet > 0) {
+        logger.info("Vasket inputstring og fjernet følgende: $fjernetTegnILesbarTekst (fjernet $antallTegnFjernet tegn)")
     }
+    return output
 }

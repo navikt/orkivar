@@ -4,12 +4,14 @@ package dab.poao.nav.no
 import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
 import dab.poao.nav.no.database.Repository
 import dab.poao.nav.no.dokark.Journalpost
+import dab.poao.nav.no.pdfgenClient.vaskStringForUgyldigeTegn
 import dab.poao.nav.no.plugins.configureHikariDataSource
 import io.kotest.assertions.json.shouldContainJsonKeyValue
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldHaveLength
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.mock.*
@@ -191,6 +193,11 @@ class ApplicationTest : StringSpec({
         bodyTilJoark.shouldContainJsonKeyValue("tittel", "Aktivitetsplan og dialog")
         bodyTilJoark.shouldContainJsonKeyValue("tema", "OPP")
         bodyTilJoark.shouldContainJsonKeyValue("overstyrInnsynsregler", "VISES_MASKINELT_GODKJENT")
+    }
+
+    "skal fjerne ulovlige tegn før journalføring" {
+        "\u000B\u000B" shouldHaveLength 2
+        " \u000B\u000B".vaskStringForUgyldigeTegn() shouldBe " "
     }
 
     "Feil i request body skal kaste 400" {
