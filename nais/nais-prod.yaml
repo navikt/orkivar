@@ -57,6 +57,8 @@ spec:
       rules:
         - application: orkivar-pdfgen
           namespace: dab
+        - application: logging
+          namespace: nais-system
       external:
         - host: dokarkiv.prod-fss-pub.nais.io
     inbound:
