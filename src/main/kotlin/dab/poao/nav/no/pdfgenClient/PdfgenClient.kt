@@ -39,9 +39,11 @@ class PdfgenClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
     }
 
     suspend fun generatePdf(payload: PdfgenPayload): PdfgenResult {
+        val jsonPayload = Json.encodeToString(payload).vaskStringForUgyldigeTegn()
+
         val response = runCatching {
             client.post("$pdfgenUrl/api/v1/genpdf/dab/aktivitetsplan") {
-                setBody(payload)
+                setBody(jsonPayload)
                 contentType(ContentType.Application.Json)
             }
         }
@@ -56,10 +58,24 @@ class PdfgenClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         return when (response.status.isSuccess()) {
             true -> PdfSuccess(response.body())
             false -> {
-                val jsonPayload = Json.encodeToString(payload)
                 logger.error(teamLogsMarker, "Feilet å generere pdf, input var: \n$jsonPayload")
                 FailedPdfGen("Feilet å generere pdf HTTP: ${response.status.value} - ${response.bodyAsText()}", )
             }
         }
+    }
+
+    private fun String.vaskStringForUgyldigeTegn(): String {
+        val regex = Regex("""[\p{Cc}\p{Cf}&&[^\r\n\t]]""")
+        val output = regex.replace(this, "")
+
+        val fjernetTegnILesbarTekst = regex.findAll(this).map { it.value[0].code }
+            .joinToString(", ") { "\\u" + it.toString(16).padStart(4, '0') }
+
+        val antallTegnFjernet = this.length - output.length
+
+        if (antallTegnFjernet > 0) {
+            logger.info("Vasket inputstring og fjernet følgende: $fjernetTegnILesbarTekst (fjernet $antallTegnFjernet tegn)")
+        }
+        return output
     }
 }
