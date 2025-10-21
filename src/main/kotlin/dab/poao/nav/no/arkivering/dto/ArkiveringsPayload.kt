@@ -2,6 +2,7 @@ package dab.poao.nav.no.arkivering.dto
 
 import dab.poao.nav.no.dokark.Fnr
 import dab.poao.nav.no.dokark.Navn
+import dab.poao.nav.no.pdfgenClient.vaskStringForUgyldigeTegn
 import kotlinx.serialization.Serializable
 
 typealias ArkivAktivitetStatus = String
@@ -70,8 +71,12 @@ enum class Stil {
 data class Detalj(
     val stil: Stil,
     val tittel: String,
-    val tekst: String?
-)
+    var tekst: String?
+) {
+    init {
+        tekst = tekst?.vaskStringForUgyldigeTegn()
+    }
+}
 
 @Serializable
 data class ArkivDialogtråd(
@@ -88,8 +93,12 @@ data class Melding(
     val sendt: String,
     val lest: Boolean,
     val viktig: Boolean,
-    val tekst: String,
-)
+    var tekst: String,
+) {
+    init {
+        tekst = tekst.vaskStringForUgyldigeTegn()
+    }
+}
 
 @Serializable
 data class ArkivEtikett(
