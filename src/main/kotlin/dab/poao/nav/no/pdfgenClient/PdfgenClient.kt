@@ -77,5 +77,6 @@ fun String.vaskStringForUgyldigeTegn(): String {
     if (antallTegnFjernet > 0) {
         logger.info("Vasket inputstring og fjernet følgende: $fjernetTegnILesbarTekst (fjernet $antallTegnFjernet tegn)")
     }
-    return output
+    val outputUtenVerticalTab = output.replace("\u000b", "")
+    return outputUtenVerticalTab
 }
