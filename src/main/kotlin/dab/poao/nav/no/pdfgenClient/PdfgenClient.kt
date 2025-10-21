@@ -13,13 +13,18 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.config.*
 import no.nav.poao.dab.ktor_oauth_client.logger
+import org.slf4j.LoggerFactory
+import org.slf4j.MarkerFactory
 
 sealed interface PdfgenResult
 data class FailedPdfGen(val message: String) : PdfgenResult
 data class PdfSuccess(val pdfByteString: ByteArray) : PdfgenResult
 
 class PdfgenClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine) {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+    private val teamLogsMarker = MarkerFactory.getMarker("TEAM_LOGS")
     val pdfgenUrl = config.property("orkivar-pdfgen.url").getString()
+
     val client = HttpClient(httpClientEngine) {
         install(HttpTimeout) {
             requestTimeoutMillis = 30000
@@ -49,7 +54,10 @@ class PdfgenClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
             .getOrElse { return FailedPdfGen("Feilet å generere pdf: ${it.message}") }
         return when (response.status.isSuccess()) {
             true -> PdfSuccess(response.body())
-            false -> FailedPdfGen("Feilet å generere pdf HTTP: ${response.status.value} - ${response.bodyAsText()}", )
+            false -> {
+                logger.error(teamLogsMarker, "Verifiser at denne logglinja kun havner i teamlogs")
+                FailedPdfGen("Feilet å generere pdf HTTP: ${response.status.value} - ${response.bodyAsText()}", )
+            }
         }
     }
 }

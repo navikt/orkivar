@@ -14,7 +14,7 @@ import kotlinx.serialization.Serializable
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
-val logger = LoggerFactory.getLogger("dab.poao.nav.no.azureAuth.AzureClient.kt")
+private val logger = LoggerFactory.getLogger("dab.poao.nav.no.azureAuth.AzureClient.kt")
 
 class AzureClient(config: ApplicationConfig) {
     private val azureClientId = config.property("azure.client-id").getString()
