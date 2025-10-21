@@ -1,7 +1,6 @@
 package dab.poao.nav.no.arkivering
 
 import dab.poao.nav.no.arkivering.dto.*
-import dab.poao.nav.no.azureAuth.logger
 import dab.poao.nav.no.database.OppfølgingsperiodeId
 import dab.poao.nav.no.database.Repository
 import dab.poao.nav.no.dokark.DokarkClient
@@ -20,10 +19,12 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.datetime.toKotlinLocalDateTime
 import no.nav.security.token.support.v3.TokenValidationContextPrincipal
+import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
+private val logger = LoggerFactory.getLogger("ArkiveringRoutes.kt")
 
 fun Route.arkiveringRoutes(
     dokarkClient: DokarkClient,

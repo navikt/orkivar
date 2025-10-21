@@ -1,6 +1,5 @@
 package dab.poao.nav.no.dokark
 
-import dab.poao.nav.no.azureAuth.logger
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.*
@@ -12,15 +11,16 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.config.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import no.nav.poao.dab.ktor_oauth_client.AzureClient
 import no.nav.poao.dab.ktor_oauth_client.IncomingToken
 import no.nav.poao.dab.ktor_oauth_client.OauthClientCredentialsConfig
+import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.util.*
 
 class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine) {
+    private val logger = LoggerFactory.getLogger(this::class.java)
     val clientScope = config.property("dokark.client-scope").getString()
     val clientUrl = config.property("dokark.client-url").getString()
     val azureClient = AzureClient(config.toOauthConfig())
