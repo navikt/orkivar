@@ -12,6 +12,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.config.*
+import kotlinx.serialization.json.Json
 import no.nav.poao.dab.ktor_oauth_client.logger
 import org.slf4j.LoggerFactory
 import org.slf4j.MarkerFactory
@@ -55,7 +56,8 @@ class PdfgenClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         return when (response.status.isSuccess()) {
             true -> PdfSuccess(response.body())
             false -> {
-                logger.error(teamLogsMarker, "Verifiser at denne logglinja kun havner i teamlogs")
+                val jsonPayload = Json.encodeToString(payload)
+                logger.error(teamLogsMarker, "Feilet å generere pdf, input var: \n$jsonPayload")
                 FailedPdfGen("Feilet å generere pdf HTTP: ${response.status.value} - ${response.bodyAsText()}", )
             }
         }
