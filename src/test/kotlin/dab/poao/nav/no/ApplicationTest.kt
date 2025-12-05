@@ -4,15 +4,12 @@ package dab.poao.nav.no
 import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
 import dab.poao.nav.no.database.Repository
 import dab.poao.nav.no.dokark.Journalpost
-import dab.poao.nav.no.pdfgenClient.vaskStringForUgyldigeTegn
 import dab.poao.nav.no.plugins.configureHikariDataSource
 import io.kotest.assertions.json.shouldContainJsonKeyValue
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldHaveLength
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.mock.*
@@ -28,7 +25,6 @@ import io.ktor.server.testing.*
 import io.ktor.utils.io.*
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import kotlinx.datetime.toJavaLocalDateTime
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import java.time.format.DateTimeFormatter
@@ -198,6 +194,7 @@ class ApplicationTest : StringSpec({
     }
 
     "Send til bruker skal generere PDF som først journalføres og så sendes til bruker" {
+        val repository by lazy { Repository(dataSource) }
         val token = mockOAuth2Server.getAzureToken("G122123")
         val fnr = "01015450300"
         val forslagAktivitet = arkivAktivitet(status = "Forslag", dialogtråd = dialogtråd)
@@ -239,12 +236,17 @@ class ApplicationTest : StringSpec({
         }
         response.status shouldBe HttpStatusCode.OK
 
+        val journalpostIDatabasen = repository.hentJournalposter(fnr).first()
 
         val requestsTilJoark = mockEngine.requestHistory.filter { joarkUrl.contains(it.url.host) }
         requestsTilJoark shouldHaveSize 2
-        val bodyTilJoark = requestsTilJoark[2].body.asString()
+        val bodyTilJoark = requestsTilJoark[1].body.asString()
+        bodyTilJoark.shouldContainJsonKeyValue("journalpostId", journalpostIDatabasen.journalpostId)
+        bodyTilJoark.shouldContainJsonKeyValue("bestillendeFagsystem", fagsaksystem)
+        bodyTilJoark.shouldContainJsonKeyValue("dokumentProdApp", "orkivar")
+        bodyTilJoark.shouldContainJsonKeyValue("distribusjonstype", "ANNET")
+        bodyTilJoark.shouldContainJsonKeyValue("distribusjonstidspunkt", "UMIDDELBART")
     }
-
 
     "Feil i request body skal kaste 400" {
         val response = client.post("/arkiver") {
@@ -466,7 +468,7 @@ private fun dokarkRespons(ferdigstilt: Boolean) = """
 
 private fun dokarkDistribuerRespons() = """
     {
-        "bestillingsId": "123",
+        "bestillingsId": "123"
     }
 """.trimIndent()
 
