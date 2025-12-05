@@ -43,8 +43,9 @@ class DokarkDistribusjonClient(config: ApplicationConfig, httpClientEngine: Http
         journalpostId: String,
         fagsaksystem: String
     ): DokarkSendTilBrukerResult {
+        val url = "$clientUrl/rest/v1/distribuerjournalpost"
         val res = runCatching {
-            client.post("$clientUrl/rest/v1/distribuerjournalpost") {
+            client.post(url) {
                 header(
                     "authorization",
                     "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}"
@@ -56,7 +57,7 @@ class DokarkDistribusjonClient(config: ApplicationConfig, httpClientEngine: Http
             .onFailure { logger.error("Noe gikk galt", it) }
             .getOrElse { return DokarkSendTilBrukerFail() }
         if (!res.status.isSuccess()) {
-            logger.warn("Feilet å distribuere journalpost: HTTP ${res.status.value} - ", res.bodyAsText())
+            logger.warn("Feilet å distribuere journalpost: HTTP ${res.status.value} - URL: $url")
             return DokarkSendTilBrukerFail()
         }
 
