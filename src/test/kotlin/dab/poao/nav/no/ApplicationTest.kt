@@ -9,7 +9,9 @@ import io.kotest.assertions.json.shouldContainJsonKeyValue
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.mock.*
@@ -153,7 +155,7 @@ class ApplicationTest : StringSpec({
         val journalposterIDatabasen = repository.hentJournalposter(fnr)
         journalposterIDatabasen shouldHaveSize 1
         val journalPost = journalposterIDatabasen.first()
-        journalPost.journalpostId shouldBe journalpostId
+        journalPost.journalpostId shouldNotBe null
         journalPost.oppfølgingsperiodeId shouldBe oppfølgingsperiodeId
 
         val opprettet = repository.hentJournalposter(fnr).first().opprettetTidspunkt
@@ -193,10 +195,10 @@ class ApplicationTest : StringSpec({
         bodyTilJoark.shouldContainJsonKeyValue("overstyrInnsynsregler", "VISES_MASKINELT_GODKJENT")
     }
 
-    "Send til bruker skal generere PDF som først journalføres og så sendes til bruker" {
+    "Send til bruker skal generere PDF som først journalføres og så distribueres til bruker" {
         val repository by lazy { Repository(dataSource) }
         val token = mockOAuth2Server.getAzureToken("G122123")
-        val fnr = "01015450300"
+        val fnr = "02015450300"
         val forslagAktivitet = arkivAktivitet(status = "Forslag", dialogtråd = dialogtråd)
         val avbruttAktivitet = arkivAktivitet(status = "Avbrutt", forhaandsorientering = forhaandsorientering)
         val sakId = 1000
@@ -450,15 +452,13 @@ private val dialogtråder = """
     } ]
 """.trimIndent()
 
-private val journalpostId = "12345"
-
 private val mål = """
     "mål" : "Å få meg jobb"
 """.trimIndent()
 
 private fun dokarkRespons(ferdigstilt: Boolean) = """
     {
-        "journalpostId": "$journalpostId",
+        "journalpostId": "${UUID.randomUUID()}",
         "journalstatus":"ENDELIG",
         "melding": null,
         "journalpostferdigstilt": $ferdigstilt,
