@@ -4,9 +4,11 @@ import dab.poao.nav.no.arkivering.dto.*
 import dab.poao.nav.no.database.OppfølgingsperiodeId
 import dab.poao.nav.no.database.Repository
 import dab.poao.nav.no.dokark.DokarkClient
-import dab.poao.nav.no.dokark.DokarkFail
-import dab.poao.nav.no.dokark.DokarkResult
-import dab.poao.nav.no.dokark.DokarkSuccess
+import dab.poao.nav.no.dokark.DokarkJournalpostFail
+import dab.poao.nav.no.dokark.DokarkJournalpostResult
+import dab.poao.nav.no.dokark.DokarkJournalpostSuccess
+import dab.poao.nav.no.dokark.DokarkSendTilBrukerFail
+import dab.poao.nav.no.dokark.DokarkSendTilBrukerSuccess
 import dab.poao.nav.no.dokark.JournalpostData
 import dab.poao.nav.no.pdfgenClient.FailedPdfGen
 import dab.poao.nav.no.pdfgenClient.PdfSuccess
@@ -33,7 +35,7 @@ fun Route.arkiveringRoutes(
     lagreJournalfoering: suspend (Repository.NyJournalføring) -> Unit,
     hentJournalføringer: suspend (OppfølgingsperiodeId) -> List<Repository.Journalfoering>
 ) {
-    suspend fun opprettJournalpost(arkiveringsPayload: JournalføringPayload, token: String): DokarkResult {
+    suspend fun opprettJournalpost(arkiveringsPayload: JournalføringPayload, token: String): DokarkJournalpostResult {
 
         val tidspunkt = LocalDateTime.now()
         val referanse = UUID.randomUUID()
@@ -45,11 +47,11 @@ fun Route.arkiveringRoutes(
             )
             when (pdfResult) {
                 is PdfSuccess -> dokarkClient.opprettJournalpost(token, lagJournalpostData(pdfResult.pdfByteString, arkiveringsPayload, referanse, tidspunkt))
-                is FailedPdfGen -> DokarkFail(pdfResult.message)
+                is FailedPdfGen -> DokarkJournalpostFail(pdfResult.message)
             }
         }
             .onFailure { logger.error("Klarte ikke arkivere pdf: ${it.message}", it) }
-            .getOrElse { DokarkFail("Uventet feil") }
+            .getOrElse { DokarkJournalpostFail("Uventet feil") }
 
         return dokarkResult
     }
@@ -62,8 +64,8 @@ fun Route.arkiveringRoutes(
         val dokarkResult = opprettJournalpost(arkiveringsPayload, token)
 
         when (dokarkResult) {
-            is DokarkFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)
-            is DokarkSuccess -> {
+            is DokarkJournalpostFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)
+            is DokarkJournalpostSuccess -> {
                 lagreJournalfoering(
                     Repository.NyJournalføring(
                         navIdent = navIdent,
@@ -75,6 +77,34 @@ fun Route.arkiveringRoutes(
                     )
                 )
                 call.respond(JournalføringOutbound(dokarkResult.tidspunkt.toKotlinLocalDateTime()))
+            }
+        }
+    }
+
+    post("/send-til-bruker") {
+        val token = call.hentUtBearerToken()
+        val navIdent = call.hentNavIdentClaim()
+        val arkiveringsPayload = call.hentPayload<JournalføringPayload>()
+        val dokarkResult = opprettJournalpost(arkiveringsPayload, token)
+
+        when (dokarkResult) {
+            is DokarkJournalpostFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)
+            is DokarkJournalpostSuccess -> {
+                lagreJournalfoering(
+                    Repository.NyJournalføring(
+                        navIdent = navIdent,
+                        fnr = arkiveringsPayload.fnr,
+                        opprettetTidspunkt = dokarkResult.tidspunkt,
+                        referanse = dokarkResult.referanse,
+                        journalpostId = dokarkResult.journalpostId,
+                        oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.oppfølgingsperiodeId)
+                    )
+                )
+                val sendTilBrukerResult = dokarkClient.sendJournalpostTilBruker()
+                when (sendTilBrukerResult) {
+                    is DokarkSendTilBrukerFail -> call.respond(HttpStatusCode.InternalServerError)
+                    is DokarkSendTilBrukerSuccess -> call.respond(JournalføringOutbound(dokarkResult.tidspunkt.toKotlinLocalDateTime()))
+                }
             }
         }
     }
@@ -92,10 +122,6 @@ fun Route.arkiveringRoutes(
                 call.respond(HttpStatusCode.InternalServerError)
             }
         }
-    }
-
-    post("/send-til-bruker") {
-
     }
 }
 

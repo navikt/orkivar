@@ -17,7 +17,6 @@ import no.nav.poao.dab.ktor_oauth_client.IncomingToken
 import no.nav.poao.dab.ktor_oauth_client.OauthClientCredentialsConfig
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
-import java.time.ZonedDateTime
 import java.util.*
 
 class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine) {
@@ -35,24 +34,28 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         }
     }
 
-    suspend fun opprettJournalpost(token: IncomingToken, journalpostData: JournalpostData): DokarkResult {
+    suspend fun sendJournalpostTilBruker(): DokarkSendTilBrukerResult {
+        return DokarkSendTilBrukerFail()
+    }
+
+    suspend fun opprettJournalpost(token: IncomingToken, journalpostData: JournalpostData): DokarkJournalpostResult {
         val res = runCatching {  client.post("$clientUrl/rest/journalpostapi/v1/journalpost?forsoekFerdigstill=true") {
             header("authorization", "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}")
             contentType(ContentType.Application.Json)
             setBody(Json.encodeToString(lagJournalpost(journalpostData)))
         } }
             .onFailure { logger.error("Noe gikk galt", it) }
-            .getOrElse { return DokarkFail("Kunne ikke poste til joark") }
+            .getOrElse { return DokarkJournalpostFail("Kunne ikke poste til joark") }
         if (!res.status.isSuccess()) {
             logger.warn("Feilet å opprette journalpost: HTTP ${res.status.value} - ", res.bodyAsText())
-            return DokarkFail("Feilet å laste opp til joark")
+            return DokarkJournalpostFail("Feilet å laste opp til joark")
         }
 
         val dokarkresponse = res.body<DokarkResponse>()
         if (!dokarkresponse.journalpostferdigstilt) {
             logger.warn("Opprettet journalpost, men den kunne ikke bli ferdigstilt automatisk")
         }
-        return DokarkSuccess(journalpostId = dokarkresponse.journalpostId, referanse = journalpostData.eksternReferanse, tidspunkt = journalpostData.tidspunkt )
+        return DokarkJournalpostSuccess(journalpostId = dokarkresponse.journalpostId, referanse = journalpostData.eksternReferanse, tidspunkt = journalpostData.tidspunkt )
     }
 }
 
@@ -95,6 +98,10 @@ data class DokarkResponseDokument(
     val dokumentInfoId: String
 )
 
-sealed interface DokarkResult
-data class DokarkSuccess(val journalpostId: String, val referanse: UUID, val tidspunkt: LocalDateTime): DokarkResult
-data class DokarkFail(val message: String): DokarkResult
+sealed interface DokarkJournalpostResult
+data class DokarkJournalpostSuccess(val journalpostId: String, val referanse: UUID, val tidspunkt: LocalDateTime): DokarkJournalpostResult
+data class DokarkJournalpostFail(val message: String): DokarkJournalpostResult
+
+sealed interface DokarkSendTilBrukerResult
+class DokarkSendTilBrukerSuccess: DokarkSendTilBrukerResult
+class DokarkSendTilBrukerFail: DokarkSendTilBrukerResult
