@@ -100,7 +100,7 @@ fun Route.arkiveringRoutes(
                         oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.oppfølgingsperiodeId)
                     )
                 )
-                val sendTilBrukerResult = dokarkClient.sendJournalpostTilBruker()
+                val sendTilBrukerResult = dokarkClient.sendJournalpostTilBruker(token, dokarkResult.journalpostId, arkiveringsPayload.fagsaksystem)
                 when (sendTilBrukerResult) {
                     is DokarkSendTilBrukerFail -> call.respond(HttpStatusCode.InternalServerError)
                     is DokarkSendTilBrukerSuccess -> call.respond(JournalføringOutbound(dokarkResult.tidspunkt.toKotlinLocalDateTime()))

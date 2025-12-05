@@ -34,16 +34,43 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         }
     }
 
-    suspend fun sendJournalpostTilBruker(): DokarkSendTilBrukerResult {
-        return DokarkSendTilBrukerFail()
+    suspend fun sendJournalpostTilBruker(
+        token: IncomingToken,
+        journalpostId: String,
+        fagsaksystem: String
+    ): DokarkSendTilBrukerResult {
+        val res = runCatching {
+            client.post("$clientUrl/rest/v1/distribuerjournalpost") {
+                header(
+                    "authorization",
+                    "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}"
+                )
+                contentType(ContentType.Application.Json)
+                setBody(Json.encodeToString(lagDistribuerJournalpost(journalpostId, fagsaksystem)))
+            }
+        }
+            .onFailure { logger.error("Noe gikk galt", it) }
+            .getOrElse { return DokarkSendTilBrukerFail() }
+        if (!res.status.isSuccess()) {
+            logger.warn("Feilet å distribuere journalpost: HTTP ${res.status.value} - ", res.bodyAsText())
+            return DokarkSendTilBrukerFail()
+        }
+
+        val dokarkresponse = res.body<DistribuerJournalpostResponse>()
+        return DokarkSendTilBrukerSuccess(dokarkresponse.bestillingsId)
     }
 
     suspend fun opprettJournalpost(token: IncomingToken, journalpostData: JournalpostData): DokarkJournalpostResult {
-        val res = runCatching {  client.post("$clientUrl/rest/journalpostapi/v1/journalpost?forsoekFerdigstill=true") {
-            header("authorization", "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}")
-            contentType(ContentType.Application.Json)
-            setBody(Json.encodeToString(lagJournalpost(journalpostData)))
-        } }
+        val res = runCatching {
+            client.post("$clientUrl/rest/journalpostapi/v1/journalpost?forsoekFerdigstill=true") {
+                header(
+                    "authorization",
+                    "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}"
+                )
+                contentType(ContentType.Application.Json)
+                setBody(Json.encodeToString(lagJournalpost(journalpostData)))
+            }
+        }
             .onFailure { logger.error("Noe gikk galt", it) }
             .getOrElse { return DokarkJournalpostFail("Kunne ikke poste til joark") }
         if (!res.status.isSuccess()) {
@@ -51,11 +78,15 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
             return DokarkJournalpostFail("Feilet å laste opp til joark")
         }
 
-        val dokarkresponse = res.body<DokarkResponse>()
+        val dokarkresponse = res.body<DokarkJournalResponse>()
         if (!dokarkresponse.journalpostferdigstilt) {
             logger.warn("Opprettet journalpost, men den kunne ikke bli ferdigstilt automatisk")
         }
-        return DokarkJournalpostSuccess(journalpostId = dokarkresponse.journalpostId, referanse = journalpostData.eksternReferanse, tidspunkt = journalpostData.tidspunkt )
+        return DokarkJournalpostSuccess(
+            journalpostId = dokarkresponse.journalpostId,
+            referanse = journalpostData.eksternReferanse,
+            tidspunkt = journalpostData.tidspunkt
+        )
     }
 }
 
@@ -85,23 +116,39 @@ data class JournalpostData(
 )
 
 @Serializable
-data class DokarkResponse(
+data class DokarkJournalResponse(
     val journalpostId: String,
     val journalstatus: String,
     val melding: String?,
     val journalpostferdigstilt: Boolean,
-    val dokumenter: List<DokarkResponseDokument>
+    val dokumenter: List<DokarkJournalResponseDokument>
 )
 
 @Serializable
-data class DokarkResponseDokument(
+data class DokarkJournalResponseDokument(
     val dokumentInfoId: String
 )
 
+@Serializable
+data class DistribuerJournalpost(
+    val journalpostId: String,
+    val bestillendeFagsystem: String,
+    val dokumentProdApp: String,
+    val distribusjonstype: String,
+    val distribusjonstidspunkt: String
+)
+
+@Serializable
+data class DistribuerJournalpostResponse(
+    val bestillingsId: String
+)
+
 sealed interface DokarkJournalpostResult
-data class DokarkJournalpostSuccess(val journalpostId: String, val referanse: UUID, val tidspunkt: LocalDateTime): DokarkJournalpostResult
-data class DokarkJournalpostFail(val message: String): DokarkJournalpostResult
+data class DokarkJournalpostSuccess(val journalpostId: String, val referanse: UUID, val tidspunkt: LocalDateTime) :
+    DokarkJournalpostResult
+
+data class DokarkJournalpostFail(val message: String) : DokarkJournalpostResult
 
 sealed interface DokarkSendTilBrukerResult
-class DokarkSendTilBrukerSuccess: DokarkSendTilBrukerResult
-class DokarkSendTilBrukerFail: DokarkSendTilBrukerResult
+class DokarkSendTilBrukerSuccess(val bestillingsId: String) : DokarkSendTilBrukerResult
+class DokarkSendTilBrukerFail : DokarkSendTilBrukerResult
