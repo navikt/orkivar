@@ -15,6 +15,9 @@ azure:
 dokark:
     client-url: "$DOKARK_CLIENT_URL:null"
     client-scope: "$DOKARK_SCOPE:null"
+    distribusjon:
+        client-url: "$DOKARK_DISTRIBUSJON_CLIENT_URL:null"
+        client-scope: "$DOKARK_DISTRIBUSJON_SCOPE:null"
 
 orkivar-pdfgen:
     url: "$ORKIVAR_PDFGEN_URL:null"

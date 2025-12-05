@@ -50,15 +50,6 @@ fun lagJournalpost(journalpostData: JournalpostData): Journalpost =
         tittel = "Aktivitetsplan og dialog"
     )
 
-fun lagDistribuerJournalpost(journalpostId: String, fagsaksystem: String) : DistribuerJournalpost =
-    DistribuerJournalpost(
-        journalpostId = journalpostId,
-        bestillendeFagsystem = fagsaksystem,
-        dokumentProdApp = "orkivar",
-        distribusjonstype = "ANNET",
-        distribusjonstidspunkt = "UMIDDELBART"
-    )
-
 @Serializable
 data class Journalpost(
     val avsenderMottaker: AvsenderMottaker,

@@ -4,6 +4,7 @@ import dab.poao.nav.no.arkivering.dto.*
 import dab.poao.nav.no.database.OppfølgingsperiodeId
 import dab.poao.nav.no.database.Repository
 import dab.poao.nav.no.dokark.DokarkClient
+import dab.poao.nav.no.dokark.DokarkDistribusjonClient
 import dab.poao.nav.no.dokark.DokarkJournalpostFail
 import dab.poao.nav.no.dokark.DokarkJournalpostResult
 import dab.poao.nav.no.dokark.DokarkJournalpostSuccess
@@ -31,6 +32,7 @@ private val logger = LoggerFactory.getLogger("ArkiveringRoutes.kt")
 
 fun Route.arkiveringRoutes(
     dokarkClient: DokarkClient,
+    dokarkDistribusjonClient: DokarkDistribusjonClient,
     pdfgenClient: PdfgenClient,
     lagreJournalfoering: suspend (Repository.NyJournalføring) -> Unit,
     hentJournalføringer: suspend (OppfølgingsperiodeId) -> List<Repository.Journalfoering>
@@ -100,7 +102,7 @@ fun Route.arkiveringRoutes(
                         oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.oppfølgingsperiodeId)
                     )
                 )
-                val sendTilBrukerResult = dokarkClient.sendJournalpostTilBruker(token, dokarkResult.journalpostId, arkiveringsPayload.fagsaksystem)
+                val sendTilBrukerResult = dokarkDistribusjonClient.sendJournalpostTilBruker(token, dokarkResult.journalpostId, arkiveringsPayload.fagsaksystem)
                 when (sendTilBrukerResult) {
                     is DokarkSendTilBrukerFail -> call.respond(HttpStatusCode.InternalServerError)
                     is DokarkSendTilBrukerSuccess -> call.respond(JournalføringOutbound(dokarkResult.tidspunkt.toKotlinLocalDateTime()))

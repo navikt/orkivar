@@ -34,32 +34,6 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         }
     }
 
-    suspend fun sendJournalpostTilBruker(
-        token: IncomingToken,
-        journalpostId: String,
-        fagsaksystem: String
-    ): DokarkSendTilBrukerResult {
-        val res = runCatching {
-            client.post("$clientUrl/rest/v1/distribuerjournalpost") {
-                header(
-                    "authorization",
-                    "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}"
-                )
-                contentType(ContentType.Application.Json)
-                setBody(Json.encodeToString(lagDistribuerJournalpost(journalpostId, fagsaksystem)))
-            }
-        }
-            .onFailure { logger.error("Noe gikk galt", it) }
-            .getOrElse { return DokarkSendTilBrukerFail() }
-        if (!res.status.isSuccess()) {
-            logger.warn("Feilet å distribuere journalpost: HTTP ${res.status.value} - ", res.bodyAsText())
-            return DokarkSendTilBrukerFail()
-        }
-
-        val dokarkresponse = res.body<DistribuerJournalpostResponse>()
-        return DokarkSendTilBrukerSuccess(dokarkresponse.bestillingsId)
-    }
-
     suspend fun opprettJournalpost(token: IncomingToken, journalpostData: JournalpostData): DokarkJournalpostResult {
         val res = runCatching {
             client.post("$clientUrl/rest/journalpostapi/v1/journalpost?forsoekFerdigstill=true") {
@@ -138,17 +112,8 @@ data class DistribuerJournalpost(
     val distribusjonstidspunkt: String
 )
 
-@Serializable
-data class DistribuerJournalpostResponse(
-    val bestillingsId: String
-)
-
 sealed interface DokarkJournalpostResult
 data class DokarkJournalpostSuccess(val journalpostId: String, val referanse: UUID, val tidspunkt: LocalDateTime) :
     DokarkJournalpostResult
 
 data class DokarkJournalpostFail(val message: String) : DokarkJournalpostResult
-
-sealed interface DokarkSendTilBrukerResult
-class DokarkSendTilBrukerSuccess(val bestillingsId: String) : DokarkSendTilBrukerResult
-class DokarkSendTilBrukerFail : DokarkSendTilBrukerResult

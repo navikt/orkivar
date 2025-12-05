@@ -78,5 +78,9 @@ spec:
       value: https://dokarkiv-q2.dev-fss-pub.nais.io
     - name: DOKARK_SCOPE
       value: api://dev-fss.teamdokumenthandtering.dokarkiv/.default
+    - name: DOKARK_DISTRIBUSJON_CLIENT_URL
+      value: https://dokdistfordeling.dev-fss-pub.nais.io
+    - name: DOKARK_DISTRIBUSJON_SCOPE
+      value: api://dev-fss.teamdokumenthandtering.dokdistfordeling/.default
     - name: ORKIVAR_PDFGEN_URL
       value: http://orkivar-pdfgen
