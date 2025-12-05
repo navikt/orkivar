@@ -5,6 +5,7 @@ import dab.poao.nav.no.database.OppfølgingsperiodeId
 import dab.poao.nav.no.database.Repository
 import dab.poao.nav.no.dokark.DokarkClient
 import dab.poao.nav.no.dokark.DokarkFail
+import dab.poao.nav.no.dokark.DokarkResult
 import dab.poao.nav.no.dokark.DokarkSuccess
 import dab.poao.nav.no.dokark.JournalpostData
 import dab.poao.nav.no.pdfgenClient.FailedPdfGen
@@ -32,14 +33,11 @@ fun Route.arkiveringRoutes(
     lagreJournalfoering: suspend (Repository.NyJournalføring) -> Unit,
     hentJournalføringer: suspend (OppfølgingsperiodeId) -> List<Repository.Journalfoering>
 ) {
-    post("/arkiver") {
-        val token = call.hentUtBearerToken()
-        val navIdent = call.hentNavIdentClaim()
-        val arkiveringsPayload = call.hentPayload<JournalføringPayload>()
+    suspend fun opprettJournalpost(arkiveringsPayload: JournalføringPayload, token: String): DokarkResult {
 
         val tidspunkt = LocalDateTime.now()
-        val pdfGenPayload = lagPdfgenPayload(arkiveringsPayload, tidspunkt)
         val referanse = UUID.randomUUID()
+        val pdfGenPayload = lagPdfgenPayload(arkiveringsPayload, tidspunkt)
 
         val dokarkResult = runCatching {
             val pdfResult = pdfgenClient.generatePdf(
@@ -53,6 +51,16 @@ fun Route.arkiveringRoutes(
             .onFailure { logger.error("Klarte ikke arkivere pdf: ${it.message}", it) }
             .getOrElse { DokarkFail("Uventet feil") }
 
+        return dokarkResult
+    }
+
+    post("/arkiver") {
+        val token = call.hentUtBearerToken()
+        val navIdent = call.hentNavIdentClaim()
+        val arkiveringsPayload = call.hentPayload<JournalføringPayload>()
+
+        val dokarkResult = opprettJournalpost(arkiveringsPayload, token)
+
         when (dokarkResult) {
             is DokarkFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)
             is DokarkSuccess -> {
@@ -60,13 +68,13 @@ fun Route.arkiveringRoutes(
                     Repository.NyJournalføring(
                         navIdent = navIdent,
                         fnr = arkiveringsPayload.fnr,
-                        opprettetTidspunkt = tidspunkt,
-                        referanse = referanse,
+                        opprettetTidspunkt = dokarkResult.tidspunkt,
+                        referanse = dokarkResult.referanse,
                         journalpostId = dokarkResult.journalpostId,
                         oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.oppfølgingsperiodeId)
                     )
                 )
-                call.respond(JournalføringOutbound(tidspunkt.toKotlinLocalDateTime()))
+                call.respond(JournalføringOutbound(dokarkResult.tidspunkt.toKotlinLocalDateTime()))
             }
         }
     }
@@ -85,7 +93,12 @@ fun Route.arkiveringRoutes(
             }
         }
     }
+
+    post("/send-til-bruker") {
+
+    }
 }
+
 
 private fun ApplicationCall.hentUtBearerToken() =
     this.request.header("Authorization")

@@ -17,6 +17,7 @@ import no.nav.poao.dab.ktor_oauth_client.IncomingToken
 import no.nav.poao.dab.ktor_oauth_client.OauthClientCredentialsConfig
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.util.*
 
 class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine) {
@@ -51,7 +52,7 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         if (!dokarkresponse.journalpostferdigstilt) {
             logger.warn("Opprettet journalpost, men den kunne ikke bli ferdigstilt automatisk")
         }
-        return DokarkSuccess(journalpostId = dokarkresponse.journalpostId)
+        return DokarkSuccess(journalpostId = dokarkresponse.journalpostId, referanse = journalpostData.eksternReferanse, tidspunkt = journalpostData.tidspunkt )
     }
 }
 
@@ -95,5 +96,5 @@ data class DokarkResponseDokument(
 )
 
 sealed interface DokarkResult
-data class DokarkSuccess(val journalpostId: String): DokarkResult
+data class DokarkSuccess(val journalpostId: String, val referanse: UUID, val tidspunkt: LocalDateTime): DokarkResult
 data class DokarkFail(val message: String): DokarkResult
