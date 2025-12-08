@@ -11,6 +11,7 @@ import dab.poao.nav.no.dokark.DokarkJournalpostSuccess
 import dab.poao.nav.no.dokark.DokarkSendTilBrukerFail
 import dab.poao.nav.no.dokark.DokarkSendTilBrukerSuccess
 import dab.poao.nav.no.dokark.JournalpostData
+import dab.poao.nav.no.dokark.JournalpostType
 import dab.poao.nav.no.pdfgenClient.FailedPdfGen
 import dab.poao.nav.no.pdfgenClient.PdfSuccess
 import dab.poao.nav.no.pdfgenClient.PdfgenClient
@@ -37,7 +38,7 @@ fun Route.arkiveringRoutes(
     lagreJournalfoering: suspend (Repository.NyJournalføring) -> Unit,
     hentJournalføringer: suspend (OppfølgingsperiodeId) -> List<Repository.Journalfoering>
 ) {
-    suspend fun opprettJournalpost(arkiveringsPayload: JournalføringPayload, token: String): DokarkJournalpostResult {
+    suspend fun opprettJournalpost(arkiveringsPayload: JournalføringPayload, journalpostType: JournalpostType, token: String): DokarkJournalpostResult {
 
         val tidspunkt = LocalDateTime.now()
         val referanse = UUID.randomUUID()
@@ -48,7 +49,7 @@ fun Route.arkiveringRoutes(
                 payload = pdfGenPayload
             )
             when (pdfResult) {
-                is PdfSuccess -> dokarkClient.opprettJournalpost(token, lagJournalpostData(pdfResult.pdfByteString, arkiveringsPayload, referanse, tidspunkt))
+                is PdfSuccess -> dokarkClient.opprettJournalpost(token, journalpostType,lagJournalpostData(pdfResult.pdfByteString, arkiveringsPayload, referanse, tidspunkt))
                 is FailedPdfGen -> DokarkJournalpostFail(pdfResult.message)
             }
         }
@@ -63,7 +64,7 @@ fun Route.arkiveringRoutes(
         val navIdent = call.hentNavIdentClaim()
         val arkiveringsPayload = call.hentPayload<JournalføringPayload>()
 
-        val dokarkResult = opprettJournalpost(arkiveringsPayload, token)
+        val dokarkResult = opprettJournalpost(arkiveringsPayload, JournalpostType.NOTAT, token)
 
         when (dokarkResult) {
             is DokarkJournalpostFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)
@@ -87,7 +88,7 @@ fun Route.arkiveringRoutes(
         val token = call.hentUtBearerToken()
         val navIdent = call.hentNavIdentClaim()
         val arkiveringsPayload = call.hentPayload<JournalføringPayload>()
-        val dokarkResult = opprettJournalpost(arkiveringsPayload, token)
+        val dokarkResult = opprettJournalpost(arkiveringsPayload, JournalpostType.UTGAAENDE, token)
 
         when (dokarkResult) {
             is DokarkJournalpostFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)

@@ -1,8 +1,6 @@
 package dab.poao.nav.no.dokark
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -12,7 +10,7 @@ typealias Navn = String
 
 val norskDatoFormat = DateTimeFormatter.ofPattern("d. MMMM uuuu", Locale.forLanguageTag("no"))
 
-fun lagJournalpost(journalpostData: JournalpostData): Journalpost =
+fun lagJournalpost(journalpostData: JournalpostData, journalpostType: JournalpostType): Journalpost =
     Journalpost(
         avsenderMottaker = AvsenderMottaker(
             id = journalpostData.fnr,
@@ -41,7 +39,7 @@ fun lagJournalpost(journalpostData: JournalpostData): Journalpost =
         ),
         eksternReferanseId = journalpostData.eksternReferanse.toString(),
         journalfoerendeEnhet = journalpostData.journalførendeEnhet,
-        journalposttype = "NOTAT",
+        journalposttype = journalpostType,
         sak = Sak(
             fagsakId = journalpostData.sakId.toString(),
             fagsaksystem = journalpostData.fagsaksystem,
@@ -60,7 +58,7 @@ data class Journalpost(
     val dokumenter: List<Dokument>,
     val eksternReferanseId: String,
     val journalfoerendeEnhet: String,
-    val journalposttype: String,
+    val journalposttype: JournalpostType,
     val sak: Sak,
     val tema: String,
     val tittel: String,
@@ -98,3 +96,9 @@ data class Sak(
     val fagsaksystem: String,
     val sakstype: String,
 )
+
+@Serializable
+enum class JournalpostType {
+    NOTAT,
+    UTGAAENDE
+}

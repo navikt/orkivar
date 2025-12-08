@@ -193,6 +193,7 @@ class ApplicationTest : StringSpec({
         bodyTilJoark.shouldContainJsonKeyValue("tittel", "Aktivitetsplan og dialog")
         bodyTilJoark.shouldContainJsonKeyValue("tema", "OPP")
         bodyTilJoark.shouldContainJsonKeyValue("overstyrInnsynsregler", "VISES_MASKINELT_GODKJENT")
+        bodyTilJoark.shouldContainJsonKeyValue("journalposttype", "NOTAT")
     }
 
     "Send til bruker skal generere PDF som først journalføres og så distribueres til bruker" {
@@ -239,6 +240,10 @@ class ApplicationTest : StringSpec({
         response.status shouldBe HttpStatusCode.OK
 
         val journalpostIDatabasen = repository.hentJournalposter(fnr).first()
+
+        val requestsTilJoark = mockEngine.requestHistory.filter { joarkUrl.contains(it.url.host) }
+        requestsTilJoark shouldHaveSize 1
+        requestsTilJoark.first().body.asString().shouldContainJsonKeyValue("journalposttype", "UTGAAENDE")
 
         val requestsTilJoarkDistribusjon = mockEngine.requestHistory.filter { joarkDistribusjonUrl.contains(it.url.host) }
         requestsTilJoarkDistribusjon shouldHaveSize 1

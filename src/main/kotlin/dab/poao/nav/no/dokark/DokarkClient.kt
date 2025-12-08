@@ -34,7 +34,7 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
         }
     }
 
-    suspend fun opprettJournalpost(token: IncomingToken, journalpostData: JournalpostData): DokarkJournalpostResult {
+    suspend fun opprettJournalpost(token: IncomingToken, journalpostType: JournalpostType, journalpostData: JournalpostData): DokarkJournalpostResult {
         val res = runCatching {
             client.post("$clientUrl/rest/journalpostapi/v1/journalpost?forsoekFerdigstill=true") {
                 header(
@@ -42,7 +42,7 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
                     "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}"
                 )
                 contentType(ContentType.Application.Json)
-                setBody(Json.encodeToString(lagJournalpost(journalpostData)))
+                setBody(Json.encodeToString(lagJournalpost(journalpostData, journalpostType)))
             }
         }
             .onFailure { logger.error("Noe gikk galt", it) }
