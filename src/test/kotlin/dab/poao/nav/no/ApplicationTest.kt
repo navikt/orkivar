@@ -194,6 +194,7 @@ class ApplicationTest : StringSpec({
         bodyTilJoark.shouldContainJsonKeyValue("tema", "OPP")
         bodyTilJoark.shouldContainJsonKeyValue("overstyrInnsynsregler", "VISES_MASKINELT_GODKJENT")
         bodyTilJoark.shouldContainJsonKeyValue("journalposttype", "NOTAT")
+        bodyTilJoark.shouldContainJsonKeyValue("dokumenter[0].brevkode", "modia-aktivitetsplan-dialog")
     }
 
     "Send til bruker skal generere PDF som først journalføres og så distribueres til bruker" {
