@@ -10,6 +10,7 @@ typealias ArkivAktivitetStatus = String
 sealed interface PdfData {
     val fnr: Fnr
     val navn: Navn
+    val tekstTilBruker: String?
     val oppfølgingsperiodeStart: String
     val oppfølgingsperiodeSlutt: String?
     val aktiviteter: Map<ArkivAktivitetStatus, List<ArkivAktivitet>>
@@ -22,6 +23,7 @@ sealed interface PdfData {
 data class JournalføringPayload(
     override val fnr: Fnr,
     override val navn: Navn,
+    override val tekstTilBruker: String?,
     override val oppfølgingsperiodeStart: String,
     override val oppfølgingsperiodeSlutt: String?,
     override val aktiviteter: Map<ArkivAktivitetStatus, List<ArkivAktivitet>>,
@@ -38,6 +40,7 @@ data class JournalføringPayload(
 data class ForhåndsvisningPayload(
     override val fnr: Fnr,
     override val navn: Navn,
+    override val tekstTilBruker: String?,
     override val oppfølgingsperiodeStart: String,
     override val oppfølgingsperiodeSlutt: String?,
     override val aktiviteter: Map<ArkivAktivitetStatus, List<ArkivAktivitet>>,

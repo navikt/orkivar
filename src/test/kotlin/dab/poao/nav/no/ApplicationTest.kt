@@ -84,6 +84,7 @@ class ApplicationTest : StringSpec({
                 """
                 {
                     "navn": "TRIVIELL SKILPADDE",
+                    "tekstTilBruker": null,
                     "fnr": "$fnr",
                     "oppfølgingsperiodeStart": "19 oktober 2021",
                     "oppfølgingsperiodeSlutt": null,
@@ -129,6 +130,7 @@ class ApplicationTest : StringSpec({
                 {
                     "navn": "TRIVIELL SKILPADDE",
                     "fnr": "$fnr",
+                    "tekstTilBruker": "Dette er en tekst",
                     "oppfølgingsperiodeStart": "19 oktober 2021",
                     "oppfølgingsperiodeSlutt": null,
                     "sakId": $sakId, 
@@ -167,6 +169,7 @@ class ApplicationTest : StringSpec({
                 {
                     "navn": "TRIVIELL SKILPADDE",
                     "fnr": "$fnr",
+                    "tekstTilBruker": "Dette er en tekst",
                     "oppfølgingsperiodeStart": "19 oktober 2021",
                     "oppfølgingsperiodeSlutt": null,
                     "journalfoeringstidspunkt":"$opprettetFormatert",
@@ -217,6 +220,7 @@ class ApplicationTest : StringSpec({
                 {
                     "navn": "TRIVIELL SKILPADDE",
                     "fnr": "$fnr",
+                    "tekstTilBruker": null,
                     "oppfølgingsperiodeStart": "19 oktober 2021",
                     "oppfølgingsperiodeSlutt": null,
                     "sakId": $sakId, 
