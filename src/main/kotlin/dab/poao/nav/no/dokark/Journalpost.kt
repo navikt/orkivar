@@ -27,6 +27,7 @@ fun lagJournalpost(journalpostData: JournalpostData, journalpostType: Journalpos
         overstyrInnsynsregler = "VISES_MASKINELT_GODKJENT",
         dokumenter = listOf(
             Dokument(
+                brevkode = "modia-aktivitetsplan-dialog",
                 tittel = "Aktivitetsplan og dialog ${journalpostData.oppfølgingsperiodeStart} - ${journalpostData.oppfølgingsperiodeSlutt?.let { it }?: journalpostData.tidspunkt.format(norskDatoFormat)}",
                 dokumentvarianter = listOf(
                     Dokumentvariant(
@@ -79,6 +80,7 @@ data class Bruker(
 
 @Serializable
 data class Dokument(
+    val brevkode: String,
     val dokumentvarianter: List<Dokumentvariant>,
     val tittel: String,
 )
