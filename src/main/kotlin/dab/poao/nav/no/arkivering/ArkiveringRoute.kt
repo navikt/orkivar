@@ -161,6 +161,7 @@ private fun lagPdfgenPayload(pdfData: PdfData, tidspunkt: LocalDateTime): Pdfgen
         navn = pdfData.navn,
         fnr = pdfData.fnr,
         tekstTilBruker = pdfData.tekstTilBruker,
+        brukteFiltre = pdfData.brukteFiltre,
         oppfølgingsperiodeStart = pdfData.oppfølgingsperiodeStart,
         oppfølgingsperiodeSlutt = pdfData.oppfølgingsperiodeSlutt,
         aktiviteter = pdfData.aktiviteter,

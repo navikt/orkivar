@@ -131,6 +131,10 @@ class ApplicationTest : StringSpec({
                     "navn": "TRIVIELL SKILPADDE",
                     "fnr": "$fnr",
                     "tekstTilBruker": "Dette er en tekst",
+                    "brukteFiltre": {
+                        "Aktivitetstype": ["Jobb jeg har nå", "Stilling"],
+                        "Avtalt aktivitet": ["Avtalt med Nav"]
+                    },
                     "oppfølgingsperiodeStart": "19 oktober 2021",
                     "oppfølgingsperiodeSlutt": null,
                     "sakId": $sakId, 
@@ -170,6 +174,10 @@ class ApplicationTest : StringSpec({
                     "navn": "TRIVIELL SKILPADDE",
                     "fnr": "$fnr",
                     "tekstTilBruker": "Dette er en tekst",
+                    "brukteFiltre": {
+                        "Aktivitetstype": ["Jobb jeg har nå", "Stilling"],
+                        "Avtalt aktivitet": ["Avtalt med Nav"]
+                    },
                     "oppfølgingsperiodeStart": "19 oktober 2021",
                     "oppfølgingsperiodeSlutt": null,
                     "journalfoeringstidspunkt":"$opprettetFormatert",
