@@ -229,6 +229,7 @@ class ApplicationTest : StringSpec({
                     "navn": "TRIVIELL SKILPADDE",
                     "fnr": "$fnr",
                     "tekstTilBruker": null,
+                    "brukteFiltre": {},
                     "oppfølgingsperiodeStart": "19 oktober 2021",
                     "oppfølgingsperiodeSlutt": null,
                     "sakId": $sakId, 
