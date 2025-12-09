@@ -1,6 +1,7 @@
 package dab.poao.nav.no.arkivering
 
 import dab.poao.nav.no.arkivering.dto.*
+import dab.poao.nav.no.database.JournalføringType
 import dab.poao.nav.no.database.OppfølgingsperiodeId
 import dab.poao.nav.no.database.Repository
 import dab.poao.nav.no.dokark.DokarkClient
@@ -36,7 +37,7 @@ fun Route.arkiveringRoutes(
     dokarkDistribusjonClient: DokarkDistribusjonClient,
     pdfgenClient: PdfgenClient,
     lagreJournalfoering: suspend (Repository.NyJournalføring) -> Unit,
-    hentJournalføringer: suspend (OppfølgingsperiodeId) -> List<Repository.Journalfoering>
+    hentJournalføringer: suspend (OppfølgingsperiodeId, JournalføringType) -> List<Repository.Journalfoering>
 ) {
     suspend fun opprettJournalpost(arkiveringsPayload: JournalføringPayload, journalpostType: JournalpostType, token: String): DokarkJournalpostResult {
 
@@ -59,6 +60,20 @@ fun Route.arkiveringRoutes(
         return dokarkResult
     }
 
+    suspend fun lagForhaandsvisning(payload: ForhåndsvisningPayload, type: JournalføringType): Result<ForhaandsvisningOutbound> {
+        val pdfgenPayload = lagPdfgenPayload(payload, LocalDateTime.now())
+        val pdfResult = pdfgenClient.generatePdf(pdfgenPayload)
+        val oppfølgingsperiodeId = UUID.fromString(payload.oppfølgingsperiodeId)
+        val sisteJournalføring = hentJournalføringer(oppfølgingsperiodeId, type).maxByOrNull { it.opprettetTidspunkt }
+        return when (pdfResult) {
+            is PdfSuccess -> Result.success(ForhaandsvisningOutbound(pdfResult.pdfByteString, sisteJournalføring?.opprettetTidspunkt))
+            is FailedPdfGen -> {
+                logger.error("Klarte ikke forhaandsvise pdf: ${pdfResult.message}")
+                Result.failure(RuntimeException(pdfResult.message))
+            }
+        }
+    }
+
     post("/arkiver") {
         val token = call.hentUtBearerToken()
         val navIdent = call.hentNavIdentClaim()
@@ -77,7 +92,7 @@ fun Route.arkiveringRoutes(
                         referanse = dokarkResult.referanse,
                         journalpostId = dokarkResult.journalpostId,
                         oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.oppfølgingsperiodeId),
-                        type = Repository.JournalføringType.JOURNALFØRING
+                        type = JournalføringType.JOURNALFØRING
                     )
                 )
                 call.respond(JournalføringOutbound(dokarkResult.tidspunkt.toKotlinLocalDateTime()))
@@ -102,7 +117,7 @@ fun Route.arkiveringRoutes(
                         referanse = dokarkResult.referanse,
                         journalpostId = dokarkResult.journalpostId,
                         oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.oppfølgingsperiodeId),
-                        type = Repository.JournalføringType.SENDING_TIL_BRUKER
+                        type = JournalføringType.SENDING_TIL_BRUKER
                     )
                 )
                 val sendTilBrukerResult = dokarkDistribusjonClient.sendJournalpostTilBruker(token, dokarkResult.journalpostId, arkiveringsPayload.fagsaksystem)
@@ -116,19 +131,19 @@ fun Route.arkiveringRoutes(
 
     post("/forhaandsvisning") {
         val forhåndsvisningPayload = call.hentPayload<ForhåndsvisningPayload>()
-        val pdfgenPayload = lagPdfgenPayload(forhåndsvisningPayload, LocalDateTime.now())
-        val pdfResult = pdfgenClient.generatePdf(pdfgenPayload)
-        val oppfølgingsperiodeId = UUID.fromString(forhåndsvisningPayload.oppfølgingsperiodeId)
-        val sisteJournalføring = hentJournalføringer(oppfølgingsperiodeId).sortedByDescending { it.opprettetTidspunkt }.firstOrNull()
-        when (pdfResult) {
-            is PdfSuccess -> call.respond(ForhaandsvisningOutbound(pdfResult.pdfByteString, sisteJournalføring?.opprettetTidspunkt))
-            is FailedPdfGen -> {
-                logger.error("Klarte ikke forhaandsvise pdf: ${pdfResult.message}")
-                call.respond(HttpStatusCode.InternalServerError)
-            }
-        }
+        lagForhaandsvisning(forhåndsvisningPayload, JournalføringType.JOURNALFØRING)
+            .onSuccess { call.respond(it) }
+            .onFailure { call.respond(HttpStatusCode.InternalServerError) }
+    }
+
+    post("/forhaandsvisning-send-til-bruker") {
+        val forhåndsvisningPayload = call.hentPayload<ForhåndsvisningPayload>()
+        lagForhaandsvisning(forhåndsvisningPayload, JournalføringType.SENDING_TIL_BRUKER)
+            .onSuccess { call.respond(it) }
+            .onFailure { call.respond(HttpStatusCode.InternalServerError) }
     }
 }
+
 
 
 private fun ApplicationCall.hentUtBearerToken() =

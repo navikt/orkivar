@@ -54,18 +54,18 @@ class Repository(dataSource: DataSource) {
         }
     }
 
-    suspend fun hentJournalposter(fnr: String): List<Journalfoering> {
+    suspend fun hentJournalposter(fnr: String, type: JournalføringType): List<Journalfoering> {
         return transaction {
             Journalfoering
-                .find { Journalfoeringer.fnr eq fnr }
+                .find { (Journalfoeringer.fnr eq fnr) and (Journalfoeringer.type eq type) }
                 .toList()
         }
     }
 
-    suspend fun hentJournalposter(oppfølgingsperiodeId: OppfølgingsperiodeId): List<Journalfoering> {
+    suspend fun hentJournalposter(oppfølgingsperiodeId: OppfølgingsperiodeId, type: JournalføringType): List<Journalfoering> {
         return transaction {
             Journalfoering
-                .find { Journalfoeringer.oppfølgingsperiodeId eq oppfølgingsperiodeId}
+                .find { (Journalfoeringer.oppfølgingsperiodeId eq oppfølgingsperiodeId) and (Journalfoeringer.type eq type)}
                 .toList()
         }
     }
@@ -79,11 +79,11 @@ class Repository(dataSource: DataSource) {
         val oppfølgingsperiodeId: OppfølgingsperiodeId,
         val type: JournalføringType,
     )
+}
 
-    enum class JournalføringType {
-        JOURNALFØRING,
-        SENDING_TIL_BRUKER
-    }
+enum class JournalføringType {
+    JOURNALFØRING,
+    SENDING_TIL_BRUKER
 }
 
 typealias OppfølgingsperiodeId = UUID

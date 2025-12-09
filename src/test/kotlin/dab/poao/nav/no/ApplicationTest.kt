@@ -2,6 +2,7 @@ package dab.poao.nav.no
 
 
 import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
+import dab.poao.nav.no.database.JournalføringType
 import dab.poao.nav.no.database.Repository
 import dab.poao.nav.no.dokark.Journalpost
 import dab.poao.nav.no.plugins.configureHikariDataSource
@@ -9,7 +10,6 @@ import io.kotest.assertions.json.shouldContainJsonKeyValue
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.ktor.client.*
@@ -106,7 +106,7 @@ class ApplicationTest : StringSpec({
 
         response.status shouldBe HttpStatusCode.OK
         response.body<ForhaandsvisningOutbound>()
-        repository.hentJournalposter(fnr) shouldHaveSize 0
+        repository.hentJournalposter(fnr, JournalføringType.JOURNALFØRING) shouldHaveSize 0
         mockEngine.requestHistory.filter { pdfgenUrl.contains(it.url.host) } shouldHaveSize 1
     }
 
@@ -158,14 +158,14 @@ class ApplicationTest : StringSpec({
         }
         response.status shouldBe HttpStatusCode.OK
 
-        val journalposterIDatabasen = repository.hentJournalposter(fnr)
+        val journalposterIDatabasen = repository.hentJournalposter(fnr, JournalføringType.JOURNALFØRING)
         journalposterIDatabasen shouldHaveSize 1
         val journalPost = journalposterIDatabasen.first()
         journalPost.journalpostId shouldNotBe null
         journalPost.oppfølgingsperiodeId shouldBe oppfølgingsperiodeId
-        journalPost.type shouldBe Repository.JournalføringType.JOURNALFØRING
+        journalPost.type shouldBe JournalføringType.JOURNALFØRING
 
-        val opprettet = repository.hentJournalposter(fnr).first().opprettetTidspunkt
+        val opprettet = repository.hentJournalposter(fnr, JournalføringType.JOURNALFØRING).first().opprettetTidspunkt
         val opprettetFormatert = opprettet.toJavaLocalDateTime().format(norskDatoKlokkeslettFormat)
         val requestsTilPdfgen = mockEngine.requestHistory.filter { pdfgenUrl.contains(it.url.host) }
         requestsTilPdfgen shouldHaveSize 1
@@ -254,8 +254,8 @@ class ApplicationTest : StringSpec({
         }
         response.status shouldBe HttpStatusCode.OK
 
-        val journalpostIDatabasen = repository.hentJournalposter(fnr).first()
-        journalpostIDatabasen.type shouldBe Repository.JournalføringType.SENDING_TIL_BRUKER
+        val journalpostIDatabasen = repository.hentJournalposter(fnr, JournalføringType.SENDING_TIL_BRUKER).first()
+        journalpostIDatabasen.type shouldBe JournalføringType.SENDING_TIL_BRUKER
 
         val requestsTilJoark = mockEngine.requestHistory.filter { joarkUrl.contains(it.url.host) }
         requestsTilJoark shouldHaveSize 1
