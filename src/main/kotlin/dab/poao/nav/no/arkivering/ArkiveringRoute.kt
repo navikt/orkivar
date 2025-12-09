@@ -76,7 +76,8 @@ fun Route.arkiveringRoutes(
                         opprettetTidspunkt = dokarkResult.tidspunkt,
                         referanse = dokarkResult.referanse,
                         journalpostId = dokarkResult.journalpostId,
-                        oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.oppfølgingsperiodeId)
+                        oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.oppfølgingsperiodeId),
+                        type = Repository.JournalføringType.JOURNALFØRING
                     )
                 )
                 call.respond(JournalføringOutbound(dokarkResult.tidspunkt.toKotlinLocalDateTime()))
@@ -100,7 +101,8 @@ fun Route.arkiveringRoutes(
                         opprettetTidspunkt = dokarkResult.tidspunkt,
                         referanse = dokarkResult.referanse,
                         journalpostId = dokarkResult.journalpostId,
-                        oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.oppfølgingsperiodeId)
+                        oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.oppfølgingsperiodeId),
+                        type = Repository.JournalføringType.SENDING_TIL_BRUKER
                     )
                 )
                 val sendTilBrukerResult = dokarkDistribusjonClient.sendJournalpostTilBruker(token, dokarkResult.journalpostId, arkiveringsPayload.fagsaksystem)

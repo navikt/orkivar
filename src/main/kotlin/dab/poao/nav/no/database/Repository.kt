@@ -26,6 +26,7 @@ class Repository(dataSource: DataSource) {
         val referanse = uuid("referanse")
         val journalpostId = text("journalpost_id")
         val oppfølgingsperiodeId = uuid("oppfølgingsperiode_id")
+        val type = enumerationByName("type", 50, JournalføringType::class)
     }
 
     class Journalfoering(id: EntityID<Int>) : IntEntity(id) {
@@ -36,6 +37,7 @@ class Repository(dataSource: DataSource) {
         val referanse by Journalfoeringer.referanse
         val journalpostId by Journalfoeringer.journalpostId
         val oppfølgingsperiodeId by Journalfoeringer.oppfølgingsperiodeId
+        val type by Journalfoeringer.type
     }
 
     suspend fun lagreJournalfoering(nyJournalføring: NyJournalføring) {
@@ -47,6 +49,7 @@ class Repository(dataSource: DataSource) {
                 it[referanse] = nyJournalføring.referanse
                 it[journalpostId] = nyJournalføring.journalpostId
                 it[oppfølgingsperiodeId] = nyJournalføring.oppfølgingsperiodeId
+                it[type] = nyJournalføring.type
             }
         }
     }
@@ -73,8 +76,14 @@ class Repository(dataSource: DataSource) {
         val opprettetTidspunkt: LocalDateTime,
         val referanse: UUID,
         val journalpostId: String,
-        val oppfølgingsperiodeId: OppfølgingsperiodeId
+        val oppfølgingsperiodeId: OppfølgingsperiodeId,
+        val type: JournalføringType,
     )
+
+    enum class JournalføringType {
+        JOURNALFØRING,
+        SENDING_TIL_BRUKER
+    }
 }
 
 typealias OppfølgingsperiodeId = UUID

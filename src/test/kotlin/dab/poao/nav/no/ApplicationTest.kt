@@ -163,6 +163,7 @@ class ApplicationTest : StringSpec({
         val journalPost = journalposterIDatabasen.first()
         journalPost.journalpostId shouldNotBe null
         journalPost.oppfølgingsperiodeId shouldBe oppfølgingsperiodeId
+        journalPost.type shouldBe Repository.JournalføringType.JOURNALFØRING
 
         val opprettet = repository.hentJournalposter(fnr).first().opprettetTidspunkt
         val opprettetFormatert = opprettet.toJavaLocalDateTime().format(norskDatoKlokkeslettFormat)
@@ -254,6 +255,7 @@ class ApplicationTest : StringSpec({
         response.status shouldBe HttpStatusCode.OK
 
         val journalpostIDatabasen = repository.hentJournalposter(fnr).first()
+        journalpostIDatabasen.type shouldBe Repository.JournalføringType.SENDING_TIL_BRUKER
 
         val requestsTilJoark = mockEngine.requestHistory.filter { joarkUrl.contains(it.url.host) }
         requestsTilJoark shouldHaveSize 1

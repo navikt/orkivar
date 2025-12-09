@@ -1,0 +1,1 @@
+alter table journalfoeringer add column type text;
