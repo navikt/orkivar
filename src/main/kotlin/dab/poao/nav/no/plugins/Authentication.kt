@@ -1,6 +1,7 @@
 import com.nimbusds.jose.util.DefaultResourceRetriever
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import no.nav.security.token.support.v3.IssuerConfig
 import no.nav.security.token.support.v3.tokenValidationSupport
 
 fun Application.configureAuthentication() {
@@ -11,6 +12,11 @@ fun Application.configureAuthentication() {
             config = config,
             resourceRetriever = DefaultResourceRetriever(),
             name = "AzureAD"
+        )
+        tokenValidationSupport(
+            config = config,
+            resourceRetriever = DefaultResourceRetriever(),
+            name = "TokenX"
         )
     }
 }

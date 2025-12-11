@@ -45,6 +45,8 @@ spec:
       destinations:
         - id: elastic
         - id: loki
+  tokenx:
+    enabled: true
   azure:
     application:
       enabled: true
