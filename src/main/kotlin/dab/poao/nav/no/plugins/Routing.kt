@@ -27,7 +27,7 @@ fun Application.configureRouting(
         get("/") {
             call.respondText("Hello World!")
         }
-        authenticate("AzureAD") {
+        authenticate("AzureAD", "TokenX") {
             arkiveringRoutes(dokarkClient, dokarkDistribusjonClient, pdfgenClient, lagreJournalføring, hentJournalføringer)
         }
     }
