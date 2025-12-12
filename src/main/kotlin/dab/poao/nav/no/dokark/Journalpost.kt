@@ -10,8 +10,13 @@ typealias Navn = String
 
 val norskDatoFormat = DateTimeFormatter.ofPattern("d. MMMM uuuu", Locale.forLanguageTag("no"))
 
-fun lagJournalpost(journalpostData: JournalpostData, journalpostType: JournalpostType): Journalpost =
-    Journalpost(
+fun lagJournalpost(journalpostData: JournalpostData, journalpostType: JournalpostType): Journalpost {
+    val dokumentTittel = when (journalpostType) {
+        JournalpostType.NOTAT -> "Aktivitetsplan og dialog ${journalpostData.oppfølgingsperiodeStart} - ${journalpostData.oppfølgingsperiodeSlutt?.let { it }?: journalpostData.tidspunkt.format(norskDatoFormat)}"
+        JournalpostType.UTGAAENDE -> "Aktivitetsplan sendt til bruker"
+    }
+
+    return Journalpost(
         avsenderMottaker = AvsenderMottaker(
             id = journalpostData.fnr,
             navn = journalpostData.navn,
@@ -28,7 +33,7 @@ fun lagJournalpost(journalpostData: JournalpostData, journalpostType: Journalpos
         dokumenter = listOf(
             Dokument(
                 brevkode = "modia-aktivitetsplan-dialog",
-                tittel = "Aktivitetsplan og dialog ${journalpostData.oppfølgingsperiodeStart} - ${journalpostData.oppfølgingsperiodeSlutt?.let { it }?: journalpostData.tidspunkt.format(norskDatoFormat)}",
+                tittel = dokumentTittel,
                 dokumentvarianter = listOf(
                     Dokumentvariant(
                         "PDFA",
@@ -48,6 +53,7 @@ fun lagJournalpost(journalpostData: JournalpostData, journalpostType: Journalpos
         ),
         tittel = "Aktivitetsplan og dialog"
     )
+}
 
 @Serializable
 data class Journalpost(
