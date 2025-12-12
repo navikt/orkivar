@@ -171,8 +171,7 @@ private suspend inline fun <reified T: Any> ApplicationCall.hentPayload(): T {
 
 private fun lagPdfgenPayload(pdfData: PdfData, tidspunkt: LocalDateTime): PdfgenPayload {
     val norskDatoKlokkeslettFormat = DateTimeFormatter.ofPattern("d. MMMM uuuu 'kl.' HH.mm", Locale.forLanguageTag("no"))
-
-    val formatertTidspunkt = tidspunkt.format(norskDatoKlokkeslettFormat)
+    val norskDatoFormat = DateTimeFormatter.ofPattern("d. MMMM uuuu", Locale.forLanguageTag("no"))
 
     return PdfgenPayload(
         navn = pdfData.navn,
@@ -184,7 +183,8 @@ private fun lagPdfgenPayload(pdfData: PdfData, tidspunkt: LocalDateTime): Pdfgen
         aktiviteter = pdfData.aktiviteter,
         dialogtråder = pdfData.dialogtråder,
         mål = pdfData.mål,
-        journalfoeringstidspunkt = formatertTidspunkt
+        journalfoeringstidspunkt = tidspunkt.format(norskDatoKlokkeslettFormat),
+        dagensDato = tidspunkt.format(norskDatoFormat)
     )
 }
 
