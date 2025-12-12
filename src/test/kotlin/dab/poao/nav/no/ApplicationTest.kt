@@ -223,13 +223,14 @@ class ApplicationTest : StringSpec({
         val tema = "OPP"
         val oppfølgingsperiodeId = UUID.randomUUID()
         val journalførendeEnhet = "0303"
+        val erManuellBruker = false
 
         val response = client.post("/send-til-bruker") {
             bearerAuth(token)
             contentType(ContentType.Application.Json)
             setBody(
                 """
-                {
+                {journalføringspayload: {
                     "navn": "TRIVIELL SKILPADDE",
                     "fnr": "$fnr",
                     "tekstTilBruker": null,
@@ -251,7 +252,9 @@ class ApplicationTest : StringSpec({
                     },
                     $dialogtråder,
                     $mål
-                }
+                },
+                "brukerHarManuellOppfølging": $erManuellBruker 
+            }
             """.trimIndent()
             )
         }
@@ -272,6 +275,46 @@ class ApplicationTest : StringSpec({
         body.shouldContainJsonKeyValue("dokumentProdApp", "orkivar")
         body.shouldContainJsonKeyValue("distribusjonstype", "ANNET")
         body.shouldContainJsonKeyValue("distribusjonstidspunkt", "UMIDDELBART")
+        body.shouldContainJsonKeyValue("tvingKanal", null)
+    }
+
+    "Manuell bruker skal få tilsendt per post" {
+        val token = mockOAuth2Server.getAzureToken("G122123")
+        val oppfølgingsperiodeId = UUID.randomUUID()
+        val erManuellBruker = true
+
+        val response = client.post("/send-til-bruker") {
+            bearerAuth(token)
+            contentType(ContentType.Application.Json)
+            setBody(
+                """
+                {journalføringspayload: {
+                    "navn": "TRIVIELL SKILPADDE",
+                    "fnr": "02015450301",
+                    "tekstTilBruker": null,
+                    "brukteFiltre": {},
+                    "oppfølgingsperiodeStart": "19 oktober 2021",
+                    "oppfølgingsperiodeSlutt": null,
+                    "sakId": 1000, 
+                    "fagsaksystem": "ARBEIDSOPPFOLGING",
+                    "tema": "OPP",
+                    "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
+                    "journalførendeEnhet": "0303",
+                    "aktiviteter": {},
+                    "dialogtråder": [],
+                    "mål": ""
+                },
+                "brukerHarManuellOppfølging": $erManuellBruker 
+            }
+            """.trimIndent()
+            )
+        }
+        response.status shouldBe HttpStatusCode.OK
+
+        val requestsTilJoarkDistribusjon = mockEngine.requestHistory.filter { joarkDistribusjonUrl.contains(it.url.host) }
+        requestsTilJoarkDistribusjon shouldHaveSize 1
+        val body = requestsTilJoarkDistribusjon.first().body.asString()
+        body.shouldContainJsonKeyValue("tvingKanal", "PRINT")
     }
 
     "Feil i request body skal kaste 400" {

@@ -38,6 +38,13 @@ data class JournalføringPayload(
     val tema: String,
 ): PdfData
 
+
+@Serializable
+data class SendTilBrukerPayload(
+    val journalføringspayload: JournalføringPayload,
+    val brukerHarManuellOppfølging: Boolean,
+)
+
 @Serializable
 data class ForhåndsvisningPayload(
     override val fnr: Fnr,

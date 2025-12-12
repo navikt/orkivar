@@ -39,18 +39,18 @@ fun Route.arkiveringRoutes(
     lagreJournalfoering: suspend (Repository.NyJournalføring) -> Unit,
     hentJournalføringer: suspend (OppfølgingsperiodeId, JournalføringType) -> List<Repository.Journalfoering>
 ) {
-    suspend fun opprettJournalpost(arkiveringsPayload: JournalføringPayload, journalpostType: JournalpostType, token: String): DokarkJournalpostResult {
+    suspend fun opprettJournalpost(journalføringspayload: JournalføringPayload, journalpostType: JournalpostType, token: String): DokarkJournalpostResult {
 
         val tidspunkt = LocalDateTime.now()
         val referanse = UUID.randomUUID()
-        val pdfGenPayload = lagPdfgenPayload(arkiveringsPayload, tidspunkt)
+        val pdfGenPayload = lagPdfgenPayload(journalføringspayload, tidspunkt)
 
         val dokarkResult = runCatching {
             val pdfResult = pdfgenClient.generatePdf(
                 payload = pdfGenPayload
             )
             when (pdfResult) {
-                is PdfSuccess -> dokarkClient.opprettJournalpost(token, journalpostType,lagJournalpostData(pdfResult.pdfByteString, arkiveringsPayload, referanse, tidspunkt))
+                is PdfSuccess -> dokarkClient.opprettJournalpost(token, journalpostType,lagJournalpostData(pdfResult.pdfByteString, journalføringspayload, referanse, tidspunkt))
                 is FailedPdfGen -> DokarkJournalpostFail(pdfResult.message)
             }
         }
@@ -103,8 +103,9 @@ fun Route.arkiveringRoutes(
     post("/send-til-bruker") {
         val token = call.hentUtBearerToken()
         val navIdent = call.hentNavIdentClaim()
-        val arkiveringsPayload = call.hentPayload<JournalføringPayload>()
-        val dokarkResult = opprettJournalpost(arkiveringsPayload, JournalpostType.UTGAAENDE, token)
+        val sendTilBrukerPayload = call.hentPayload<SendTilBrukerPayload>()
+        val journalføringspayload = sendTilBrukerPayload.journalføringspayload
+        val dokarkResult = opprettJournalpost(journalføringspayload, JournalpostType.UTGAAENDE, token)
 
         when (dokarkResult) {
             is DokarkJournalpostFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)
@@ -112,15 +113,15 @@ fun Route.arkiveringRoutes(
                 lagreJournalfoering(
                     Repository.NyJournalføring(
                         navIdent = navIdent,
-                        fnr = arkiveringsPayload.fnr,
+                        fnr = journalføringspayload.fnr,
                         opprettetTidspunkt = dokarkResult.tidspunkt,
                         referanse = dokarkResult.referanse,
                         journalpostId = dokarkResult.journalpostId,
-                        oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.oppfølgingsperiodeId),
+                        oppfølgingsperiodeId = UUID.fromString(journalføringspayload.oppfølgingsperiodeId),
                         type = JournalføringType.SENDING_TIL_BRUKER
                     )
                 )
-                val sendTilBrukerResult = dokarkDistribusjonClient.sendJournalpostTilBruker(token, dokarkResult.journalpostId, arkiveringsPayload.fagsaksystem)
+                val sendTilBrukerResult = dokarkDistribusjonClient.sendJournalpostTilBruker(token, dokarkResult.journalpostId, journalføringspayload.fagsaksystem, sendTilBrukerPayload.brukerHarManuellOppfølging)
                 when (sendTilBrukerResult) {
                     is DokarkSendTilBrukerFail -> call.respond(HttpStatusCode.InternalServerError)
                     is DokarkSendTilBrukerSuccess -> call.respond(JournalføringOutbound(dokarkResult.tidspunkt.toKotlinLocalDateTime()))

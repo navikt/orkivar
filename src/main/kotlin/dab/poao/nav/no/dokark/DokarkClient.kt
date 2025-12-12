@@ -109,6 +109,7 @@ data class DistribuerJournalpost(
     val bestillendeFagsystem: String,
     val dokumentProdApp: String,
     val distribusjonstype: String,
+    val tvingKanal: String?,
     val distribusjonstidspunkt: String
 )
 

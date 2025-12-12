@@ -1,28 +1,21 @@
 package dab.poao.nav.no.dokark
 
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.DEFAULT
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
-import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
-import io.ktor.http.isSuccess
-import io.ktor.serialization.kotlinx.json.json
-import io.ktor.server.config.ApplicationConfig
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.config.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import no.nav.poao.dab.ktor_oauth_client.AzureClient
 import no.nav.poao.dab.ktor_oauth_client.IncomingToken
 import org.slf4j.LoggerFactory
 
-class DokarkDistribusjonClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine)  {
+class DokarkDistribusjonClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine) {
     private val logger = LoggerFactory.getLogger(this::class.java)
     val clientScope = config.property("dokark.distribusjon.client-scope").getString()
     val clientUrl = config.property("dokark.distribusjon.client-url").getString()
@@ -40,7 +33,8 @@ class DokarkDistribusjonClient(config: ApplicationConfig, httpClientEngine: Http
     suspend fun sendJournalpostTilBruker(
         token: IncomingToken,
         journalpostId: String,
-        fagsaksystem: String
+        fagsaksystem: String,
+        tvingPrint: Boolean,
     ): DokarkSendTilBrukerResult {
         val url = "$clientUrl/rest/v1/distribuerjournalpost"
         val res = runCatching {
@@ -50,7 +44,18 @@ class DokarkDistribusjonClient(config: ApplicationConfig, httpClientEngine: Http
                     "Bearer ${azureClient.getOnBehalfOfToken("openid profile $clientScope", token)}"
                 )
                 contentType(ContentType.Application.Json)
-                setBody(Json.encodeToString(lagDistribuerJournalpost(journalpostId, fagsaksystem)))
+                setBody(
+                    Json.encodeToString(
+                        DistribuerJournalpost(
+                            journalpostId = journalpostId,
+                            bestillendeFagsystem = fagsaksystem,
+                            dokumentProdApp = "orkivar",
+                            distribusjonstype = "ANNET",
+                            tvingKanal = if (tvingPrint) "PRINT" else null,
+                            distribusjonstidspunkt = "UMIDDELBART"
+                        )
+                    )
+                )
             }
         }
             .onFailure { logger.error("Noe gikk galt", it) }
@@ -63,15 +68,6 @@ class DokarkDistribusjonClient(config: ApplicationConfig, httpClientEngine: Http
         val dokarkresponse = res.body<DistribuerJournalpostResponse>()
         return DokarkSendTilBrukerSuccess(dokarkresponse.bestillingsId)
     }
-
-    fun lagDistribuerJournalpost(journalpostId: String, fagsaksystem: String) : DistribuerJournalpost =
-        DistribuerJournalpost(
-            journalpostId = journalpostId,
-            bestillendeFagsystem = fagsaksystem,
-            dokumentProdApp = "orkivar",
-            distribusjonstype = "ANNET",
-            distribusjonstidspunkt = "UMIDDELBART"
-        )
 }
 
 @Serializable
