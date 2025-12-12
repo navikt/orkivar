@@ -5,6 +5,7 @@ import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
 import dab.poao.nav.no.database.JournalføringType
 import dab.poao.nav.no.database.Repository
 import dab.poao.nav.no.dokark.Journalpost
+import dab.poao.nav.no.dokark.norskDatoFormat
 import dab.poao.nav.no.plugins.configureHikariDataSource
 import io.kotest.assertions.json.shouldContainJsonKeyValue
 import io.kotest.assertions.json.shouldEqualJson
@@ -166,7 +167,8 @@ class ApplicationTest : StringSpec({
         journalPost.type shouldBe JournalføringType.JOURNALFØRING
 
         val opprettet = repository.hentJournalposter(fnr, JournalføringType.JOURNALFØRING).first().opprettetTidspunkt
-        val opprettetFormatert = opprettet.toJavaLocalDateTime().format(norskDatoKlokkeslettFormat)
+        val journalføringstidspunkt = opprettet.toJavaLocalDateTime().format(norskDatoKlokkeslettFormat)
+        val journalføringsdato = opprettet.toJavaLocalDateTime().format(norskDatoFormat)
         val requestsTilPdfgen = mockEngine.requestHistory.filter { pdfgenUrl.contains(it.url.host) }
         requestsTilPdfgen shouldHaveSize 1
 
@@ -181,7 +183,8 @@ class ApplicationTest : StringSpec({
                     },
                     "oppfølgingsperiodeStart": "19 oktober 2021",
                     "oppfølgingsperiodeSlutt": null,
-                    "journalfoeringstidspunkt":"$opprettetFormatert",
+                    "journalfoeringstidspunkt":"$journalføringstidspunkt",
+                    "dagensDato": "$journalføringsdato",
                     "aktiviteter": {
                         "Planlagt": [
                             $forslagAktivitet
