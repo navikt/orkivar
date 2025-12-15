@@ -10,6 +10,7 @@ data class PdfgenPayload(
     val navn: String,
     val fnr: String,
     val tekstTilBruker: String?,
+    val journalførendeEnhetNavn: String,
     val brukteFiltre: Map<String, List<String>>?,
     val oppfølgingsperiodeStart: String,
     val oppfølgingsperiodeSlutt: String?,

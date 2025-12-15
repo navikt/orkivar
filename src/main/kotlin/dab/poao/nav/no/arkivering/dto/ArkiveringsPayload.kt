@@ -11,6 +11,7 @@ sealed interface PdfData {
     val fnr: Fnr
     val navn: Navn
     val tekstTilBruker: String?
+    val journalførendeEnhetNavn: String
     val brukteFiltre: Map<String, List<String>>
     val oppfølgingsperiodeStart: String
     val oppfølgingsperiodeSlutt: String?
@@ -25,6 +26,7 @@ data class JournalføringPayload(
     override val fnr: Fnr,
     override val navn: Navn,
     override val tekstTilBruker: String?,
+    override val journalførendeEnhetNavn: String,
     override val brukteFiltre: Map<String, List<String>> = emptyMap(),
     override val oppfølgingsperiodeStart: String,
     override val oppfølgingsperiodeSlutt: String?,
@@ -50,6 +52,7 @@ data class ForhåndsvisningPayload(
     override val fnr: Fnr,
     override val navn: Navn,
     override val tekstTilBruker: String?,
+    override val journalførendeEnhetNavn: String,
     override val brukteFiltre: Map<String, List<String>> = emptyMap(),
     override val oppfølgingsperiodeStart: String,
     override val oppfølgingsperiodeSlutt: String?,

@@ -86,6 +86,7 @@ class ApplicationTest : StringSpec({
                 {
                     "navn": "TRIVIELL SKILPADDE",
                     "tekstTilBruker": null,
+                    "journalførendeEnhetNavn": "Nav Helsfyr",
                     "fnr": "$fnr",
                     "oppfølgingsperiodeStart": "19 oktober 2021",
                     "oppfølgingsperiodeSlutt": null,
@@ -132,6 +133,7 @@ class ApplicationTest : StringSpec({
                     "navn": "TRIVIELL SKILPADDE",
                     "fnr": "$fnr",
                     "tekstTilBruker": "Dette er en tekst",
+                    "journalførendeEnhetNavn": "Nav Helsfyr",
                     "brukteFiltre": {
                         "Aktivitetstype": ["Jobb jeg har nå", "Stilling"],
                         "Avtalt aktivitet": ["Avtalt med Nav"]
@@ -177,6 +179,7 @@ class ApplicationTest : StringSpec({
                     "navn": "TRIVIELL SKILPADDE",
                     "fnr": "$fnr",
                     "tekstTilBruker": "Dette er en tekst",
+                    "journalførendeEnhetNavn": "Nav Helsfyr",
                     "brukteFiltre": {
                         "Aktivitetstype": ["Jobb jeg har nå", "Stilling"],
                         "Avtalt aktivitet": ["Avtalt med Nav"]
@@ -234,6 +237,7 @@ class ApplicationTest : StringSpec({
                     "navn": "TRIVIELL SKILPADDE",
                     "fnr": "$fnr",
                     "tekstTilBruker": null,
+                    "journalførendeEnhetNavn": "Nav Helsfyr",
                     "brukteFiltre": {},
                     "oppfølgingsperiodeStart": "19 oktober 2021",
                     "oppfølgingsperiodeSlutt": null,
@@ -292,6 +296,7 @@ class ApplicationTest : StringSpec({
                     "navn": "TRIVIELL SKILPADDE",
                     "fnr": "02015450301",
                     "tekstTilBruker": null,
+                    "journalførendeEnhetNavn": "Nav Helsfyr",
                     "brukteFiltre": {},
                     "oppfølgingsperiodeStart": "19 oktober 2021",
                     "oppfølgingsperiodeSlutt": null,
