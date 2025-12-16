@@ -34,7 +34,7 @@ data class JournalføringPayload(
     override val dialogtråder: List<ArkivDialogtråd>,
     override val mål: String?,
     override val oppfølgingsperiodeId: String,
-    val journalførendeEnhet: String,
+    val journalførendeEnhetId: String,
     val sakId: Long,
     val fagsaksystem: String,
     val tema: String,

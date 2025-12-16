@@ -202,6 +202,6 @@ private fun lagJournalpostData(pdf: ByteArray, journalføringsPayload: Journalf�
         eksternReferanse = referanse,
         oppfølgingsperiodeStart = journalføringsPayload.oppfølgingsperiodeStart,
         oppfølgingsperiodeSlutt = journalføringsPayload.oppfølgingsperiodeSlutt,
-        journalførendeEnhet = journalføringsPayload.journalførendeEnhet
+        journalførendeEnhet = journalføringsPayload.journalførendeEnhetId
     )
 }
