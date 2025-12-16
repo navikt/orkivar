@@ -122,7 +122,7 @@ class ApplicationTest : StringSpec({
         val fagsaksystem = "ARBEIDSOPPFOLGING"
         val tema = "OPP"
         val oppfølgingsperiodeId = UUID.randomUUID()
-        val journalførendeEnhet = "0303"
+        val journalførendeEnhetId = "0303"
 
         val response = client.post("/arkiver") {
             bearerAuth(token)
@@ -144,7 +144,7 @@ class ApplicationTest : StringSpec({
                     "fagsaksystem": $fagsaksystem,
                     "tema": "$tema",
                     "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
-                    "journalførendeEnhet": "$journalførendeEnhet",
+                    "journalførendeEnhetId": "$journalførendeEnhetId",
                     "aktiviteter": {
                         "Planlagt": [
                             $forslagAktivitet
@@ -207,7 +207,7 @@ class ApplicationTest : StringSpec({
         bodyTilJoark.shouldContainJsonKeyValue("sak.fagsakId", sakId.toString())
         bodyTilJoark.shouldContainJsonKeyValue("eksternReferanseId", journalPost.referanse.toString())
         bodyTilJoark.shouldContainJsonKeyValue("sak.fagsaksystem", fagsaksystem)
-        bodyTilJoark.shouldContainJsonKeyValue("journalfoerendeEnhet", journalførendeEnhet)
+        bodyTilJoark.shouldContainJsonKeyValue("journalfoerendeEnhet", journalførendeEnhetId)
         bodyTilJoark.shouldContainJsonKeyValue("tittel", "Aktivitetsplan og dialog")
         bodyTilJoark.shouldContainJsonKeyValue("tema", "OPP")
         bodyTilJoark.shouldContainJsonKeyValue("overstyrInnsynsregler", "VISES_MASKINELT_GODKJENT")
@@ -225,7 +225,7 @@ class ApplicationTest : StringSpec({
         val fagsaksystem = "ARBEIDSOPPFOLGING"
         val tema = "OPP"
         val oppfølgingsperiodeId = UUID.randomUUID()
-        val journalførendeEnhet = "0303"
+        val journalførendeEnhetId = "0303"
         val erManuellBruker = false
 
         val response = client.post("/send-til-bruker") {
@@ -245,7 +245,7 @@ class ApplicationTest : StringSpec({
                     "fagsaksystem": $fagsaksystem,
                     "tema": "$tema",
                     "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
-                    "journalførendeEnhet": "$journalførendeEnhet",
+                    "journalførendeEnhetId": "$journalførendeEnhetId",
                     "aktiviteter": {
                         "Planlagt": [
                             $forslagAktivitet
