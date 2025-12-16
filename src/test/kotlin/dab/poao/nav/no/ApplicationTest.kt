@@ -304,7 +304,7 @@ class ApplicationTest : StringSpec({
                     "fagsaksystem": "ARBEIDSOPPFOLGING",
                     "tema": "OPP",
                     "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
-                    "journalførendeEnhet": "0303",
+                    "journalførendeEnhetId": "0303",
                     "aktiviteter": {},
                     "dialogtråder": [],
                     "mål": ""
