@@ -7,60 +7,35 @@ import kotlinx.serialization.Serializable
 
 typealias ArkivAktivitetStatus = String
 
-sealed interface PdfData {
-    val fnr: Fnr
-    val navn: Navn
-    val tekstTilBruker: String?
-    val journalførendeEnhetNavn: String
-    val brukteFiltre: Map<String, List<String>>
-    val oppfølgingsperiodeStart: String
-    val oppfølgingsperiodeSlutt: String?
-    val aktiviteter: Map<ArkivAktivitetStatus, List<ArkivAktivitet>>
-    val dialogtråder: List<ArkivDialogtråd>
-    val mål: String?
-    val oppfølgingsperiodeId: String
-}
+@Serializable
+data class PdfData(
+    val fnr: Fnr,
+    val navn: Navn,
+    val tekstTilBruker: String?,
+    val journalførendeEnhetNavn: String,
+    val brukteFiltre: Map<String, List<String>>,
+    val oppfølgingsperiodeStart: String,
+    val oppfølgingsperiodeSlutt: String?,
+    val aktiviteter: Map<ArkivAktivitetStatus, List<ArkivAktivitet>>,
+    val dialogtråder: List<ArkivDialogtråd>,
+    val mål: String?,
+    val oppfølgingsperiodeId: String,
+)
 
 @Serializable
 data class JournalføringPayload(
-    override val fnr: Fnr,
-    override val navn: Navn,
-    override val tekstTilBruker: String?,
-    override val journalførendeEnhetNavn: String,
-    override val brukteFiltre: Map<String, List<String>> = emptyMap(),
-    override val oppfølgingsperiodeStart: String,
-    override val oppfølgingsperiodeSlutt: String?,
-    override val aktiviteter: Map<ArkivAktivitetStatus, List<ArkivAktivitet>>,
-    override val dialogtråder: List<ArkivDialogtråd>,
-    override val mål: String?,
-    override val oppfølgingsperiodeId: String,
     val journalførendeEnhetId: String,
     val sakId: Long,
     val fagsaksystem: String,
     val tema: String,
-): PdfData
-
+    val pdfPayload: PdfData
+)
 
 @Serializable
 data class SendTilBrukerPayload(
     val journalføringspayload: JournalføringPayload,
     val brukerHarManuellOppfølging: Boolean,
 )
-
-@Serializable
-data class ForhåndsvisningPayload(
-    override val fnr: Fnr,
-    override val navn: Navn,
-    override val tekstTilBruker: String?,
-    override val journalførendeEnhetNavn: String,
-    override val brukteFiltre: Map<String, List<String>> = emptyMap(),
-    override val oppfølgingsperiodeStart: String,
-    override val oppfølgingsperiodeSlutt: String?,
-    override val aktiviteter: Map<ArkivAktivitetStatus, List<ArkivAktivitet>>,
-    override val dialogtråder: List<ArkivDialogtråd>,
-    override val mål: String?,
-    override val oppfølgingsperiodeId: String,
-): PdfData
 
 @Serializable
 data class ArkivAktivitet(
