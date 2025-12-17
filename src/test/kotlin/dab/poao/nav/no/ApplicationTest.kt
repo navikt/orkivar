@@ -88,6 +88,7 @@ class ApplicationTest : StringSpec({
                     "tekstTilBruker": null,
                     "journalførendeEnhetNavn": "Nav Helsfyr",
                     "fnr": "$fnr",
+                    "brukteFiltre": {},
                     "oppfølgingsperiodeStart": "19 oktober 2021",
                     "oppfølgingsperiodeSlutt": null,
                     "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
@@ -130,31 +131,33 @@ class ApplicationTest : StringSpec({
             setBody(
                 """
                 {
-                    "navn": "TRIVIELL SKILPADDE",
-                    "fnr": "$fnr",
-                    "tekstTilBruker": "Dette er en tekst",
-                    "journalførendeEnhetNavn": "Nav Helsfyr",
-                    "brukteFiltre": {
-                        "Aktivitetstype": ["Jobb jeg har nå", "Stilling"],
-                        "Avtalt aktivitet": ["Avtalt med Nav"]
-                    },
-                    "oppfølgingsperiodeStart": "19 oktober 2021",
-                    "oppfølgingsperiodeSlutt": null,
                     "sakId": $sakId, 
                     "fagsaksystem": $fagsaksystem,
                     "tema": "$tema",
-                    "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
                     "journalførendeEnhetId": "$journalførendeEnhetId",
-                    "aktiviteter": {
-                        "Planlagt": [
-                            $forslagAktivitet
-                        ],
-                        "Avbrutt": [
-                            $avbruttAktivitet
-                        ]
-                    },
-                    $dialogtråder,
-                    $mål
+                    "pdfPayload": {
+                        "navn": "TRIVIELL SKILPADDE",
+                        "fnr": "$fnr",
+                        "tekstTilBruker": "Dette er en tekst",
+                        "journalførendeEnhetNavn": "Nav Helsfyr",
+                        "brukteFiltre": {
+                            "Aktivitetstype": ["Jobb jeg har nå", "Stilling"],
+                            "Avtalt aktivitet": ["Avtalt med Nav"]
+                        },
+                        "oppfølgingsperiodeStart": "19 oktober 2021",
+                        "oppfølgingsperiodeSlutt": null,
+                        "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
+                        "aktiviteter": {
+                            "Planlagt": [
+                                $forslagAktivitet
+                            ],
+                            "Avbrutt": [
+                                $avbruttAktivitet
+                            ]
+                        },
+                        $dialogtråder,
+                        $mål
+                    }
                 }
             """.trimIndent()
             )
@@ -233,29 +236,35 @@ class ApplicationTest : StringSpec({
             contentType(ContentType.Application.Json)
             setBody(
                 """
-                {journalføringspayload: {
-                    "navn": "TRIVIELL SKILPADDE",
-                    "fnr": "$fnr",
-                    "tekstTilBruker": null,
-                    "journalførendeEnhetNavn": "Nav Helsfyr",
-                    "brukteFiltre": {},
-                    "oppfølgingsperiodeStart": "19 oktober 2021",
-                    "oppfølgingsperiodeSlutt": null,
+                {
+                journalføringspayload: {
                     "sakId": $sakId, 
                     "fagsaksystem": $fagsaksystem,
                     "tema": "$tema",
-                    "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
                     "journalførendeEnhetId": "$journalførendeEnhetId",
-                    "aktiviteter": {
-                        "Planlagt": [
-                            $forslagAktivitet
-                        ],
-                        "Avbrutt": [
-                            $avbruttAktivitet
-                        ]
-                    },
-                    $dialogtråder,
-                    $mål
+                    "pdfPayload": {
+                        "navn": "TRIVIELL SKILPADDE",
+                        "fnr": "$fnr",
+                        "tekstTilBruker": "Dette er en tekst",
+                        "journalførendeEnhetNavn": "Nav Helsfyr",
+                        "brukteFiltre": {
+                            "Aktivitetstype": ["Jobb jeg har nå", "Stilling"],
+                            "Avtalt aktivitet": ["Avtalt med Nav"]
+                        },
+                        "oppfølgingsperiodeStart": "19 oktober 2021",
+                        "oppfølgingsperiodeSlutt": null,
+                        "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
+                        "aktiviteter": {
+                            "Planlagt": [
+                                $forslagAktivitet
+                            ],
+                            "Avbrutt": [
+                                $avbruttAktivitet
+                            ]
+                        },
+                        $dialogtråder,
+                        $mål
+                        }
                 },
                 "brukerHarManuellOppfølging": $erManuellBruker 
             }
@@ -293,21 +302,24 @@ class ApplicationTest : StringSpec({
             setBody(
                 """
                 {journalføringspayload: {
-                    "navn": "TRIVIELL SKILPADDE",
-                    "fnr": "02015450301",
-                    "tekstTilBruker": null,
-                    "journalførendeEnhetNavn": "Nav Helsfyr",
-                    "brukteFiltre": {},
-                    "oppfølgingsperiodeStart": "19 oktober 2021",
-                    "oppfølgingsperiodeSlutt": null,
                     "sakId": 1000, 
                     "fagsaksystem": "ARBEIDSOPPFOLGING",
                     "tema": "OPP",
-                    "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
                     "journalførendeEnhetId": "0303",
-                    "aktiviteter": {},
-                    "dialogtråder": [],
-                    "mål": ""
+                    "pdfPayload": {
+                        "navn": "TRIVIELL SKILPADDE",
+                        "fnr": "02015450301",
+                        "brukteFiltre": {},
+                        "tekstTilBruker": null,
+                        "journalførendeEnhetNavn": "Nav Helsfyr",
+                        "brukteFiltre": {},
+                        "oppfølgingsperiodeStart": "19 oktober 2021",
+                        "oppfølgingsperiodeSlutt": null,
+                        "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
+                        "aktiviteter": {},
+                        "dialogtråder": [],
+                        "mål": ""
+                    }
                 },
                 "brukerHarManuellOppfølging": $erManuellBruker 
             }

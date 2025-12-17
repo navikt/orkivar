@@ -43,7 +43,7 @@ fun Route.arkiveringRoutes(
 
         val tidspunkt = LocalDateTime.now()
         val referanse = UUID.randomUUID()
-        val pdfGenPayload = lagPdfgenPayload(journalføringspayload, tidspunkt)
+        val pdfGenPayload = lagPdfgenPayload(journalføringspayload.pdfPayload, tidspunkt)
 
         val dokarkResult = runCatching {
             val pdfResult = pdfgenClient.generatePdf(
@@ -60,7 +60,7 @@ fun Route.arkiveringRoutes(
         return dokarkResult
     }
 
-    suspend fun lagForhaandsvisning(payload: ForhåndsvisningPayload, type: JournalføringType): Result<ForhaandsvisningOutbound> {
+    suspend fun lagForhaandsvisning(payload: PdfData, type: JournalføringType): Result<ForhaandsvisningOutbound> {
         val pdfgenPayload = lagPdfgenPayload(payload, LocalDateTime.now())
         val pdfResult = pdfgenClient.generatePdf(pdfgenPayload)
         val oppfølgingsperiodeId = UUID.fromString(payload.oppfølgingsperiodeId)
@@ -87,11 +87,11 @@ fun Route.arkiveringRoutes(
                 lagreJournalfoering(
                     Repository.NyJournalføring(
                         navIdent = navIdent,
-                        fnr = arkiveringsPayload.fnr,
+                        fnr = arkiveringsPayload.pdfPayload.fnr,
                         opprettetTidspunkt = dokarkResult.tidspunkt,
                         referanse = dokarkResult.referanse,
                         journalpostId = dokarkResult.journalpostId,
-                        oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.oppfølgingsperiodeId),
+                        oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.pdfPayload.oppfølgingsperiodeId),
                         type = JournalføringType.JOURNALFØRING
                     )
                 )
@@ -113,11 +113,11 @@ fun Route.arkiveringRoutes(
                 lagreJournalfoering(
                     Repository.NyJournalføring(
                         navIdent = navIdent,
-                        fnr = journalføringspayload.fnr,
+                        fnr = journalføringspayload.pdfPayload.fnr,
                         opprettetTidspunkt = dokarkResult.tidspunkt,
                         referanse = dokarkResult.referanse,
                         journalpostId = dokarkResult.journalpostId,
-                        oppfølgingsperiodeId = UUID.fromString(journalføringspayload.oppfølgingsperiodeId),
+                        oppfølgingsperiodeId = UUID.fromString(journalføringspayload.pdfPayload.oppfølgingsperiodeId),
                         type = JournalføringType.SENDING_TIL_BRUKER
                     )
                 )
@@ -131,14 +131,14 @@ fun Route.arkiveringRoutes(
     }
 
     post("/forhaandsvisning") {
-        val forhåndsvisningPayload = call.hentPayload<ForhåndsvisningPayload>()
+        val forhåndsvisningPayload = call.hentPayload<PdfData>()
         lagForhaandsvisning(forhåndsvisningPayload, JournalføringType.JOURNALFØRING)
             .onSuccess { call.respond(it) }
             .onFailure { call.respond(HttpStatusCode.InternalServerError) }
     }
 
     post("/forhaandsvisning-send-til-bruker") {
-        val forhåndsvisningPayload = call.hentPayload<ForhåndsvisningPayload>()
+        val forhåndsvisningPayload = call.hentPayload<PdfData>()
         lagForhaandsvisning(forhåndsvisningPayload, JournalføringType.SENDING_TIL_BRUKER)
             .onSuccess { call.respond(it) }
             .onFailure { call.respond(HttpStatusCode.InternalServerError) }
@@ -193,15 +193,15 @@ private fun lagPdfgenPayload(pdfData: PdfData, tidspunkt: LocalDateTime): Pdfgen
 private fun lagJournalpostData(pdf: ByteArray, journalføringsPayload: JournalføringPayload, referanse: UUID, tidspunkt: LocalDateTime): JournalpostData {
     return JournalpostData(
         pdf = pdf,
-        navn = journalføringsPayload.navn,
-        fnr = journalføringsPayload.fnr,
+        navn = journalføringsPayload.pdfPayload.navn,
+        fnr = journalføringsPayload.pdfPayload.fnr,
         tidspunkt = tidspunkt,
         sakId = journalføringsPayload.sakId,
         fagsaksystem = journalføringsPayload.fagsaksystem,
         tema = journalføringsPayload.tema,
         eksternReferanse = referanse,
-        oppfølgingsperiodeStart = journalføringsPayload.oppfølgingsperiodeStart,
-        oppfølgingsperiodeSlutt = journalføringsPayload.oppfølgingsperiodeSlutt,
+        oppfølgingsperiodeStart = journalføringsPayload.pdfPayload.oppfølgingsperiodeStart,
+        oppfølgingsperiodeSlutt = journalføringsPayload.pdfPayload.oppfølgingsperiodeSlutt,
         journalførendeEnhet = journalføringsPayload.journalførendeEnhetId
     )
 }
