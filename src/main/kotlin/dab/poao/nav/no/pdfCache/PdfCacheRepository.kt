@@ -10,6 +10,7 @@ import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.upsert
 import java.time.LocalDateTime
+import java.util.UUID
 import javax.sql.DataSource
 import kotlinx.datetime.LocalDateTime as KotlinxLocalDateTime
 
@@ -25,6 +26,7 @@ class PdfCacheRepository(dataSource: DataSource) {
         val createdAt = datetime("created_at")
         val updatedAt = datetime("updated_at")
         val pdf = binary("pdf")
+        val uuid = uuid("uuid")
 
         init {
             uniqueIndex(veilederIdent, fnr)
@@ -36,11 +38,11 @@ class PdfCacheRepository(dataSource: DataSource) {
 
         val veilederIdent by PdfCache.veilederIdent
         val fnr by PdfCache.fnr
-        var createdAt by PdfCache.createdAt
-        var updatedAt by PdfCache.updatedAt
-        var pdf by PdfCache.pdf
+        val createdAt by PdfCache.createdAt
+        val updatedAt by PdfCache.updatedAt
+        val pdf by PdfCache.pdf
+        val uuid by PdfCache.uuid
     }
-
 
     fun lagre(nyPdf: NyPdfSomSkalCaches) {
         transaction {
@@ -49,6 +51,7 @@ class PdfCacheRepository(dataSource: DataSource) {
                 it[fnr] = nyPdf.fnr
                 it[updatedAt] = KotlinxLocalDateTime.parse(LocalDateTime.now().toString())
                 it[pdf] = nyPdf.pdf
+                it[uuid] = UUID.randomUUID()
             }
         }
     }
