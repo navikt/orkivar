@@ -10,6 +10,7 @@ import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.kotlin.datetime.datetime
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.upsertReturning
 import java.time.LocalDateTime
@@ -56,6 +57,12 @@ class PdfCacheRepository(dataSource: DataSource) {
                 it[pdf] = nyPdf.pdf
                 it[uuid] = UUID.randomUUID()
             }.single().mapTilCachetPdf()
+        }
+    }
+
+    fun hent(uuid: UUID): PdfFraCache {
+        return transaction {
+            PdfCache.selectAll().where { PdfCache.uuid eq uuid }.single().mapTilCachetPdf()
         }
     }
 

@@ -13,7 +13,9 @@ class PdfCache(
         return pdfCacheRepository.lagre(nyPdf)
     }
 
-
+    fun hentFraCache(uuid: UUID): PdfFraCache {
+        return pdfCacheRepository.hent(uuid)
+    }
 }
 
 data class NyPdfSomSkalCaches(
