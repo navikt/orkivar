@@ -42,6 +42,5 @@ class PdfCacheTest {
         val lagretPdf = pdfCache.lagre(pdf)
         pdfCache.slett(lagretPdf.uuid)
         pdfCache.hentFraCache(lagretPdf.uuid) shouldBe null
-
     }
 }

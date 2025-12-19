@@ -8,6 +8,7 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.less
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import org.jetbrains.exposed.sql.selectAll
@@ -69,6 +70,12 @@ class PdfCacheRepository(dataSource: DataSource) {
     fun slett(uuid: UUID) {
         transaction {
             CachetPdfTabell.deleteWhere { CachetPdfTabell.uuid eq uuid }
+        }
+    }
+
+    fun slettRaderSomIkkeHarBlittOppdatertEtter(tidspunkt: LocalDateTime) {
+        transaction {
+            CachetPdfTabell.deleteWhere { CachetPdfTabell.updatedAt.less(KotlinxLocalDateTime.parse(tidspunkt.toString())) }
         }
     }
 
