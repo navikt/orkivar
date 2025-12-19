@@ -6,11 +6,14 @@ import org.jetbrains.exposed.dao.id.CompositeID
 import org.jetbrains.exposed.dao.id.CompositeIdTable
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.upsert
+import org.jetbrains.exposed.sql.upsertReturning
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 import javax.sql.DataSource
 import kotlinx.datetime.LocalDateTime as KotlinxLocalDateTime
 
@@ -44,15 +47,28 @@ class PdfCacheRepository(dataSource: DataSource) {
         val uuid by PdfCache.uuid
     }
 
-    fun lagre(nyPdf: NyPdfSomSkalCaches) {
-        transaction {
-            PdfCache.upsert(keys = arrayOf(PdfCache.veilederIdent, PdfCache.fnr)) {
+    fun lagre(nyPdf: NyPdfSomSkalCaches): PdfFraCache {
+        return transaction {
+            PdfCache.upsertReturning(keys = arrayOf(PdfCache.veilederIdent, PdfCache.fnr)) {
                 it[veilederIdent] = nyPdf.veilederIdent
                 it[fnr] = nyPdf.fnr
                 it[updatedAt] = KotlinxLocalDateTime.parse(LocalDateTime.now().toString())
                 it[pdf] = nyPdf.pdf
                 it[uuid] = UUID.randomUUID()
-            }
+            }.single().mapTilCachetPdf()
         }
+    }
+
+    fun slett(uuid: UUID) {
+        transaction {
+            PdfCache.deleteWhere { PdfCache.uuid eq uuid }
+        }
+    }
+
+    fun ResultRow.mapTilCachetPdf(): PdfFraCache {
+        return PdfFraCache(
+            uuid = this[PdfCache.uuid],
+            pdf = this[PdfCache.pdf]
+        )
     }
 }

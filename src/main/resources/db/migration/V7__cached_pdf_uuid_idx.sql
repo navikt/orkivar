@@ -1,0 +1,1 @@
+create index cached_pdf_uuid_idx on cachet_pdf(uuid);
