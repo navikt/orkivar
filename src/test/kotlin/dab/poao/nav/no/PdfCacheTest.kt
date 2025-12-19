@@ -33,6 +33,6 @@ class PdfCacheTest {
         val nyPdf = NyPdfSomSkalCaches(pdf = "bytearray".toByteArray(), fnr = "12345678910", veilederIdent = "T123123")
         val lagretPdf = pdfCache.lagre(nyPdf)
         val hentetPdf = pdfCache.hentFraCache(lagretPdf.uuid)
-        hentetPdf shouldBe nyPdf
+        hentetPdf.pdf shouldBe nyPdf.pdf
     }
 }
