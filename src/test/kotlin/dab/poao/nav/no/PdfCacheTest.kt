@@ -1,7 +1,7 @@
 package dab.poao.nav.no
 
-import dab.poao.nav.no.pdfCache.NyPdfSomSkalCaches
-import dab.poao.nav.no.pdfCache.PdfCache
+import dab.poao.nav.no.pdfCaching.NyPdfSomSkalCaches
+import dab.poao.nav.no.pdfCaching.PdfCache
 import io.kotest.matchers.shouldBe
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import org.flywaydb.core.Flyway

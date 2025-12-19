@@ -1,4 +1,4 @@
-package dab.poao.nav.no.pdfCache
+package dab.poao.nav.no.pdfCaching
 
 import org.jetbrains.exposed.dao.CompositeEntity
 import org.jetbrains.exposed.dao.CompositeEntityClass
@@ -24,7 +24,7 @@ class PdfCacheRepository(dataSource: DataSource) {
         Database.connect(dataSource)
     }
 
-    object PdfCache : CompositeIdTable("cachet_pdf") {
+    object CachetPdfTabell : CompositeIdTable("cachet_pdf") {
         val veilederIdent = varchar("veileder_ident", 7)
         val fnr = varchar("fnr", 11)
         val createdAt = datetime("created_at")
@@ -38,19 +38,19 @@ class PdfCacheRepository(dataSource: DataSource) {
     }
 
     class CachetPdf(id: EntityID<CompositeID>) : CompositeEntity(id) {
-        companion object : CompositeEntityClass<CachetPdf>(PdfCache)
+        companion object : CompositeEntityClass<CachetPdf>(CachetPdfTabell)
 
-        val veilederIdent by PdfCache.veilederIdent
-        val fnr by PdfCache.fnr
-        val createdAt by PdfCache.createdAt
-        val updatedAt by PdfCache.updatedAt
-        val pdf by PdfCache.pdf
-        val uuid by PdfCache.uuid
+        val veilederIdent by CachetPdfTabell.veilederIdent
+        val fnr by CachetPdfTabell.fnr
+        val createdAt by CachetPdfTabell.createdAt
+        val updatedAt by CachetPdfTabell.updatedAt
+        val pdf by CachetPdfTabell.pdf
+        val uuid by CachetPdfTabell.uuid
     }
 
     fun lagre(nyPdf: NyPdfSomSkalCaches): PdfFraCache {
         return transaction {
-            PdfCache.upsertReturning(keys = arrayOf(PdfCache.veilederIdent, PdfCache.fnr)) {
+            CachetPdfTabell.upsertReturning(keys = arrayOf(CachetPdfTabell.veilederIdent, CachetPdfTabell.fnr)) {
                 it[veilederIdent] = nyPdf.veilederIdent
                 it[fnr] = nyPdf.fnr
                 it[updatedAt] = KotlinxLocalDateTime.parse(LocalDateTime.now().toString())
@@ -62,20 +62,20 @@ class PdfCacheRepository(dataSource: DataSource) {
 
     fun hent(uuid: UUID): PdfFraCache? {
         return transaction {
-            PdfCache.selectAll().where { PdfCache.uuid eq uuid }.singleOrNull()?.mapTilCachetPdf()
+            CachetPdfTabell.selectAll().where { CachetPdfTabell.uuid eq uuid }.singleOrNull()?.mapTilCachetPdf()
         }
     }
 
     fun slett(uuid: UUID) {
         transaction {
-            PdfCache.deleteWhere { PdfCache.uuid eq uuid }
+            CachetPdfTabell.deleteWhere { CachetPdfTabell.uuid eq uuid }
         }
     }
 
     fun ResultRow.mapTilCachetPdf(): PdfFraCache {
         return PdfFraCache(
-            uuid = this[PdfCache.uuid],
-            pdf = this[PdfCache.pdf]
+            uuid = this[CachetPdfTabell.uuid],
+            pdf = this[CachetPdfTabell.pdf]
         )
     }
 }

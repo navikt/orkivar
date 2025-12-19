@@ -1,12 +1,9 @@
-package dab.poao.nav.no.pdfCache
+package dab.poao.nav.no.pdfCaching
 
-import kotlinx.datetime.LocalDateTime
 import java.util.UUID
 import javax.sql.DataSource
 
-class PdfCache(
-    val dataSource: DataSource,
-) {
+class PdfCache(dataSource: DataSource) {
     private val pdfCacheRepository = PdfCacheRepository(dataSource)
 
     fun lagre(nyPdf: NyPdfSomSkalCaches): PdfFraCache {
