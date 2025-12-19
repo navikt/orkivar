@@ -13,8 +13,12 @@ class PdfCache(
         return pdfCacheRepository.lagre(nyPdf)
     }
 
-    fun hentFraCache(uuid: UUID): PdfFraCache {
+    fun hentFraCache(uuid: UUID): PdfFraCache? {
         return pdfCacheRepository.hent(uuid)
+    }
+
+    fun slett(uuid: UUID) {
+        pdfCacheRepository.slett(uuid)
     }
 }
 

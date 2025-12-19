@@ -60,9 +60,9 @@ class PdfCacheRepository(dataSource: DataSource) {
         }
     }
 
-    fun hent(uuid: UUID): PdfFraCache {
+    fun hent(uuid: UUID): PdfFraCache? {
         return transaction {
-            PdfCache.selectAll().where { PdfCache.uuid eq uuid }.single().mapTilCachetPdf()
+            PdfCache.selectAll().where { PdfCache.uuid eq uuid }.singleOrNull()?.mapTilCachetPdf()
         }
     }
 
