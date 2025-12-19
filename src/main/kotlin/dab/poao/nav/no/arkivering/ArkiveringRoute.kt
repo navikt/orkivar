@@ -3,7 +3,7 @@ package dab.poao.nav.no.arkivering
 import dab.poao.nav.no.arkivering.dto.*
 import dab.poao.nav.no.database.JournalføringType
 import dab.poao.nav.no.database.OppfølgingsperiodeId
-import dab.poao.nav.no.database.Repository
+import dab.poao.nav.no.database.JournalføringerRepository
 import dab.poao.nav.no.dokark.DokarkClient
 import dab.poao.nav.no.dokark.DokarkDistribusjonClient
 import dab.poao.nav.no.dokark.DokarkJournalpostFail
@@ -36,8 +36,8 @@ fun Route.arkiveringRoutes(
     dokarkClient: DokarkClient,
     dokarkDistribusjonClient: DokarkDistribusjonClient,
     pdfgenClient: PdfgenClient,
-    lagreJournalfoering: suspend (Repository.NyJournalføring) -> Unit,
-    hentJournalføringer: suspend (OppfølgingsperiodeId, JournalføringType) -> List<Repository.Journalfoering>
+    lagreJournalfoering: suspend (JournalføringerRepository.NyJournalføring) -> Unit,
+    hentJournalføringer: suspend (OppfølgingsperiodeId, JournalføringType) -> List<JournalføringerRepository.Journalfoering>
 ) {
     suspend fun opprettJournalpost(journalføringspayload: JournalføringPayload, journalpostType: JournalpostType, token: String): DokarkJournalpostResult {
 
@@ -85,7 +85,7 @@ fun Route.arkiveringRoutes(
             is DokarkJournalpostFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)
             is DokarkJournalpostSuccess -> {
                 lagreJournalfoering(
-                    Repository.NyJournalføring(
+                    JournalføringerRepository.NyJournalføring(
                         navIdent = navIdent,
                         fnr = arkiveringsPayload.pdfPayload.fnr,
                         opprettetTidspunkt = dokarkResult.tidspunkt,
@@ -111,7 +111,7 @@ fun Route.arkiveringRoutes(
             is DokarkJournalpostFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)
             is DokarkJournalpostSuccess -> {
                 lagreJournalfoering(
-                    Repository.NyJournalføring(
+                    JournalføringerRepository.NyJournalføring(
                         navIdent = navIdent,
                         fnr = journalføringspayload.pdfPayload.fnr,
                         opprettetTidspunkt = dokarkResult.tidspunkt,

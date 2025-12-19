@@ -13,7 +13,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 import javax.sql.DataSource
 
-class Repository(dataSource: DataSource) {
+class JournalføringerRepository(dataSource: DataSource) {
 
     init {
         Database.connect(dataSource)
@@ -30,7 +30,7 @@ class Repository(dataSource: DataSource) {
     }
 
     class Journalfoering(id: EntityID<Int>) : IntEntity(id) {
-        companion object : IntEntityClass<Journalfoering>(Journalfoeringer)
+        companion object Companion : IntEntityClass<Journalfoering>(Journalfoeringer)
         val opprettetTidspunkt by Journalfoeringer.opprettetTidspunkt
         val fnr by Journalfoeringer.fnr
         val navIdent by Journalfoeringer.navIdent

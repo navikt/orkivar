@@ -3,7 +3,7 @@ package dab.poao.nav.no
 
 import dab.poao.nav.no.arkivering.dto.ForhaandsvisningOutbound
 import dab.poao.nav.no.database.JournalføringType
-import dab.poao.nav.no.database.Repository
+import dab.poao.nav.no.database.JournalføringerRepository
 import dab.poao.nav.no.dokark.Journalpost
 import dab.poao.nav.no.dokark.norskDatoFormat
 import dab.poao.nav.no.plugins.configureHikariDataSource
@@ -71,7 +71,7 @@ class ApplicationTest : StringSpec({
     }
 
     "Forhåndsvisning skal generere og returnere PDF" {
-        val repository by lazy { Repository(dataSource) }
+        val journalføringerRepository by lazy { JournalføringerRepository(dataSource) }
         val token = mockOAuth2Server.getAzureToken("G123223")
         val fnr = "01015450300"
         val forslagAktivitet = arkivAktivitet(status = "Forslag", dialogtråd = dialogtråd)
@@ -109,12 +109,12 @@ class ApplicationTest : StringSpec({
 
         response.status shouldBe HttpStatusCode.OK
         response.body<ForhaandsvisningOutbound>()
-        repository.hentJournalposter(fnr, JournalføringType.JOURNALFØRING) shouldHaveSize 0
+        journalføringerRepository.hentJournalposter(fnr, JournalføringType.JOURNALFØRING) shouldHaveSize 0
         mockEngine.requestHistory.filter { pdfgenUrl.contains(it.url.host) } shouldHaveSize 1
     }
 
     "Journalføring skal generere PDF, sende til Joark og lagre referanse til journalføringen i egen database" {
-        val repository by lazy { Repository(dataSource) }
+        val journalføringerRepository by lazy { JournalføringerRepository(dataSource) }
         val token = mockOAuth2Server.getAzureToken("G122123")
         val fnr = "01015450300"
         val forslagAktivitet = arkivAktivitet(status = "Forslag", dialogtråd = dialogtråd)
@@ -164,14 +164,14 @@ class ApplicationTest : StringSpec({
         }
         response.status shouldBe HttpStatusCode.OK
 
-        val journalposterIDatabasen = repository.hentJournalposter(fnr, JournalføringType.JOURNALFØRING)
+        val journalposterIDatabasen = journalføringerRepository.hentJournalposter(fnr, JournalføringType.JOURNALFØRING)
         journalposterIDatabasen shouldHaveSize 1
         val journalPost = journalposterIDatabasen.first()
         journalPost.journalpostId shouldNotBe null
         journalPost.oppfølgingsperiodeId shouldBe oppfølgingsperiodeId
         journalPost.type shouldBe JournalføringType.JOURNALFØRING
 
-        val opprettet = repository.hentJournalposter(fnr, JournalføringType.JOURNALFØRING).first().opprettetTidspunkt
+        val opprettet = journalføringerRepository.hentJournalposter(fnr, JournalføringType.JOURNALFØRING).first().opprettetTidspunkt
         val journalføringstidspunkt = opprettet.toJavaLocalDateTime().format(norskDatoKlokkeslettFormat)
         val journalføringsdato = opprettet.toJavaLocalDateTime().format(norskDatoFormat)
         val requestsTilPdfgen = mockEngine.requestHistory.filter { pdfgenUrl.contains(it.url.host) }
@@ -219,7 +219,7 @@ class ApplicationTest : StringSpec({
     }
 
     "Send til bruker skal generere PDF som først journalføres og så distribueres til bruker" {
-        val repository by lazy { Repository(dataSource) }
+        val journalføringerRepository by lazy { JournalføringerRepository(dataSource) }
         val token = mockOAuth2Server.getAzureToken("G122123")
         val fnr = "02015450300"
         val forslagAktivitet = arkivAktivitet(status = "Forslag", dialogtråd = dialogtråd)
@@ -273,7 +273,7 @@ class ApplicationTest : StringSpec({
         }
         response.status shouldBe HttpStatusCode.OK
 
-        val journalpostIDatabasen = repository.hentJournalposter(fnr, JournalføringType.SENDING_TIL_BRUKER).first()
+        val journalpostIDatabasen = journalføringerRepository.hentJournalposter(fnr, JournalføringType.SENDING_TIL_BRUKER).first()
         journalpostIDatabasen.type shouldBe JournalføringType.SENDING_TIL_BRUKER
 
         val requestsTilJoark = mockEngine.requestHistory.filter { joarkUrl.contains(it.url.host) }

@@ -1,7 +1,7 @@
 package dab.poao.nav.no
 
 import configureAuthentication
-import dab.poao.nav.no.database.Repository
+import dab.poao.nav.no.database.JournalføringerRepository
 import dab.poao.nav.no.plugins.*
 import io.ktor.client.*
 import io.ktor.client.engine.*
@@ -23,10 +23,10 @@ fun Application.module(httpClientEngine: HttpClientEngine = HttpClient().engine)
         json()
     }
     val datasource = configureHikariDataSource()
-    val repository = Repository(datasource)
+    val journalføringerRepository = JournalføringerRepository(datasource)
     configureAuthentication()
     configureMonitoring()
-    configureRouting(httpClientEngine = httpClientEngine, lagreJournalføring = repository::lagreJournalfoering, hentJournalføringer = repository::hentJournalposter)
+    configureRouting(httpClientEngine = httpClientEngine, lagreJournalføring = journalføringerRepository::lagreJournalfoering, hentJournalføringer = journalføringerRepository::hentJournalposter)
     configureFlyway(datasource)
     configureErrorHandling()
 }
