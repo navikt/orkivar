@@ -1,9 +1,19 @@
-package dab.poao.nav.no.pdfcache
+package dab.poao.nav.no.pdfCache
 
-class PdfCache {
+import javax.sql.DataSource
 
-    fun lagrePdf() {
+class PdfCache(
+    val dataSource: DataSource,
+) {
+    private val pdfCacheRepository = PdfCacheRepository(dataSource)
 
+    fun lagre(nyPdf: NyPdfSomSkalCaches) {
+        pdfCacheRepository.lagre(nyPdf)
     }
-
 }
+
+data class NyPdfSomSkalCaches(
+    val pdf: ByteArray,
+    val fnr: String,
+    val veilederIdent: String,
+)
