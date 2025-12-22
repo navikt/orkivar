@@ -149,7 +149,7 @@ fun Route.arkiveringRoutes(
 
     post("/forhaandsvisning-send-til-bruker") {
         val forhåndsvisningPayload = call.hentPayload<PdfData>()
-        val navIdentHvisInternBruker = call.hentNavIdentClaimOrNull() ?: "forhaandsvisning"
+        val navIdentHvisInternBruker = call.hentNavIdentClaimOrNull()
         lagForhaandsvisning(forhåndsvisningPayload, JournalføringType.SENDING_TIL_BRUKER, navIdentHvisInternBruker)
             .onSuccess { call.respond(it) }
             .onFailure { call.respond(HttpStatusCode.InternalServerError) }

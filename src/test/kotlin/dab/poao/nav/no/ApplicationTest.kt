@@ -116,6 +116,38 @@ class ApplicationTest : StringSpec({
         pdfCacheRepository.hent(UUID.fromString(forhaandsvisningOutbound.uuidCachetPdf!!)) shouldNotBe null
     }
 
+    "Eksterne brukere skal kunne forhåndsvise for utskrift" {
+        val fnr = "01015450300"
+        val token = mockOAuth2Server.getTokenXToken(fnr)
+        val oppfølgingsperiodeId = UUID.randomUUID().toString()
+
+        val response = client.post("/forhaandsvisning-send-til-bruker") {
+            bearerAuth(token)
+            contentType(ContentType.Application.Json)
+            setBody(
+                """
+                {
+                    "navn": "TRIVIELL SKILPADDE",
+                    "tekstTilBruker": null,
+                    "journalførendeEnhetNavn": "Nav Helsfyr",
+                    "fnr": "$fnr",
+                    "brukteFiltre": {},
+                    "oppfølgingsperiodeStart": "19 oktober 2021",
+                    "oppfølgingsperiodeSlutt": null,
+                    "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
+                    "aktiviteter": {},
+                    $dialogtråder,
+                    $mål
+                }
+            """.trimIndent()
+            )
+        }
+
+        response.status shouldBe HttpStatusCode.OK
+        val forhaandsvisningOutbound = response.body<ForhaandsvisningOutbound>()
+        forhaandsvisningOutbound shouldNotBe null
+    }
+
     "Journalføring skal generere PDF, sende til Joark og lagre referanse til journalføringen i egen database" {
         val journalføringerRepository by lazy { JournalføringerRepository(dataSource) }
         val token = mockOAuth2Server.getAzureToken("G122123")
@@ -437,6 +469,13 @@ private fun MockOAuth2Server.getAzureToken(navIdent: String) =
         issuerId = "AzureAD",
         subject = navIdent,
         claims = mapOf("NAVident" to navIdent, "oid" to UUID.randomUUID())
+    ).serialize()
+
+private fun MockOAuth2Server.getTokenXToken(fnr: String) =
+    issueToken(
+        issuerId = "AzureAD",
+        subject = fnr,
+        claims = mapOf("pid" to fnr, "oid" to UUID.randomUUID())
     ).serialize()
 
 private fun arkivAktivitet(status: String, dialogtråd: String? = null, forhaandsorientering: String? = null) = """
