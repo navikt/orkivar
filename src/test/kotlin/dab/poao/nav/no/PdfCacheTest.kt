@@ -31,16 +31,16 @@ class PdfCacheTest {
     @Test
     fun `skal kunne hente pdf uten feil`() {
         val nyPdf = NyPdfSomSkalCaches(pdf = "bytearray".toByteArray(), fnr = "12345678910", veilederIdent = "T123123")
-        val lagretPdf = pdfCache.lagre(nyPdf)
-        val hentetPdf = pdfCache.hentFraCache(lagretPdf.uuid)
+        val lagretPdfUuid = pdfCache.lagre(nyPdf)
+        val hentetPdf = pdfCache.hentFraCache(lagretPdfUuid)
         hentetPdf?.pdf shouldBe nyPdf.pdf
     }
 
     @Test
     fun `skal kunne slette pdf uten feil`() {
         val pdf = NyPdfSomSkalCaches(pdf = "bytearray".toByteArray(), fnr = "12345678910", veilederIdent = "T123123")
-        val lagretPdf = pdfCache.lagre(pdf)
-        pdfCache.slett(lagretPdf.uuid)
-        pdfCache.hentFraCache(lagretPdf.uuid) shouldBe null
+        val lagretPdfUuid = pdfCache.lagre(pdf)
+        pdfCache.slett(lagretPdfUuid)
+        pdfCache.hentFraCache(lagretPdfUuid) shouldBe null
     }
 }
