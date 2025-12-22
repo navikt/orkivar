@@ -28,13 +28,14 @@ data class JournalføringPayload(
     val sakId: Long,
     val fagsaksystem: String,
     val tema: String,
-    val pdfPayload: PdfData
+    val pdfPayload: PdfData,
+    val uuidCachetPdf: String,
 )
 
 @Serializable
 data class SendTilBrukerPayload(
     val journalføringspayload: JournalføringPayload,
-    val brukerHarManuellOppfølging: Boolean,
+    val brukerHarManuellOppfølging: Boolean
 )
 
 @Serializable
