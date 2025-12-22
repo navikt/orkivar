@@ -2,6 +2,7 @@ package dab.poao.nav.no
 
 import configureAuthentication
 import dab.poao.nav.no.database.JournalføringerRepository
+import dab.poao.nav.no.pdfCaching.PdfCache
 import dab.poao.nav.no.plugins.*
 import io.ktor.client.*
 import io.ktor.client.engine.*
@@ -24,9 +25,10 @@ fun Application.module(httpClientEngine: HttpClientEngine = HttpClient().engine)
     }
     val datasource = configureHikariDataSource()
     val journalføringerRepository = JournalføringerRepository(datasource)
+    val pdfCache = PdfCache(datasource)
     configureAuthentication()
     configureMonitoring()
-    configureRouting(httpClientEngine = httpClientEngine, lagreJournalføring = journalføringerRepository::lagreJournalfoering, hentJournalføringer = journalføringerRepository::hentJournalposter)
+    configureRouting(httpClientEngine = httpClientEngine, pdfCache =  pdfCache::lagre, lagreJournalføring = journalføringerRepository::lagreJournalfoering, hentJournalføringer = journalføringerRepository::hentJournalposter)
     configureFlyway(datasource)
     configureErrorHandling()
 }

@@ -13,6 +13,7 @@ import dab.poao.nav.no.dokark.DokarkSendTilBrukerFail
 import dab.poao.nav.no.dokark.DokarkSendTilBrukerSuccess
 import dab.poao.nav.no.dokark.JournalpostData
 import dab.poao.nav.no.dokark.JournalpostType
+import dab.poao.nav.no.pdfCaching.NyPdfSomSkalCaches
 import dab.poao.nav.no.pdfgenClient.FailedPdfGen
 import dab.poao.nav.no.pdfgenClient.PdfSuccess
 import dab.poao.nav.no.pdfgenClient.PdfgenClient
@@ -37,7 +38,8 @@ fun Route.arkiveringRoutes(
     dokarkDistribusjonClient: DokarkDistribusjonClient,
     pdfgenClient: PdfgenClient,
     lagreJournalfoering: suspend (JournalføringerRepository.NyJournalføring) -> Unit,
-    hentJournalføringer: suspend (OppfølgingsperiodeId, JournalføringType) -> List<JournalføringerRepository.Journalfoering>
+    hentJournalføringer: suspend (OppfølgingsperiodeId, JournalføringType) -> List<JournalføringerRepository.Journalfoering>,
+    cachePdf: (NyPdfSomSkalCaches) -> UUID,
 ) {
     suspend fun opprettJournalpost(journalføringspayload: JournalføringPayload, journalpostType: JournalpostType, token: String): DokarkJournalpostResult {
 
@@ -60,13 +62,20 @@ fun Route.arkiveringRoutes(
         return dokarkResult
     }
 
-    suspend fun lagForhaandsvisning(payload: PdfData, type: JournalføringType): Result<ForhaandsvisningOutbound> {
+    suspend fun lagForhaandsvisning(payload: PdfData, type: JournalføringType, navIdent: String?): Result<ForhaandsvisningOutbound> {
         val pdfgenPayload = lagPdfgenPayload(payload, LocalDateTime.now())
         val pdfResult = pdfgenClient.generatePdf(pdfgenPayload)
         val oppfølgingsperiodeId = UUID.fromString(payload.oppfølgingsperiodeId)
         val sisteJournalføring = hentJournalføringer(oppfølgingsperiodeId, type).maxByOrNull { it.opprettetTidspunkt }
         return when (pdfResult) {
-            is PdfSuccess -> Result.success(ForhaandsvisningOutbound(pdfResult.pdfByteString, sisteJournalføring?.opprettetTidspunkt))
+            is PdfSuccess -> {
+                val uuidCachetPdf = if (navIdent != null) {
+                    cachePdf(NyPdfSomSkalCaches(pdf = pdfResult.pdfByteString, fnr = payload.fnr, veilederIdent = navIdent))
+                } else {
+                    null
+                }
+                Result.success(ForhaandsvisningOutbound(pdfResult.pdfByteString, sisteJournalføring?.opprettetTidspunkt, uuidCachetPdf.toString()))
+            }
             is FailedPdfGen -> {
                 logger.error("Klarte ikke forhaandsvise pdf: ${pdfResult.message}")
                 Result.failure(RuntimeException(pdfResult.message))
@@ -132,20 +141,20 @@ fun Route.arkiveringRoutes(
 
     post("/forhaandsvisning") {
         val forhåndsvisningPayload = call.hentPayload<PdfData>()
-        lagForhaandsvisning(forhåndsvisningPayload, JournalføringType.JOURNALFØRING)
+        val navIdentHvisInternBruker = call.hentNavIdentClaimOrNull()
+        lagForhaandsvisning(forhåndsvisningPayload, JournalføringType.JOURNALFØRING, navIdentHvisInternBruker)
             .onSuccess { call.respond(it) }
             .onFailure { call.respond(HttpStatusCode.InternalServerError) }
     }
 
     post("/forhaandsvisning-send-til-bruker") {
         val forhåndsvisningPayload = call.hentPayload<PdfData>()
-        lagForhaandsvisning(forhåndsvisningPayload, JournalføringType.SENDING_TIL_BRUKER)
+        val navIdentHvisInternBruker = call.hentNavIdentClaimOrNull() ?: "forhaandsvisning"
+        lagForhaandsvisning(forhåndsvisningPayload, JournalføringType.SENDING_TIL_BRUKER, navIdentHvisInternBruker)
             .onSuccess { call.respond(it) }
             .onFailure { call.respond(HttpStatusCode.InternalServerError) }
     }
 }
-
-
 
 private fun ApplicationCall.hentUtBearerToken() =
     this.request.header("Authorization")
@@ -153,10 +162,15 @@ private fun ApplicationCall.hentUtBearerToken() =
         ?.lastOrNull() ?: throw IllegalAccessException("No bearer token found")
 
 private fun ApplicationCall.hentNavIdentClaim(): String {
-    return authentication.principal<TokenValidationContextPrincipal>()?.context
-        ?.getClaims("AzureAD")
-        ?.getStringClaim("NAVident")
-        ?: throw IllegalAccessException("Ingen NAVident-claim på tokenet")
+    return hentNavIdentClaimOrNull() ?: throw IllegalAccessException("Ingen NAVident-claim på tokenet")
+}
+
+private fun ApplicationCall.hentNavIdentClaimOrNull(): String? {
+    return runCatching {
+        authentication.principal<TokenValidationContextPrincipal>()?.context
+            ?.getClaims("AzureAD")
+            ?.getStringClaim("NAVident")
+    }.getOrNull()
 }
 
 private suspend inline fun <reified T: Any> ApplicationCall.hentPayload(): T {

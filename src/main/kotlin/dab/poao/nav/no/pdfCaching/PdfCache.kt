@@ -1,6 +1,8 @@
 package dab.poao.nav.no.pdfCaching
 
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
@@ -12,8 +14,16 @@ class PdfCache(dataSource: DataSource) {
     private val pdfCacheRepository = PdfCacheRepository(dataSource)
     private val logger = LoggerFactory.getLogger(this::class.java)
 
-    fun lagre(nyPdf: NyPdfSomSkalCaches): PdfFraCache {
-        return pdfCacheRepository.lagre(nyPdf)
+    private val scope = CoroutineScope(
+        SupervisorJob() + Dispatchers.IO
+    )
+
+    init {
+        startPeriodiskSletting()
+    }
+
+    fun lagre(nyPdf: NyPdfSomSkalCaches): UUID {
+        return pdfCacheRepository.lagre(nyPdf).uuid
     }
 
     fun hentFraCache(uuid: UUID): PdfFraCache? {
@@ -24,11 +34,11 @@ class PdfCache(dataSource: DataSource) {
         pdfCacheRepository.slett(uuid)
     }
 
-    suspend fun start() = coroutineScope {
+    private fun startPeriodiskSletting() {
         val minutterEnPdfSkalVæreICache = 1L // TODO: Sett opp til 15
         val antallMillisekunderMellomKjøring = 1000L * 60
 
-        launch {
+        scope.launch {
             while (true) {
                 try {
                     pdfCacheRepository.slettRaderSomIkkeHarBlittOppdatertEtter(LocalDateTime.now().minusMinutes(minutterEnPdfSkalVæreICache))
@@ -39,7 +49,6 @@ class PdfCache(dataSource: DataSource) {
             }
         }
     }
-
 }
 
 data class NyPdfSomSkalCaches(
