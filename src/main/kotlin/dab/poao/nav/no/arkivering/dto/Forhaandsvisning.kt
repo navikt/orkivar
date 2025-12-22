@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 data class ForhaandsvisningOutbound(
     val pdf: ByteArray,
     val sistJournalført: LocalDateTime?,
-    val uuidCachetPdf: String,
+    val uuidCachetPdf: String?,
 )

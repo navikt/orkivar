@@ -146,6 +146,7 @@ class ApplicationTest : StringSpec({
         response.status shouldBe HttpStatusCode.OK
         val forhaandsvisningOutbound = response.body<ForhaandsvisningOutbound>()
         forhaandsvisningOutbound shouldNotBe null
+        forhaandsvisningOutbound.uuidCachetPdf shouldBe null
     }
 
     "Journalføring skal generere PDF, sende til Joark og lagre referanse til journalføringen i egen database" {

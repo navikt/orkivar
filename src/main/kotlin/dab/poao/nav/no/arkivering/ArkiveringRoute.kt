@@ -74,7 +74,7 @@ fun Route.arkiveringRoutes(
                 } else {
                     null
                 }
-                Result.success(ForhaandsvisningOutbound(pdfResult.pdfByteString, sisteJournalføring?.opprettetTidspunkt, uuidCachetPdf.toString()))
+                Result.success(ForhaandsvisningOutbound(pdfResult.pdfByteString, sisteJournalføring?.opprettetTidspunkt, uuidCachetPdf?.toString()))
             }
             is FailedPdfGen -> {
                 logger.error("Klarte ikke forhaandsvise pdf: ${pdfResult.message}")
