@@ -28,7 +28,7 @@ fun Application.module(httpClientEngine: HttpClientEngine = HttpClient().engine)
     val pdfCache = PdfCache(datasource)
     configureAuthentication()
     configureMonitoring()
-    configureRouting(httpClientEngine = httpClientEngine, pdfCache =  pdfCache::lagre, lagreJournalføring = journalføringerRepository::lagreJournalfoering, hentJournalføringer = journalføringerRepository::hentJournalposter)
+    configureRouting(httpClientEngine = httpClientEngine, cachePdf =  pdfCache::lagre, hentPdfFraCache = pdfCache::hentFraCache, lagreJournalføring = journalføringerRepository::lagreJournalfoering, hentJournalføringer = journalføringerRepository::hentJournalposter)
     configureFlyway(datasource)
     configureErrorHandling()
 }

@@ -6,8 +6,8 @@ import dab.poao.nav.no.database.JournalføringType
 import dab.poao.nav.no.database.JournalføringerRepository
 import dab.poao.nav.no.dokark.Journalpost
 import dab.poao.nav.no.dokark.norskDatoFormat
+import dab.poao.nav.no.pdfCaching.NyPdfSomSkalCaches
 import dab.poao.nav.no.pdfCaching.PdfCacheRepository
-import dab.poao.nav.no.plugins.configureHikariDataSource
 import io.kotest.assertions.json.shouldContainJsonKeyValue
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.StringSpec
@@ -31,25 +31,28 @@ import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
 import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.serialization.json.Json
 import no.nav.security.mock.oauth2.MockOAuth2Server
+import org.flywaydb.core.Flyway
 import java.time.format.DateTimeFormatter
 import java.util.*
-import javax.sql.DataSource
 
 class ApplicationTest : StringSpec({
     lateinit var testApp: TestApplication
     lateinit var client: HttpClient
     lateinit var mockOAuth2Server: MockOAuth2Server
-    lateinit var postgres: EmbeddedPostgres
-    lateinit var dataSource: DataSource
+    val postgres = EmbeddedPostgres.start()
+    val dataSource = postgres.postgresDatabase
 
     beforeSpec {
+        Flyway.configure()
+            .dataSource(dataSource)
+            .load()
+            .migrate()
+
         mockOAuth2Server = MockOAuth2Server().also { it.start() }
-        postgres = EmbeddedPostgres.start()
 
         testApp = TestApplication {
             environment {
-                val config = doConfig(mockOAuth2Server, postgres)
-                dataSource = configureHikariDataSource(config)
+                doConfig(mockOAuth2Server, postgres)
             }
             application { module(mockEngine) }
         }
@@ -72,7 +75,7 @@ class ApplicationTest : StringSpec({
     }
 
     "Forhåndsvisning skal generere, cache og returnere PDF" {
-        val journalføringerRepository by lazy { JournalføringerRepository(dataSource) }
+        val journalføringerRepository = JournalføringerRepository(dataSource)
         val pdfCacheRepository by lazy { PdfCacheRepository(dataSource) }
         val token = mockOAuth2Server.getAzureToken("G123223")
         val fnr = "01015450300"
@@ -150,7 +153,7 @@ class ApplicationTest : StringSpec({
     }
 
     "Journalføring skal generere PDF, sende til Joark og lagre referanse til journalføringen i egen database" {
-        val journalføringerRepository by lazy { JournalføringerRepository(dataSource) }
+        val journalføringerRepository = JournalføringerRepository(dataSource)
         val token = mockOAuth2Server.getAzureToken("G122123")
         val fnr = "01015450300"
         val forslagAktivitet = arkivAktivitet(status = "Forslag", dialogtråd = dialogtråd)
@@ -193,7 +196,8 @@ class ApplicationTest : StringSpec({
                         },
                         $dialogtråder,
                         $mål
-                    }
+                    },
+                    "uuidCachetPdf": "${UUID.randomUUID()}"
                 }
             """.trimIndent()
             )
@@ -254,6 +258,52 @@ class ApplicationTest : StringSpec({
         bodyTilJoark.shouldContainJsonKeyValue("dokumenter[0].brevkode", "modia-aktivitetsplan-dialog")
     }
 
+    "Journalføring skal bruke cachet PDF hvis finnes" {
+        val pdfCacheRepository = PdfCacheRepository(dataSource)
+        val navIdent = "G122123"
+        val token = mockOAuth2Server.getAzureToken(navIdent)
+        val fnr = "01015450300"
+        val lagretPdfUuid = pdfCacheRepository.lagre(NyPdfSomSkalCaches(pdf = "pdf".toByteArray(), fnr = fnr, veilederIdent = navIdent)).uuid
+
+        val response = client.post("/arkiver") {
+            bearerAuth(token)
+            contentType(ContentType.Application.Json)
+            setBody(
+                """
+                {
+                    "sakId": 1000, 
+                    "fagsaksystem": "ARBEIDSOPPFOLGING",
+                    "tema": "OPP",
+                    "journalførendeEnhetId": "0303",
+                    "pdfPayload": {
+                        "navn": "TRIVIELL SKILPADDE",
+                        "fnr": "$fnr",
+                        "tekstTilBruker": "Dette er en tekst",
+                        "journalførendeEnhetNavn": "Nav Helsfyr",
+                        "brukteFiltre": {
+                            "Aktivitetstype": ["Jobb jeg har nå", "Stilling"],
+                            "Avtalt aktivitet": ["Avtalt med Nav"]
+                        },
+                        "oppfølgingsperiodeStart": "19 oktober 2021",
+                        "oppfølgingsperiodeSlutt": null,
+                        "oppfølgingsperiodeId": "${UUID.randomUUID()}",
+                        "aktiviteter": {},
+                        $dialogtråder,
+                        $mål
+                    },
+                    "uuidCachetPdf": "$lagretPdfUuid"
+                }
+            """.trimIndent()
+            )
+        }
+        response.status shouldBe HttpStatusCode.OK
+
+        val requestsTilPdfgen = mockEngine.requestHistory.filter { pdfgenUrl.contains(it.url.host) }
+        requestsTilPdfgen shouldHaveSize 0
+        val requestsTilJoark = mockEngine.requestHistory.filter { joarkUrl.contains(it.url.host) }
+        requestsTilJoark shouldHaveSize 1
+    }
+
     "Send til bruker skal generere PDF som først journalføres og så distribueres til bruker" {
         val journalføringerRepository by lazy { JournalføringerRepository(dataSource) }
         val token = mockOAuth2Server.getAzureToken("G122123")
@@ -278,6 +328,7 @@ class ApplicationTest : StringSpec({
                     "fagsaksystem": $fagsaksystem,
                     "tema": "$tema",
                     "journalførendeEnhetId": "$journalførendeEnhetId",
+                    "uuidCachetPdf": "${UUID.randomUUID()}",
                     "pdfPayload": {
                         "navn": "TRIVIELL SKILPADDE",
                         "fnr": "$fnr",
@@ -302,7 +353,7 @@ class ApplicationTest : StringSpec({
                         $mål
                         }
                 },
-                "brukerHarManuellOppfølging": $erManuellBruker 
+                "brukerHarManuellOppfølging": $erManuellBruker
             }
             """.trimIndent()
             )
@@ -342,6 +393,7 @@ class ApplicationTest : StringSpec({
                     "fagsaksystem": "ARBEIDSOPPFOLGING",
                     "tema": "OPP",
                     "journalførendeEnhetId": "0303",
+                    "uuidCachetPdf": "${UUID.randomUUID()}",
                     "pdfPayload": {
                         "navn": "TRIVIELL SKILPADDE",
                         "fnr": "02015450301",
@@ -357,7 +409,7 @@ class ApplicationTest : StringSpec({
                         "mål": ""
                     }
                 },
-                "brukerHarManuellOppfølging": $erManuellBruker 
+                "brukerHarManuellOppfølging": $erManuellBruker
             }
             """.trimIndent()
             )

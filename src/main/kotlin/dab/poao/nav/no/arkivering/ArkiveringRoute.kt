@@ -14,6 +14,7 @@ import dab.poao.nav.no.dokark.DokarkSendTilBrukerSuccess
 import dab.poao.nav.no.dokark.JournalpostData
 import dab.poao.nav.no.dokark.JournalpostType
 import dab.poao.nav.no.pdfCaching.NyPdfSomSkalCaches
+import dab.poao.nav.no.pdfCaching.PdfFraCache
 import dab.poao.nav.no.pdfgenClient.FailedPdfGen
 import dab.poao.nav.no.pdfgenClient.PdfSuccess
 import dab.poao.nav.no.pdfgenClient.PdfgenClient
@@ -40,20 +41,31 @@ fun Route.arkiveringRoutes(
     lagreJournalfoering: suspend (JournalføringerRepository.NyJournalføring) -> Unit,
     hentJournalføringer: suspend (OppfølgingsperiodeId, JournalføringType) -> List<JournalføringerRepository.Journalfoering>,
     cachePdf: (NyPdfSomSkalCaches) -> UUID,
+    hentPdfFraCache: (UUID) -> PdfFraCache?,
 ) {
     suspend fun opprettJournalpost(journalføringspayload: JournalføringPayload, journalpostType: JournalpostType, token: String): DokarkJournalpostResult {
 
         val tidspunkt = LocalDateTime.now()
         val referanse = UUID.randomUUID()
-        val pdfGenPayload = lagPdfgenPayload(journalføringspayload.pdfPayload, tidspunkt)
+        val pdfFraCache = hentPdfFraCache(UUID.fromString(journalføringspayload.uuidCachetPdf))
+
+        val pdfResult: Result<ByteArray> = if (pdfFraCache != null) {
+            logger.info("Fant PDF i cache")
+            Result.success(pdfFraCache.pdf)
+        } else {
+            logger.info("Fant ikke PDF i cache, genererer ny PDF")
+            val pdfGenPayload = lagPdfgenPayload(journalføringspayload.pdfPayload, tidspunkt)
+            val pdfResult = pdfgenClient.generatePdf(payload = pdfGenPayload)
+            when (pdfResult) {
+                is PdfSuccess -> Result.success(pdfResult.pdfByteString)
+                is FailedPdfGen -> Result.failure(RuntimeException(pdfResult.message))
+            }
+        }
 
         val dokarkResult = runCatching {
-            val pdfResult = pdfgenClient.generatePdf(
-                payload = pdfGenPayload
-            )
-            when (pdfResult) {
-                is PdfSuccess -> dokarkClient.opprettJournalpost(token, journalpostType,lagJournalpostData(pdfResult.pdfByteString, journalføringspayload, referanse, tidspunkt))
-                is FailedPdfGen -> DokarkJournalpostFail(pdfResult.message)
+            when (pdfResult.isSuccess) {
+                true -> dokarkClient.opprettJournalpost(token, journalpostType,lagJournalpostData(pdfResult.getOrThrow(), journalføringspayload, referanse, tidspunkt))
+                false -> DokarkJournalpostFail(pdfResult.exceptionOrNull()?.message ?: "Uventet feil ved PDF-generering")
             }
         }
             .onFailure { logger.error("Klarte ikke arkivere pdf: ${it.message}", it) }
@@ -87,7 +99,6 @@ fun Route.arkiveringRoutes(
         val token = call.hentUtBearerToken()
         val navIdent = call.hentNavIdentClaim()
         val arkiveringsPayload = call.hentPayload<JournalføringPayload>()
-
         val dokarkResult = opprettJournalpost(arkiveringsPayload, JournalpostType.NOTAT, token)
 
         when (dokarkResult) {

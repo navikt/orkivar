@@ -8,8 +8,7 @@ import dab.poao.nav.no.dokark.DokarkClient
 import dab.poao.nav.no.dokark.DokarkDistribusjonClient
 import dab.poao.nav.no.health.healthEndpoints
 import dab.poao.nav.no.pdfCaching.NyPdfSomSkalCaches
-import dab.poao.nav.no.pdfCaching.PdfCache
-import dab.poao.nav.no.pdfCaching.PdfCacheRepository
+import dab.poao.nav.no.pdfCaching.PdfFraCache
 import dab.poao.nav.no.pdfgenClient.PdfgenClient
 import io.ktor.client.engine.*
 import io.ktor.server.application.*
@@ -23,7 +22,8 @@ fun Application.configureRouting(
     dokarkClient: DokarkClient = DokarkClient(environment.config, httpClientEngine),
     dokarkDistribusjonClient: DokarkDistribusjonClient = DokarkDistribusjonClient(environment.config, httpClientEngine),
     pdfgenClient: PdfgenClient = PdfgenClient(environment.config, httpClientEngine),
-    pdfCache: (NyPdfSomSkalCaches) -> UUID,
+    cachePdf: (NyPdfSomSkalCaches) -> UUID,
+    hentPdfFraCache: (UUID) -> PdfFraCache?,
     lagreJournalføring: suspend (JournalføringerRepository.NyJournalføring) -> Unit,
     hentJournalføringer: suspend (OppfølgingsperiodeId, JournalføringType) -> List<JournalføringerRepository.Journalfoering>
 ) {
@@ -33,7 +33,7 @@ fun Application.configureRouting(
             call.respondText("Hello World!")
         }
         authenticate("AzureAD", "TokenX") {
-            arkiveringRoutes(dokarkClient, dokarkDistribusjonClient, pdfgenClient, lagreJournalføring, hentJournalføringer, pdfCache)
+            arkiveringRoutes(dokarkClient, dokarkDistribusjonClient, pdfgenClient, lagreJournalføring, hentJournalføringer, cachePdf, hentPdfFraCache)
         }
     }
 }
