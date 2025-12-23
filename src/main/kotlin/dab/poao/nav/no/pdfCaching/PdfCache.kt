@@ -27,7 +27,7 @@ class PdfCache(dataSource: DataSource) {
     }
 
     fun hentFraCache(uuid: UUID): PdfFraCache? {
-        return pdfCacheRepository.hent(uuid)
+        return pdfCacheRepository.hent(uuid)?.also { pdfCacheRepository.slett(uuid) }
     }
 
     fun slett(uuid: UUID) {

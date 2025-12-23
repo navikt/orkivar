@@ -20,7 +20,7 @@ class PdfCacheTest {
     }
 
     @Test
-    fun `skal lagre pdf uten feil`() {
+    fun `Skal lagre pdf uten feil`() {
         val nyPdf = NyPdfSomSkalCaches(
             pdf = "bytearray".toByteArray(),
             fnr = "12345678910",
@@ -30,7 +30,7 @@ class PdfCacheTest {
     }
 
     @Test
-    fun `når PDF oppdateres skal UUID oppdateres`() {
+    fun `Når PDF oppdateres skal UUID oppdateres`() {
         val pdf = NyPdfSomSkalCaches(pdf = "bytearray".toByteArray(), fnr = "12345678910", veilederIdent = "T123123")
         val lagretPdfUuid = pdfCache.lagre(pdf)
         val oppdatertPdfUuid = pdfCache.lagre(pdf.copy(pdf = "annetByteArray".toByteArray()))
@@ -38,7 +38,7 @@ class PdfCacheTest {
     }
 
     @Test
-    fun `skal kunne hente pdf uten feil`() {
+    fun `Skal kunne hente pdf uten feil`() {
         val nyPdf = NyPdfSomSkalCaches(pdf = "bytearray".toByteArray(), fnr = "12345678910", veilederIdent = "T123123")
         val lagretPdfUuid = pdfCache.lagre(nyPdf)
         val hentetPdf = pdfCache.hentFraCache(lagretPdfUuid)
@@ -46,7 +46,17 @@ class PdfCacheTest {
     }
 
     @Test
-    fun `skal kunne slette pdf uten feil`() {
+    fun `Når PDF hentes fra cache skal den også slettes`() {
+        val nyPdf = NyPdfSomSkalCaches(pdf = "bytearray".toByteArray(), fnr = "12345678910", veilederIdent = "T123123")
+        val lagretPdfUuid = pdfCache.lagre(nyPdf)
+        val hentetPdf = pdfCache.hentFraCache(lagretPdfUuid)
+        hentetPdf?.pdf shouldBe nyPdf.pdf
+        val hentetPdfPåNytt = pdfCache.hentFraCache(lagretPdfUuid)
+        hentetPdfPåNytt shouldBe null
+    }
+
+    @Test
+    fun `Skal kunne slette pdf uten feil`() {
         val pdf = NyPdfSomSkalCaches(pdf = "bytearray".toByteArray(), fnr = "12345678910", veilederIdent = "T123123")
         val lagretPdfUuid = pdfCache.lagre(pdf)
         pdfCache.slett(lagretPdfUuid)
