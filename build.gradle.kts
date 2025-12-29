@@ -1,23 +1,23 @@
-val ktor_version = "3.2.3"
-val kotlin_version = "2.2.0"
-val logback_version = "1.5.18"
+val ktor_version = "3.3.3"
+val kotlin_version = "2.3.0"
+val logback_version = "1.5.23"
 val logstash_encoder_version = "8.1"
 val tokensupport_version = "5.0.34"
 val mockoauth_version = "2.2.1"
 val dab_common_version = "2024.11.14-10.46.174740baf5c7"
 val hikaricp_version = "7.0.2"
-val embedded_postgres_version = "2.1.0"
-val postgres_driver_version = "42.7.7"
+val embedded_postgres_version = "2.2.0"
+val postgres_driver_version = "42.7.8"
 val flyway_version = "9.22.3"
 val embeddedPostgresBinaries_version = "17.5.0"
 val exposed_version = "0.61.0"
-val kotest_version = "6.0.3"
-val prometeus_version = "1.15.2"
+val kotest_version = "6.0.7"
+val prometeus_version = "1.16.1"
 
 plugins {
-    kotlin("jvm") version "2.2.0"
-    id("io.ktor.plugin") version "3.2.3"
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0"
+    kotlin("jvm") version "2.3.0"
+    id("io.ktor.plugin") version "3.3.3"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.0"
 }
 
 tasks.test {
