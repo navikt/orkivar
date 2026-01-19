@@ -35,7 +35,7 @@ class PdfCache(dataSource: DataSource) {
     }
 
     private fun startPeriodiskSletting() {
-        val minutterEnPdfSkalVæreICache = 10L
+        val minutterEnPdfSkalVæreICache = 60L
         val antallMillisekunderMellomKjøring = 1000L * 60
 
         scope.launch {
