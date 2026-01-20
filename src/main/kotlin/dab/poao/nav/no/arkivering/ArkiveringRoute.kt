@@ -53,7 +53,7 @@ fun Route.arkiveringRoutes(
             logger.info("Fant PDF i cache")
             Result.success(pdfFraCache.pdf)
         } else {
-            logger.info("Fant ikke PDF i cache, genererer ny PDF")
+            logger.info("Fant ikke PDF i cache med uuid: ${journalføringspayload.uuidCachetPdf}, genererer ny PDF")
             val pdfGenPayload = lagPdfgenPayload(journalføringspayload.pdfPayload, tidspunkt)
             val pdfResult = pdfgenClient.generatePdf(payload = pdfGenPayload)
             when (pdfResult) {
