@@ -30,6 +30,16 @@ class PdfCacheTest {
     }
 
     @Test
+    fun `Skal kunne lagre flere PDF-er for samme veileder og bruker`() {
+        val pdf1 = NyPdfSomSkalCaches(pdf = "byteArray1".toByteArray(), fnr = "12345678910", veilederIdent = "T123123")
+        val pdf2 = pdf1.copy(pdf = "byteArray1".toByteArray())
+        val førstePdfUuid = pdfCache.lagre(pdf1)
+        val andrePdfUuid = pdfCache.lagre(pdf2)
+        pdfCache.hentFraCache(førstePdfUuid) shouldNotBe null
+        pdfCache.hentFraCache(andrePdfUuid) shouldNotBe null
+    }
+
+    @Test
     fun `Når PDF oppdateres skal UUID oppdateres`() {
         val pdf = NyPdfSomSkalCaches(pdf = "bytearray".toByteArray(), fnr = "12345678910", veilederIdent = "T123123")
         val lagretPdfUuid = pdfCache.lagre(pdf)
