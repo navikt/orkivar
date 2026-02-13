@@ -43,7 +43,11 @@ fun Route.arkiveringRoutes(
     cachePdf: (NyPdfSomSkalCaches) -> UUID,
     hentPdfFraCache: (UUID) -> PdfFraCache?,
 ) {
-    suspend fun opprettJournalpost(journalføringspayload: JournalføringPayload, journalpostType: JournalpostType, token: String): DokarkJournalpostResult {
+    suspend fun opprettJournalpost(
+        journalføringspayload: JournalføringPayload,
+        journalpostType: JournalpostType,
+        token: String
+    ): DokarkJournalpostResult {
 
         val tidspunkt = LocalDateTime.now()
         val referanse = UUID.randomUUID()
@@ -52,6 +56,8 @@ fun Route.arkiveringRoutes(
         val pdfResult: Result<ByteArray> = if (pdfFraCache != null) {
             logger.info("Fant PDF i cache")
             Result.success(pdfFraCache.pdf)
+        } else if (journalføringspayload.pdfPayload == null) {
+            Result.failure(IllegalArgumentException("PDF-payload er null, og ingen PDF funnet i cache for uuid: ${journalføringspayload.uuidCachetPdf}"))
         } else {
             logger.info("Fant ikke PDF i cache med uuid: ${journalføringspayload.uuidCachetPdf}, genererer ny PDF")
             val pdfGenPayload = lagPdfgenPayload(journalføringspayload.pdfPayload, tidspunkt)
@@ -64,8 +70,15 @@ fun Route.arkiveringRoutes(
 
         val dokarkResult = runCatching {
             when (pdfResult.isSuccess) {
-                true -> dokarkClient.opprettJournalpost(token, journalpostType,lagJournalpostData(pdfResult.getOrThrow(), journalføringspayload, referanse, tidspunkt))
-                false -> DokarkJournalpostFail(pdfResult.exceptionOrNull()?.message ?: "Uventet feil ved PDF-generering")
+                true -> dokarkClient.opprettJournalpost(
+                    token,
+                    journalpostType,
+                    lagJournalpostData(pdfResult.getOrThrow(), journalføringspayload, referanse, tidspunkt)
+                )
+
+                false -> DokarkJournalpostFail(
+                    pdfResult.exceptionOrNull()?.message ?: "Uventet feil ved PDF-generering"
+                )
             }
         }
             .onFailure { logger.error("Klarte ikke arkivere pdf: ${it.message}", it) }
@@ -74,7 +87,11 @@ fun Route.arkiveringRoutes(
         return dokarkResult
     }
 
-    suspend fun lagForhaandsvisning(payload: PdfData, type: JournalføringType, navIdent: String?): Result<ForhaandsvisningOutbound> {
+    suspend fun lagForhaandsvisning(
+        payload: PdfData,
+        type: JournalføringType,
+        navIdent: String?
+    ): Result<ForhaandsvisningOutbound> {
         val pdfgenPayload = lagPdfgenPayload(payload, LocalDateTime.now())
         val pdfResult = pdfgenClient.generatePdf(pdfgenPayload)
         val oppfølgingsperiodeId = UUID.fromString(payload.oppfølgingsperiodeId)
@@ -82,12 +99,25 @@ fun Route.arkiveringRoutes(
         return when (pdfResult) {
             is PdfSuccess -> {
                 val uuidCachetPdf = if (navIdent != null) {
-                    cachePdf(NyPdfSomSkalCaches(pdf = pdfResult.pdfByteString, fnr = payload.fnr, veilederIdent = navIdent))
+                    cachePdf(
+                        NyPdfSomSkalCaches(
+                            pdf = pdfResult.pdfByteString,
+                            fnr = payload.fnr,
+                            veilederIdent = navIdent
+                        )
+                    )
                 } else {
                     null
                 }
-                Result.success(ForhaandsvisningOutbound(pdfResult.pdfByteString, sisteJournalføring?.opprettetTidspunkt, uuidCachetPdf?.toString()))
+                Result.success(
+                    ForhaandsvisningOutbound(
+                        pdfResult.pdfByteString,
+                        sisteJournalføring?.opprettetTidspunkt,
+                        uuidCachetPdf?.toString()
+                    )
+                )
             }
+
             is FailedPdfGen -> {
                 logger.error("Klarte ikke forhaandsvise pdf: ${pdfResult.message}")
                 Result.failure(RuntimeException(pdfResult.message))
@@ -100,6 +130,8 @@ fun Route.arkiveringRoutes(
         val navIdent = call.hentNavIdentClaim()
         val arkiveringsPayload = call.hentPayload<JournalføringPayload>()
         val dokarkResult = opprettJournalpost(arkiveringsPayload, JournalpostType.NOTAT, token)
+        val fnr = arkiveringsPayload.pdfPayload?.fnr ?: arkiveringsPayload.fnr ?: throw IllegalStateException("Fant ikke fnr. Dette skal ikke skje. Klienten skal enten sende det i pdfPayload eller i eget felt. Midlertidig løsning mens vi endrer api.")
+        val oppfølgingsperiodeId = arkiveringsPayload.pdfPayload?.oppfølgingsperiodeId ?: arkiveringsPayload.oppfølgingsperiodeId ?: throw IllegalStateException("Fant ikke oppfølgingsperiodeId. Dette skal ikke skje. Klienten skal enten sende det i pdfPayload eller i eget felt. Midlertidig løsning mens vi endrer api.")
 
         when (dokarkResult) {
             is DokarkJournalpostFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)
@@ -107,11 +139,11 @@ fun Route.arkiveringRoutes(
                 lagreJournalfoering(
                     JournalføringerRepository.NyJournalføring(
                         navIdent = navIdent,
-                        fnr = arkiveringsPayload.pdfPayload.fnr,
+                        fnr = fnr,
                         opprettetTidspunkt = dokarkResult.tidspunkt,
                         referanse = dokarkResult.referanse,
                         journalpostId = dokarkResult.journalpostId,
-                        oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.pdfPayload.oppfølgingsperiodeId),
+                        oppfølgingsperiodeId = UUID.fromString(oppfølgingsperiodeId),
                         type = JournalføringType.JOURNALFØRING
                     )
                 )
@@ -126,6 +158,8 @@ fun Route.arkiveringRoutes(
         val sendTilBrukerPayload = call.hentPayload<SendTilBrukerPayload>()
         val journalføringspayload = sendTilBrukerPayload.journalføringspayload
         val dokarkResult = opprettJournalpost(journalføringspayload, JournalpostType.UTGAAENDE, token)
+        val fnr = journalføringspayload.pdfPayload?.fnr ?: journalføringspayload.fnr ?: throw IllegalStateException("Fant ikke fnr. Dette skal ikke skje. Klienten skal enten sende det i pdfPayload eller i eget felt. Midlertidig løsning mens vi endrer api.")
+        val oppfølgingsperiodeId = journalføringspayload.pdfPayload?.oppfølgingsperiodeId ?: journalføringspayload.oppfølgingsperiodeId ?: throw IllegalStateException("Fant ikke oppfølgingsperiodeId. Dette skal ikke skje. Klienten skal enten sende det i pdfPayload eller i eget felt. Midlertidig løsning mens vi endrer api.")
 
         when (dokarkResult) {
             is DokarkJournalpostFail -> call.respond(HttpStatusCode.InternalServerError, dokarkResult.message)
@@ -133,15 +167,20 @@ fun Route.arkiveringRoutes(
                 lagreJournalfoering(
                     JournalføringerRepository.NyJournalføring(
                         navIdent = navIdent,
-                        fnr = journalføringspayload.pdfPayload.fnr,
+                        fnr = fnr,
                         opprettetTidspunkt = dokarkResult.tidspunkt,
                         referanse = dokarkResult.referanse,
                         journalpostId = dokarkResult.journalpostId,
-                        oppfølgingsperiodeId = UUID.fromString(journalføringspayload.pdfPayload.oppfølgingsperiodeId),
+                        oppfølgingsperiodeId = UUID.fromString(oppfølgingsperiodeId),
                         type = JournalføringType.SENDING_TIL_BRUKER
                     )
                 )
-                val sendTilBrukerResult = dokarkDistribusjonClient.sendJournalpostTilBruker(token, dokarkResult.journalpostId, journalføringspayload.fagsaksystem, sendTilBrukerPayload.brukerHarManuellOppfølging)
+                val sendTilBrukerResult = dokarkDistribusjonClient.sendJournalpostTilBruker(
+                    token,
+                    dokarkResult.journalpostId,
+                    journalføringspayload.fagsaksystem,
+                    sendTilBrukerPayload.brukerHarManuellOppfølging
+                )
                 when (sendTilBrukerResult) {
                     is DokarkSendTilBrukerFail -> call.respond(HttpStatusCode.InternalServerError)
                     is DokarkSendTilBrukerSuccess -> call.respond(JournalføringOutbound(dokarkResult.tidspunkt.toKotlinLocalDateTime()))
@@ -184,7 +223,7 @@ private fun ApplicationCall.hentNavIdentClaimOrNull(): String? {
     }.getOrNull()
 }
 
-private suspend inline fun <reified T: Any> ApplicationCall.hentPayload(): T {
+private suspend inline fun <reified T : Any> ApplicationCall.hentPayload(): T {
     // Eksplisitt kasting av exception for å sikre at stacktrace kommer til loggen
     // Kan fjernes når feature er ferdig, og alt kan da gjøres inline der denne funksjonen brukes
     return try {
@@ -196,7 +235,8 @@ private suspend inline fun <reified T: Any> ApplicationCall.hentPayload(): T {
 }
 
 private fun lagPdfgenPayload(pdfData: PdfData, tidspunkt: LocalDateTime): PdfgenPayload {
-    val norskDatoKlokkeslettFormat = DateTimeFormatter.ofPattern("d. MMMM uuuu 'kl.' HH.mm", Locale.forLanguageTag("no"))
+    val norskDatoKlokkeslettFormat =
+        DateTimeFormatter.ofPattern("d. MMMM uuuu 'kl.' HH.mm", Locale.forLanguageTag("no"))
     val norskDatoFormat = DateTimeFormatter.ofPattern("d. MMMM uuuu", Locale.forLanguageTag("no"))
 
     return PdfgenPayload(
@@ -215,7 +255,12 @@ private fun lagPdfgenPayload(pdfData: PdfData, tidspunkt: LocalDateTime): Pdfgen
     )
 }
 
-private fun lagJournalpostData(pdf: ByteArray, journalføringsPayload: JournalføringPayload, referanse: UUID, tidspunkt: LocalDateTime): JournalpostData {
+private fun lagJournalpostData(
+    pdf: ByteArray,
+    journalføringsPayload: JournalføringPayload,
+    referanse: UUID,
+    tidspunkt: LocalDateTime
+): JournalpostData {
     return JournalpostData(
         pdf = pdf,
         navn = journalføringsPayload.pdfPayload.navn,

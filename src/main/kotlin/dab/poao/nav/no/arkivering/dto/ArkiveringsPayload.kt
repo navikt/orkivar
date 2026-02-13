@@ -24,11 +24,13 @@ data class PdfData(
 
 @Serializable
 data class JournalføringPayload(
+    val fnr: String?,
+    val oppfølgingsperiodeId: String?,
     val journalførendeEnhetId: String,
     val sakId: Long,
     val fagsaksystem: String,
     val tema: String,
-    val pdfPayload: PdfData,
+    val pdfPayload: PdfData?,
     val uuidCachetPdf: String,
 )
 
