@@ -32,11 +32,9 @@ spec:
     max: 2
     cpuThresholdPercentage: 50
   resources:
-    limits:
-      memory: 512Mi
     requests:
       cpu: 82m
-      memory: 416Mi
+      memory: 768Mi
   observability:
     autoInstrumentation:
       enabled: true
@@ -70,6 +68,8 @@ spec:
           cluster: prod-gcp
 
   env:
+    - name: JAVA_OPTS
+      value: "-XX:InitialRAMPercentage=25 -XX:MaxRAMPercentage=75"
     - name: DOKARK_CLIENT_URL
       value: https://dokarkiv.prod-fss-pub.nais.io
     - name: DOKARK_SCOPE

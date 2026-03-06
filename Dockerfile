@@ -10,4 +10,6 @@ WORKDIR /app
 COPY build/libs/*.jar ./
 EXPOSE 8080
 USER nonroot
+
+ENTRYPOINT ["/bin/sh","-c","java $JAVA_OPTS -jar $0"]
 CMD ["dab.poao.nav.no.orkivar-all.jar"]
