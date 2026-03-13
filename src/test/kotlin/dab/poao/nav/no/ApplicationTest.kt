@@ -152,15 +152,16 @@ class ApplicationTest : StringSpec({
         forhaandsvisningOutbound.uuidCachetPdf shouldBe null
     }
 
-    "Journalføring skal generere PDF, sende til Joark og lagre referanse til journalføringen i egen database" {
+    "Journalføring skal hente PDF fra cache, sende til Joark og lagre referanse til journalføringen i egen database" {
         val journalføringerRepository = JournalføringerRepository(dataSource)
-        val token = mockOAuth2Server.getAzureToken("G122123")
+        val pdfCacheRepository = PdfCacheRepository(dataSource)
+        val navIdent = "G122123"
+        val token = mockOAuth2Server.getAzureToken(navIdent)
         val fnr = "01015450300"
-        val forslagAktivitet = arkivAktivitet(status = "Forslag", dialogtråd = dialogtråd)
-        val avbruttAktivitet = arkivAktivitet(status = "Avbrutt", forhaandsorientering = forhaandsorientering)
         val sakId = 1000
         val fagsaksystem = "ARBEIDSOPPFOLGING"
         val tema = "OPP"
+        val lagretPdfUuid = pdfCacheRepository.lagre(NyPdfSomSkalCaches(pdf = "pdf".toByteArray(), fnr = fnr, veilederIdent = navIdent)).uuid
         val oppfølgingsperiodeId = UUID.randomUUID()
         val journalførendeEnhetId = "0303"
 
@@ -174,30 +175,12 @@ class ApplicationTest : StringSpec({
                     "fagsaksystem": $fagsaksystem,
                     "tema": "$tema",
                     "journalførendeEnhetId": "$journalførendeEnhetId",
-                    "pdfPayload": {
-                        "navn": "TRIVIELL SKILPADDE",
-                        "fnr": "$fnr",
-                        "tekstTilBruker": "Dette er en tekst",
-                        "journalførendeEnhetNavn": "Nav Helsfyr",
-                        "brukteFiltre": {
-                            "Aktivitetstype": ["Jobb jeg har nå", "Stilling"],
-                            "Avtalt aktivitet": ["Avtalt med Nav"]
-                        },
-                        "oppfølgingsperiodeStart": "19 oktober 2021",
-                        "oppfølgingsperiodeSlutt": null,
-                        "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
-                        "aktiviteter": {
-                            "Planlagt": [
-                                $forslagAktivitet
-                            ],
-                            "Avbrutt": [
-                                $avbruttAktivitet
-                            ]
-                        },
-                        $dialogtråder,
-                        $mål
-                    },
-                    "uuidCachetPdf": "${UUID.randomUUID()}"
+                    "fnr": "$fnr",
+                    "navn": "TRIVIELL SKILPADDE",
+                    "oppfølgingsperiodeStart": "19 oktober 2021",
+                    "oppfølgingsperiodeSlutt": null,
+                    "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
+                    "uuidCachetPdf": "$lagretPdfUuid"
                 }
             """.trimIndent()
             )
@@ -212,38 +195,6 @@ class ApplicationTest : StringSpec({
         journalPost.type shouldBe JournalføringType.JOURNALFØRING
 
         val opprettet = journalføringerRepository.hentJournalposter(fnr, JournalføringType.JOURNALFØRING).first().opprettetTidspunkt
-        val journalføringstidspunkt = opprettet.toJavaLocalDateTime().format(norskDatoKlokkeslettFormat)
-        val journalføringsdato = opprettet.toJavaLocalDateTime().format(norskDatoFormat)
-        val requestsTilPdfgen = mockEngine.requestHistory.filter { pdfgenUrl.contains(it.url.host) }
-        requestsTilPdfgen shouldHaveSize 1
-
-        requestsTilPdfgen.first().body.asString() shouldEqualJson """
-                {
-                    "navn": "TRIVIELL SKILPADDE",
-                    "fnr": "$fnr",
-                    "tekstTilBruker": "Dette er en tekst",
-                    "journalførendeEnhetNavn": "Nav Helsfyr",
-                    "brukteFiltre": {
-                        "Aktivitetstype": ["Jobb jeg har nå", "Stilling"],
-                        "Avtalt aktivitet": ["Avtalt med Nav"]
-                    },
-                    "oppfølgingsperiodeStart": "19 oktober 2021",
-                    "oppfølgingsperiodeSlutt": null,
-                    "journalfoeringstidspunkt":"$journalføringstidspunkt",
-                    "dagensDato": "$journalføringsdato",
-                    "aktiviteter": {
-                        "Planlagt": [
-                            $forslagAktivitet
-                        ],
-                        "Avbrutt": [
-                            $avbruttAktivitet
-                        ]
-                    },
-                    $dialogtråder,
-                    $mål
-                }
-               """.trimMargin()
-
         val requestsTilJoark = mockEngine.requestHistory.filter { joarkUrl.contains(it.url.host) }
         requestsTilJoark shouldHaveSize 1
         val bodyTilJoark = requestsTilJoark.first().body.asString()
@@ -258,64 +209,19 @@ class ApplicationTest : StringSpec({
         bodyTilJoark.shouldContainJsonKeyValue("dokumenter[0].brevkode", "modia-aktivitetsplan-dialog")
     }
 
-    "Journalføring skal bruke cachet PDF hvis finnes" {
+    "Send til bruker skal hente PDF fra cache som først journalføres og så distribueres til bruker" {
+        val journalføringerRepository by lazy { JournalføringerRepository(dataSource) }
         val pdfCacheRepository = PdfCacheRepository(dataSource)
         val navIdent = "G122123"
         val token = mockOAuth2Server.getAzureToken(navIdent)
-        val fnr = "01015450300"
-        val lagretPdfUuid = pdfCacheRepository.lagre(NyPdfSomSkalCaches(pdf = "pdf".toByteArray(), fnr = fnr, veilederIdent = navIdent)).uuid
-
-        val response = client.post("/arkiver") {
-            bearerAuth(token)
-            contentType(ContentType.Application.Json)
-            setBody(
-                """
-                {
-                    "sakId": 1000, 
-                    "fagsaksystem": "ARBEIDSOPPFOLGING",
-                    "tema": "OPP",
-                    "journalførendeEnhetId": "0303",
-                    "pdfPayload": {
-                        "navn": "TRIVIELL SKILPADDE",
-                        "fnr": "$fnr",
-                        "tekstTilBruker": "Dette er en tekst",
-                        "journalførendeEnhetNavn": "Nav Helsfyr",
-                        "brukteFiltre": {
-                            "Aktivitetstype": ["Jobb jeg har nå", "Stilling"],
-                            "Avtalt aktivitet": ["Avtalt med Nav"]
-                        },
-                        "oppfølgingsperiodeStart": "19 oktober 2021",
-                        "oppfølgingsperiodeSlutt": null,
-                        "oppfølgingsperiodeId": "${UUID.randomUUID()}",
-                        "aktiviteter": {},
-                        $dialogtråder,
-                        $mål
-                    },
-                    "uuidCachetPdf": "$lagretPdfUuid"
-                }
-            """.trimIndent()
-            )
-        }
-        response.status shouldBe HttpStatusCode.OK
-
-        val requestsTilPdfgen = mockEngine.requestHistory.filter { pdfgenUrl.contains(it.url.host) }
-        requestsTilPdfgen shouldHaveSize 0
-        val requestsTilJoark = mockEngine.requestHistory.filter { joarkUrl.contains(it.url.host) }
-        requestsTilJoark shouldHaveSize 1
-    }
-
-    "Send til bruker skal generere PDF som først journalføres og så distribueres til bruker" {
-        val journalføringerRepository by lazy { JournalføringerRepository(dataSource) }
-        val token = mockOAuth2Server.getAzureToken("G122123")
         val fnr = "02015450300"
-        val forslagAktivitet = arkivAktivitet(status = "Forslag", dialogtråd = dialogtråd)
-        val avbruttAktivitet = arkivAktivitet(status = "Avbrutt", forhaandsorientering = forhaandsorientering)
         val sakId = 1000
         val fagsaksystem = "ARBEIDSOPPFOLGING"
         val tema = "OPP"
         val oppfølgingsperiodeId = UUID.randomUUID()
         val journalførendeEnhetId = "0303"
         val erManuellBruker = false
+        val lagretPdfUuid = pdfCacheRepository.lagre(NyPdfSomSkalCaches(pdf = "pdf".toByteArray(), fnr = fnr, veilederIdent = navIdent)).uuid
 
         val response = client.post("/send-til-bruker") {
             bearerAuth(token)
@@ -325,33 +231,15 @@ class ApplicationTest : StringSpec({
                 {
                 journalføringspayload: {
                     "sakId": $sakId, 
+                    "fnr": "$fnr",
+                    "navn": "TRIVIELL SKILPADDE",
+                    "oppfølgingsperiodeStart": "19 oktober 2021",
+                    "oppfølgingsperiodeSlutt": null,
+                    "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
                     "fagsaksystem": $fagsaksystem,
                     "tema": "$tema",
                     "journalførendeEnhetId": "$journalførendeEnhetId",
-                    "uuidCachetPdf": "${UUID.randomUUID()}",
-                    "pdfPayload": {
-                        "navn": "TRIVIELL SKILPADDE",
-                        "fnr": "$fnr",
-                        "tekstTilBruker": "Dette er en tekst",
-                        "journalførendeEnhetNavn": "Nav Helsfyr",
-                        "brukteFiltre": {
-                            "Aktivitetstype": ["Jobb jeg har nå", "Stilling"],
-                            "Avtalt aktivitet": ["Avtalt med Nav"]
-                        },
-                        "oppfølgingsperiodeStart": "19 oktober 2021",
-                        "oppfølgingsperiodeSlutt": null,
-                        "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
-                        "aktiviteter": {
-                            "Planlagt": [
-                                $forslagAktivitet
-                            ],
-                            "Avbrutt": [
-                                $avbruttAktivitet
-                            ]
-                        },
-                        $dialogtråder,
-                        $mål
-                        }
+                    "uuidCachetPdf": "$lagretPdfUuid"
                 },
                 "brukerHarManuellOppfølging": $erManuellBruker
             }
@@ -379,8 +267,12 @@ class ApplicationTest : StringSpec({
     }
 
     "Manuell bruker skal få tilsendt per post" {
-        val token = mockOAuth2Server.getAzureToken("G122123")
+        val pdfCacheRepository = PdfCacheRepository(dataSource)
+        val navIdent = "G122123"
+        val token = mockOAuth2Server.getAzureToken(navIdent)
         val oppfølgingsperiodeId = UUID.randomUUID()
+        val fnr = "02015450300"
+        val lagretPdfUuid = pdfCacheRepository.lagre(NyPdfSomSkalCaches(pdf = "pdf".toByteArray(), fnr = fnr, veilederIdent = navIdent)).uuid
         val erManuellBruker = true
 
         val response = client.post("/send-til-bruker") {
@@ -390,24 +282,15 @@ class ApplicationTest : StringSpec({
                 """
                 {journalføringspayload: {
                     "sakId": 1000, 
+                    "fnr": "$fnr",
+                    "navn": "TRIVIELL SKILPADDE",
+                    "oppfølgingsperiodeStart": "19 oktober 2021",
+                    "oppfølgingsperiodeSlutt": null,
+                    "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
                     "fagsaksystem": "ARBEIDSOPPFOLGING",
                     "tema": "OPP",
                     "journalførendeEnhetId": "0303",
-                    "uuidCachetPdf": "${UUID.randomUUID()}",
-                    "pdfPayload": {
-                        "navn": "TRIVIELL SKILPADDE",
-                        "fnr": "02015450301",
-                        "brukteFiltre": {},
-                        "tekstTilBruker": null,
-                        "journalførendeEnhetNavn": "Nav Helsfyr",
-                        "brukteFiltre": {},
-                        "oppfølgingsperiodeStart": "19 oktober 2021",
-                        "oppfølgingsperiodeSlutt": null,
-                        "oppfølgingsperiodeId": "$oppfølgingsperiodeId",
-                        "aktiviteter": {},
-                        "dialogtråder": [],
-                        "mål": ""
-                    }
+                    "uuidCachetPdf": "$lagretPdfUuid"
                 },
                 "brukerHarManuellOppfølging": $erManuellBruker
             }

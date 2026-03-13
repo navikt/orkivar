@@ -49,24 +49,12 @@ fun Route.arkiveringRoutes(
         val referanse = UUID.randomUUID()
         val pdfFraCache = hentPdfFraCache(UUID.fromString(journalføringspayload.uuidCachetPdf))
 
-        val pdfResult: Result<ByteArray> = if (pdfFraCache != null) {
-            logger.info("Fant PDF i cache")
-            Result.success(pdfFraCache.pdf)
-        } else {
-            logger.info("Fant ikke PDF i cache med uuid: ${journalføringspayload.uuidCachetPdf}, genererer ny PDF")
-            val pdfGenPayload = lagPdfgenPayload(journalføringspayload.pdfPayload, tidspunkt)
-            val pdfResult = pdfgenClient.generatePdf(payload = pdfGenPayload)
-            when (pdfResult) {
-                is PdfSuccess -> Result.success(pdfResult.pdfByteString)
-                is FailedPdfGen -> Result.failure(RuntimeException(pdfResult.message))
-            }
+        if (pdfFraCache == null) {
+            return DokarkJournalpostFail("Fant ikke PDF i cache, veileder må lage ny forhåndsvisning")
         }
 
         val dokarkResult = runCatching {
-            when (pdfResult.isSuccess) {
-                true -> dokarkClient.opprettJournalpost(token, journalpostType,lagJournalpostData(pdfResult.getOrThrow(), journalføringspayload, referanse, tidspunkt))
-                false -> DokarkJournalpostFail(pdfResult.exceptionOrNull()?.message ?: "Uventet feil ved PDF-generering")
-            }
+           dokarkClient.opprettJournalpost(token, journalpostType,lagJournalpostData(pdfFraCache.pdf, journalføringspayload, referanse, tidspunkt))
         }
             .onFailure { logger.error("Klarte ikke arkivere pdf: ${it.message}", it) }
             .getOrElse { DokarkJournalpostFail("Uventet feil") }
@@ -107,11 +95,11 @@ fun Route.arkiveringRoutes(
                 lagreJournalfoering(
                     JournalføringerRepository.NyJournalføring(
                         navIdent = navIdent,
-                        fnr = arkiveringsPayload.pdfPayload.fnr,
+                        fnr = arkiveringsPayload.fnr,
                         opprettetTidspunkt = dokarkResult.tidspunkt,
                         referanse = dokarkResult.referanse,
                         journalpostId = dokarkResult.journalpostId,
-                        oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.pdfPayload.oppfølgingsperiodeId),
+                        oppfølgingsperiodeId = UUID.fromString(arkiveringsPayload.oppfølgingsperiodeId),
                         type = JournalføringType.JOURNALFØRING
                     )
                 )
@@ -133,11 +121,11 @@ fun Route.arkiveringRoutes(
                 lagreJournalfoering(
                     JournalføringerRepository.NyJournalføring(
                         navIdent = navIdent,
-                        fnr = journalføringspayload.pdfPayload.fnr,
+                        fnr = journalføringspayload.fnr,
                         opprettetTidspunkt = dokarkResult.tidspunkt,
                         referanse = dokarkResult.referanse,
                         journalpostId = dokarkResult.journalpostId,
-                        oppfølgingsperiodeId = UUID.fromString(journalføringspayload.pdfPayload.oppfølgingsperiodeId),
+                        oppfølgingsperiodeId = UUID.fromString(journalføringspayload.oppfølgingsperiodeId),
                         type = JournalføringType.SENDING_TIL_BRUKER
                     )
                 )
@@ -218,15 +206,15 @@ private fun lagPdfgenPayload(pdfData: PdfData, tidspunkt: LocalDateTime): Pdfgen
 private fun lagJournalpostData(pdf: ByteArray, journalføringsPayload: JournalføringPayload, referanse: UUID, tidspunkt: LocalDateTime): JournalpostData {
     return JournalpostData(
         pdf = pdf,
-        navn = journalføringsPayload.pdfPayload.navn,
-        fnr = journalføringsPayload.pdfPayload.fnr,
+        navn = journalføringsPayload.navn,
+        fnr = journalføringsPayload.fnr,
         tidspunkt = tidspunkt,
         sakId = journalføringsPayload.sakId,
         fagsaksystem = journalføringsPayload.fagsaksystem,
         tema = journalføringsPayload.tema,
         eksternReferanse = referanse,
-        oppfølgingsperiodeStart = journalføringsPayload.pdfPayload.oppfølgingsperiodeStart,
-        oppfølgingsperiodeSlutt = journalføringsPayload.pdfPayload.oppfølgingsperiodeSlutt,
+        oppfølgingsperiodeStart = journalføringsPayload.oppfølgingsperiodeStart,
+        oppfølgingsperiodeSlutt = journalføringsPayload.oppfølgingsperiodeSlutt,
         journalførendeEnhet = journalføringsPayload.journalførendeEnhetId
     )
 }

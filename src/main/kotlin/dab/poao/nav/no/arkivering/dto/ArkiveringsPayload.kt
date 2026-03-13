@@ -1,5 +1,6 @@
 package dab.poao.nav.no.arkivering.dto
 
+import dab.poao.nav.no.database.OppfølgingsperiodeId
 import dab.poao.nav.no.dokark.Fnr
 import dab.poao.nav.no.dokark.Navn
 import dab.poao.nav.no.pdfgenClient.vaskStringForUgyldigeTegn
@@ -24,11 +25,15 @@ data class PdfData(
 
 @Serializable
 data class JournalføringPayload(
+    val fnr: Fnr,
+    val navn: Navn,
+    val oppfølgingsperiodeId: String,
+    val oppfølgingsperiodeStart: String,
+    val oppfølgingsperiodeSlutt: String?,
     val journalførendeEnhetId: String,
     val sakId: Long,
     val fagsaksystem: String,
     val tema: String,
-    val pdfPayload: PdfData,
     val uuidCachetPdf: String,
 )
 
