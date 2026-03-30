@@ -175,7 +175,6 @@ class ApplicationTest : StringSpec({
                     "pdfPayload": {
                         "navn": "TRIVIELL SKILPADDE",
                         "fnr": "$fnr",
-                        "tekstTilBruker": "Dette er en tekst",
                         "journalførendeEnhetNavn": "Nav Helsfyr",
                         "brukteFiltre": {
                             "Aktivitetstype": ["Jobb jeg har nå", "Stilling"],
@@ -219,7 +218,6 @@ class ApplicationTest : StringSpec({
                 {
                     "navn": "TRIVIELL SKILPADDE",
                     "fnr": "$fnr",
-                    "tekstTilBruker": "Dette er en tekst",
                     "journalførendeEnhetNavn": "Nav Helsfyr",
                     "brukteFiltre": {
                         "Aktivitetstype": ["Jobb jeg har nå", "Stilling"],
@@ -276,7 +274,6 @@ class ApplicationTest : StringSpec({
                     "pdfPayload": {
                         "navn": "TRIVIELL SKILPADDE",
                         "fnr": "$fnr",
-                        "tekstTilBruker": "Dette er en tekst",
                         "journalførendeEnhetNavn": "Nav Helsfyr",
                         "brukteFiltre": {
                             "Aktivitetstype": ["Jobb jeg har nå", "Stilling"],
@@ -330,7 +327,6 @@ class ApplicationTest : StringSpec({
                     "pdfPayload": {
                         "navn": "TRIVIELL SKILPADDE",
                         "fnr": "$fnr",
-                        "tekstTilBruker": "Dette er en tekst",
                         "journalførendeEnhetNavn": "Nav Helsfyr",
                         "brukteFiltre": {
                             "Aktivitetstype": ["Jobb jeg har nå", "Stilling"],
@@ -396,7 +392,6 @@ class ApplicationTest : StringSpec({
                         "navn": "TRIVIELL SKILPADDE",
                         "fnr": "02015450301",
                         "brukteFiltre": {},
-                        "tekstTilBruker": null,
                         "journalførendeEnhetNavn": "Nav Helsfyr",
                         "brukteFiltre": {},
                         "oppfølgingsperiodeStart": "19 oktober 2021",
