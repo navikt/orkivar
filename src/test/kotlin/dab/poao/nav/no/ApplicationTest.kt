@@ -90,7 +90,6 @@ class ApplicationTest : StringSpec({
                 """
                 {
                     "navn": "TRIVIELL SKILPADDE",
-                    "tekstTilBruker": null,
                     "journalførendeEnhetNavn": "Nav Helsfyr",
                     "fnr": "$fnr",
                     "brukteFiltre": {},
@@ -131,7 +130,6 @@ class ApplicationTest : StringSpec({
                 """
                 {
                     "navn": "TRIVIELL SKILPADDE",
-                    "tekstTilBruker": null,
                     "journalførendeEnhetNavn": "Nav Helsfyr",
                     "fnr": "$fnr",
                     "brukteFiltre": {},

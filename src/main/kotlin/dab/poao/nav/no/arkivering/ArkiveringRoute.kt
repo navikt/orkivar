@@ -202,7 +202,6 @@ private fun lagPdfgenPayload(pdfData: PdfData, tidspunkt: LocalDateTime): Pdfgen
     return PdfgenPayload(
         navn = pdfData.navn,
         fnr = pdfData.fnr,
-        tekstTilBruker = pdfData.tekstTilBruker,
         journalførendeEnhetNavn = pdfData.journalførendeEnhetNavn,
         brukteFiltre = pdfData.brukteFiltre.ifEmpty { null },
         oppfølgingsperiodeStart = pdfData.oppfølgingsperiodeStart,

@@ -11,7 +11,6 @@ typealias ArkivAktivitetStatus = String
 data class PdfData(
     val fnr: Fnr,
     val navn: Navn,
-    val tekstTilBruker: String?,
     val journalførendeEnhetNavn: String,
     val brukteFiltre: Map<String, List<String>>,
     val oppfølgingsperiodeStart: String,
