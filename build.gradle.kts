@@ -1,4 +1,4 @@
-val ktor_version = "3.3.2"
+val ktor_version = "3.4.0"
 val kotlin_version = "2.2.0"
 val logback_version = "1.5.18"
 val logstash_encoder_version = "9.0"
@@ -16,7 +16,7 @@ val prometeus_version = "1.15.2"
 
 plugins {
     kotlin("jvm") version "2.2.0"
-    id("io.ktor.plugin") version "3.3.2"
+    id("io.ktor.plugin") version "3.4.0"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.0"
 }
 
@@ -44,10 +44,10 @@ repositories {
 }
 
 dependencies {
-    implementation("io.ktor:ktor-server-core-jvm")
-    implementation("io.ktor:ktor-server-metrics-micrometer-jvm")
-    implementation("io.ktor:ktor-server-call-logging-jvm")
-    implementation("io.ktor:ktor-server-netty-jvm")
+    implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
+    implementation("io.ktor:ktor-server-metrics-micrometer:$ktor_version")
+    implementation("io.ktor:ktor-server-call-logging-jvm:$ktor_version")
+    implementation("io.ktor:ktor-server-netty-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-config-yaml:$ktor_version")
     implementation("io.ktor:ktor-server-auth:$ktor_version")
     implementation("io.ktor:ktor-server-auth-jwt:$ktor_version")
