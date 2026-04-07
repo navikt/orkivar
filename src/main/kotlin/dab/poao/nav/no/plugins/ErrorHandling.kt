@@ -15,6 +15,8 @@ fun Application.configureErrorHandling() {
             call.respondText(text = "400: ${cause.message}", status = HttpStatusCode.BadRequest)
         }
         exception<Exception> { call, cause ->
+            cause.printStackTrace()
+            println("HEI, feil")
             call.respondText(text = "500: ${cause.message}", status = HttpStatusCode.InternalServerError)
         }
     }
