@@ -1,15 +1,19 @@
 package dab.poao.nav.no.database
 
 import dab.poao.nav.no.dokark.Fnr
-import org.jetbrains.exposed.dao.IntEntity
-import org.jetbrains.exposed.dao.IntEntityClass
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.IntIdTable
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.v1.core.and
+import org.jetbrains.exposed.v1.dao.IntEntity
+import org.jetbrains.exposed.v1.dao.IntEntityClass
+import org.jetbrains.exposed.v1.core.dao.id.EntityID
+import org.jetbrains.exposed.v1.core.dao.id.IntIdTable
+import org.jetbrains.exposed.v1.core.java.javaUUID
+import org.jetbrains.exposed.v1.datetime.datetime
+import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.Database
+import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.jdbc.insert
 import kotlinx.datetime.LocalDateTime as KotlinxLocalDateTime
 import java.time.LocalDateTime
-import org.jetbrains.exposed.sql.kotlin.datetime.datetime
-import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 import javax.sql.DataSource
 
@@ -23,9 +27,9 @@ class JournalføringerRepository(dataSource: DataSource) {
         val navIdent = varchar("navident", 7)
         val fnr = varchar("foedselsnummer", 11)
         val opprettetTidspunkt = datetime("opprettet_tidspunkt")
-        val referanse = uuid("referanse")
+        val referanse = javaUUID("referanse")
         val journalpostId = text("journalpost_id")
-        val oppfølgingsperiodeId = uuid("oppfølgingsperiode_id")
+        val oppfølgingsperiodeId = javaUUID("oppfølgingsperiode_id")
         val type = enumerationByName("type", 50, JournalføringType::class)
     }
 
