@@ -2,13 +2,13 @@ val ktor_version = "3.4.0"
 val kotlin_version = "2.2.0"
 val logback_version = "1.5.18"
 val logstash_encoder_version = "9.0"
-val tokensupport_version = "5.0.34"
+val tokensupport_version = "6.0.5"
 val mockoauth_version = "3.0.1"
 val dab_common_version = "2024.11.14-10.46.174740baf5c7"
 val hikaricp_version = "7.0.2"
-val embedded_postgres_version = "2.2.0"
-val postgres_driver_version = "42.7.7"
-val flyway_version = "9.22.3"
+val embedded_postgres_version = "2.2.2"
+val postgres_driver_version = "42.7.10"
+val flyway_version = "12.3.0"
 val embeddedPostgresBinaries_version = "18.0.0"
 val exposed_version = "1.2.0"
 val kotest_version = "6.0.3"
@@ -73,7 +73,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:$hikaricp_version")
     implementation("org.postgresql:postgresql:$postgres_driver_version")
     implementation("org.flywaydb:flyway-core:$flyway_version")
-    implementation("io.zonky.test.postgres:embedded-postgres-binaries-bom:$embeddedPostgresBinaries_version")
+    implementation("org.flywaydb:flyway-database-postgresql:$flyway_version")
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
@@ -86,4 +86,5 @@ dependencies {
     testImplementation("no.nav.security:mock-oauth2-server:$mockoauth_version")
     testImplementation("io.ktor:ktor-client-mock:$ktor_version")
     testImplementation("io.zonky.test:embedded-postgres:$embedded_postgres_version")
+    testImplementation(platform("io.zonky.test.postgres:embedded-postgres-binaries-bom:$embeddedPostgresBinaries_version"))
 }
