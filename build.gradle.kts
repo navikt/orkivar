@@ -8,7 +8,7 @@ val dab_common_version = "2024.11.14-10.46.174740baf5c7"
 val hikaricp_version = "7.0.2"
 val embedded_postgres_version = "2.2.2"
 val postgres_driver_version = "42.7.10"
-val flyway_version = "9.22.3"
+val flyway_version = "12.3.0"
 val embeddedPostgresBinaries_version = "18.3.0"
 val exposed_version = "1.2.0"
 val kotest_version = "6.1.11"
@@ -73,6 +73,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:$hikaricp_version")
     implementation("org.postgresql:postgresql:$postgres_driver_version")
     implementation("org.flywaydb:flyway-core:$flyway_version")
+    implementation("org.flywaydb:flyway-database-postgresql:${flyway_version}")
     implementation("org.jetbrains.exposed:exposed-core:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-dao:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
