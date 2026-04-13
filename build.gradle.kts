@@ -24,6 +24,10 @@ tasks.test {
     useJUnitPlatform()
 }
 
+tasks.shadowJar {
+    mergeServiceFiles()
+}
+
 kotlin {
     jvmToolchain(21)
 }
