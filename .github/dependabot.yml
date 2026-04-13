@@ -7,6 +7,8 @@ updates:
       day: monday
       time: "07:00"
       timezone: Europe/Oslo
+    cooldown:
+      default-days: 3
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
@@ -15,6 +17,8 @@ updates:
       time: "07:00"
       timezone: Europe/Oslo
     open-pull-requests-limit: 10
+    cooldown:
+      default-days: 3
     groups:
       minor-and-patch:
         update-types:

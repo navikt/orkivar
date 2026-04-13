@@ -20,13 +20,14 @@ jobs:
   dev:
     name: Deploy to dev
     uses: ./.github/workflows/deploy.yml
-    secrets: inherit
+    secrets:
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
     with:
       env: dev
   prod:
     name: Deploy to prod
     uses: ./.github/workflows/deploy.yml
-    secrets: inherit
+    secrets:
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
     with:
       env: prod
-# TODO: Legg til secrets
