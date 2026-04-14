@@ -26,6 +26,7 @@ tasks.test {
 
 tasks.shadowJar {
     mergeServiceFiles()
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 kotlin {

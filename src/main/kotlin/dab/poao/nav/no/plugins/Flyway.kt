@@ -1,12 +1,12 @@
 package dab.poao.nav.no.plugins
 
-import io.ktor.server.application.*
-import org.flywaydb.core.Flyway
 import javax.sql.DataSource
+import org.flywaydb.core.Flyway
 
 
-fun Application.configureFlyway(dataSource: DataSource) {
+fun configureFlyway(dataSource: DataSource) {
     Flyway.configure()
+        .validateMigrationNaming(true)
         .dataSource(dataSource)
         .load()
         .migrate()

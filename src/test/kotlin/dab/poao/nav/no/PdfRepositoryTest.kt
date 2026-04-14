@@ -2,10 +2,10 @@ package dab.poao.nav.no
 
 import dab.poao.nav.no.pdfCaching.NyPdfSomSkalCaches
 import dab.poao.nav.no.pdfCaching.PdfCacheRepository
+import dab.poao.nav.no.plugins.configureFlyway
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
-import org.flywaydb.core.Flyway
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
@@ -14,10 +14,7 @@ class PdfRepositoryTest {
     private val pdfCacheRepository = PdfCacheRepository(dataSource)
 
     init {
-        Flyway.configure()
-            .dataSource(dataSource)
-            .load()
-            .migrate()
+        configureFlyway(dataSource)
     }
 
     @Test
