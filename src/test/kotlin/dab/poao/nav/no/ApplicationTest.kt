@@ -8,32 +8,42 @@ import dab.poao.nav.no.dokark.Journalpost
 import dab.poao.nav.no.dokark.norskDatoFormat
 import dab.poao.nav.no.pdfCaching.NyPdfSomSkalCaches
 import dab.poao.nav.no.pdfCaching.PdfCacheRepository
+import dab.poao.nav.no.plugins.configureFlyway
 import io.kotest.assertions.json.shouldContainJsonKeyValue
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.mock.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.websocket.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import io.ktor.http.content.*
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.config.*
-import io.ktor.server.engine.*
-import io.ktor.server.testing.*
-import io.ktor.utils.io.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
+import io.ktor.client.engine.mock.respondBadRequest
+import io.ktor.client.engine.mock.toByteArray
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.content.OutgoingContent
+import io.ktor.http.contentType
+import io.ktor.http.headersOf
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.server.config.MapApplicationConfig
+import io.ktor.server.engine.ApplicationEnvironmentBuilder
+import io.ktor.server.testing.TestApplication
+import io.ktor.utils.io.ByteReadChannel
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import java.util.UUID
 import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.serialization.json.Json
 import no.nav.security.mock.oauth2.MockOAuth2Server
-import org.flywaydb.core.Flyway
-import java.time.format.DateTimeFormatter
-import java.util.*
 
 class ApplicationTest : StringSpec({
     lateinit var testApp: TestApplication
@@ -43,10 +53,7 @@ class ApplicationTest : StringSpec({
     val dataSource = postgres.postgresDatabase
 
     beforeSpec {
-        Flyway.configure()
-            .dataSource(dataSource)
-            .load()
-            .migrate()
+        configureFlyway(dataSource)
 
         mockOAuth2Server = MockOAuth2Server().also { it.start() }
 
