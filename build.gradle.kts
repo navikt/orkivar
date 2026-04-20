@@ -8,11 +8,11 @@ val dab_common_version = "2024.11.14-10.46.174740baf5c7"
 val hikaricp_version = "7.0.2"
 val embedded_postgres_version = "2.2.2"
 val postgres_driver_version = "42.7.10"
-val flyway_version = "12.3.0"
+val flyway_version = "12.4.0"
 val embeddedPostgresBinaries_version = "18.3.0"
 val exposed_version = "1.2.0"
 val kotest_version = "6.1.11"
-val prometeus_version = "1.16.4"
+val prometeus_version = "1.16.5"
 
 plugins {
     kotlin("jvm") version "2.3.20"
