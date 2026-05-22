@@ -13,6 +13,7 @@ val embeddedPostgresBinaries_version = "18.3.0"
 val exposed_version = "1.2.0"
 val kotest_version = "6.1.11"
 val prometeus_version = "1.16.4"
+val netty_version = "4.2.13.Final"
 
 plugins {
     kotlin("jvm") version "2.3.20"
@@ -46,6 +47,15 @@ application {
 repositories {
     mavenCentral()
     maven("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
+}
+
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "io.netty" && requested.name != "netty-tcnative") {
+            useVersion(netty_version)
+            because("Patch CVEs in netty-codec-http <= 4.2.12")
+        }
+    }
 }
 
 dependencies {
