@@ -32,7 +32,7 @@ jobs:
       - name: ORKIVAR - Test and build
         run: ./gradlew build
       - name: Push docker image to GAR
-        uses: nais/docker-build-push@45d352fb62fb52ccb5ff6cba22c047fa02b35321
+        uses: nais/docker-build-push@751a312f0803eb96a05a41fadf51be19b7be362c
         id: docker-build-push
         with:
           docker_context: .
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: nais/deploy/actions/deploy@fa754451577294aae42872a69b888b3470478ec1
+      - uses: nais/deploy/actions/deploy@a7f8690f9b367fcbf5348a0a1e21d44f1aae50eb
         env:
           CLUSTER: ${{ inputs.env }}-gcp
           RESOURCE: nais/nais-${{ inputs.env }}.yaml
