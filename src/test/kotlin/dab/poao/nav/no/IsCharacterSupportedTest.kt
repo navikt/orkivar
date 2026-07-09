@@ -55,4 +55,9 @@ class IsCharacterSupportedTest {
     fun `Skal ikke vaske tegn ofte brukt i markdown`() {
         "```#_[]<>0*".vaskStringForUgyldigeTegn() shouldBe "```#_[]<>0*"
     }
+
+    @Test
+    fun `Skal vaske bort hjerte-tegn`() {
+        "♡".vaskStringForUgyldigeTegn() shouldBe ""
+    }
 }
