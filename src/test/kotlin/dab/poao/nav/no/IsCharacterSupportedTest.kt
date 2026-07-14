@@ -49,4 +49,8 @@ class IsCharacterSupportedTest: StringSpec({
     "Skal vaske bort hjertetegn" {
         "♡".vaskStringForUgyldigeTegn() shouldBe ""
     }
+
+    "Skal vaske bort pil tegn" {
+        "➢".vaskStringForUgyldigeTegn() shouldBe ""
+    }
 })

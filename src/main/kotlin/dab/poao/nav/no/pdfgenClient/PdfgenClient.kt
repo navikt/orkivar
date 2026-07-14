@@ -129,7 +129,7 @@ private fun isValidForSourceSansOrEmoji(codePoint: Int): Boolean {
         codePoint in 0x1F900..0x1F9FF -> true // Supplemental Symbols & Pictographs (🦊, 🌮)
         codePoint in 0x1FA70..0x1FAFF -> true // Symbols and Pictographs Extended-A (🪓, 🪵)
         codePoint in 0x2600..0x26FF && codePoint != 0x2661 -> true // Misc Symbols (⚡, ⚽, ⚠️), excluding ♡
-        codePoint in 0x2700..0x27BF   -> true // Dingbats (✨, ❌)
+        codePoint in 0x2700..0x27BF && codePoint != 0x27A2 -> true // // Dingbats (✨, ❌), exclude ➢
 
         // Reject everything else (like ↧ / U+21A7 or unsupported non-Latin scripts)
         else -> false
