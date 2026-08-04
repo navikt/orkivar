@@ -2,6 +2,10 @@ name: Build
 
 on:
   workflow_call:
+    outputs:
+      image:
+        description: 'The Docker image built by this workflow'
+        value: ${{ jobs.build.outputs.image }}
     secrets:
       SLACK_WEBHOOK:
         required: true
