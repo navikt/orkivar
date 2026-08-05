@@ -35,6 +35,7 @@ jobs:
 
   prod:
     name: Deploy to prod
+    needs: build
     uses: ./.github/workflows/deploy.yml
     secrets:
       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
