@@ -1,0 +1,49 @@
+name: Build
+
+on:
+  workflow_call:
+    outputs:
+      image:
+        description: 'The Docker image built by this workflow'
+        value: ${{ jobs.build.outputs.image }}
+    secrets:
+      SLACK_WEBHOOK:
+        required: true
+
+jobs:
+  build:
+    name: Build and push Docker container
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    outputs:
+      image: ${{ steps.docker-build-push.outputs.image }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: 'temurin'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92
+      - name: ORKIVAR - Test and build
+        run: ./gradlew build
+      - name: Push docker image to GAR
+        uses: nais/docker-build-push@05dbb6091b30bd84279c6d64a45ef8782fd410a5
+        id: docker-build-push
+        with:
+          docker_context: .
+          team: dab
+      - name: Slack Notification (test failure)
+        if: failure()
+        uses: rtCamp/action-slack-notify@33ca3be66c6f378fe1610fd1d5258632dbed5e58
+        env:
+          SLACK_COLOR: danger
+          SLACK_USERNAME: Github Actions
+          SLACK_ICON: https://github.com/github.png?size=48
+          SLACK_TITLE: 'Orkivar: tester feilet under deploy til prod'
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: 'Commit-message til feilende deploy: ${{ github.event.head_commit.message }}'

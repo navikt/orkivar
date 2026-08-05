@@ -10,10 +10,19 @@ permissions:
   id-token: write
 
 jobs:
+  build:
+    name: Build
+    uses: ./.github/workflows/build.yml
+
+    secrets:
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
   dev:
     name: Deploy to dev
+    needs: build
     uses: ./.github/workflows/deploy.yml
     secrets:
       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
     with:
       env: dev
+      image: ${{ needs.build.outputs.image }}
