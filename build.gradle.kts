@@ -1,6 +1,6 @@
 val ktor_version = "3.5.2"
 val kotlin_version = "2.4.10"
-val logback_version = "1.6.0"
+val logback_version = "1.6.1"
 val logstash_encoder_version = "9.0"
 val tokensupport_version = "6.0.11"
 val mockoauth_version = "3.0.1"
@@ -10,14 +10,14 @@ val embedded_postgres_version = "2.2.2"
 val postgres_driver_version = "42.7.13"
 val flyway_version = "12.10.0"
 val embeddedPostgresBinaries_version = "18.4.0"
-val exposed_version = "1.3.1"
+val exposed_version = "1.4.0"
 val kotest_version = "6.2.3"
 val prometeus_version = "1.17.0"
 val netty_version = "4.2.13.Final"
 
 plugins {
     kotlin("jvm") version "2.4.10"
-    id("io.ktor.plugin") version "3.5.1"
+    id("io.ktor.plugin") version "3.5.2"
     id("org.jetbrains.kotlin.plugin.serialization") version "2.4.10"
 }
 
