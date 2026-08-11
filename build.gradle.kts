@@ -49,15 +49,6 @@ repositories {
     maven("https://github-package-registry-mirror.gc.nav.no/cached/maven-release")
 }
 
-configurations.all {
-    resolutionStrategy.eachDependency {
-        if (requested.group == "io.netty" && requested.name != "netty-tcnative") {
-            useVersion(netty_version)
-            because("Patch CVEs in netty-codec-http <= 4.2.12")
-        }
-    }
-}
-
 dependencies {
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktor_version")
