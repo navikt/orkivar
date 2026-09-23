@@ -24,6 +24,13 @@ fun Application.configureMonitoring() {
             path.startsWith("/") && !excludedPaths.contains(path)
         }
         callIdMdc("nav-call-id")
+        format { call ->
+            val responseTime = call.processingTimeMillis()
+            val status = call.response.status()?.value
+            val method = call.request.httpMethod.value
+            val path = call.request.path()
+            "$status $method - $path in ${responseTime}ms"
+        }
     }
     routing {
         get("/metrics-micrometer") {
