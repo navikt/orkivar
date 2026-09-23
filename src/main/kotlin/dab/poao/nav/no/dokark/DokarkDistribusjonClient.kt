@@ -58,7 +58,7 @@ class DokarkDistribusjonClient(config: ApplicationConfig, httpClientEngine: Http
                 )
             }
         }
-            .onFailure { logger.error("Noe gikk galt", it) }
+            .onFailure { logger.error("Feil mot Dokark, klarte ikke distribuere journalpost: ${it.message}", it) }
             .getOrElse { return DokarkSendTilBrukerFail() }
         if (!res.status.isSuccess()) {
             logger.warn("Feilet å distribuere journalpost: HTTP ${res.status.value} - URL: $url")

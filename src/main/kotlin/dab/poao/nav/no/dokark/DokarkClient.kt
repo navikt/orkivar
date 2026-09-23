@@ -45,7 +45,7 @@ class DokarkClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
                 setBody(Json.encodeToString(lagJournalpost(journalpostData, journalpostType)))
             }
         }
-            .onFailure { logger.error("Noe gikk galt", it) }
+            .onFailure { logger.error("Feil mot Dokark, klarte ikke ferdigstille journalpost: ${it.message}", it) }
             .getOrElse { return DokarkJournalpostFail("Kunne ikke poste til joark") }
         if (!res.status.isSuccess()) {
             logger.warn("Feilet å opprette journalpost: HTTP ${res.status.value} - ", res.bodyAsText())
