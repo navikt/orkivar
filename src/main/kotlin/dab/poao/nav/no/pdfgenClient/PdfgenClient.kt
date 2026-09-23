@@ -69,14 +69,6 @@ fun String.vaskStringForUgyldigeTegn(): String {
     return this.sanitizeForTypstSourceSans("")
 }
 
-/*
-* "Source Sans Pro" is currently the font used in the PDFs, this function checks if
-* a given character is supported by that font,
-* */
-fun Char.isSupportedBySourceSansPro(): Boolean {
-    return true;
-}
-
 fun String.sanitizeForTypstSourceSans(replacement: String = ""): String {
     val result = StringBuilder()
     var i = 0
@@ -97,6 +89,10 @@ fun String.sanitizeForTypstSourceSans(replacement: String = ""): String {
     return result.toString()
 }
 
+/*
+* "Source Sans Pro" is currently the font used in the PDFs, this function checks if
+* a given character is supported by that font,
+* */
 private fun isValidForSourceSansOrEmoji(codePoint: Int): Boolean {
     return when {
         // --- 0. WHITESPACE & STRUCTURAL CONTROL ---
@@ -128,7 +124,7 @@ private fun isValidForSourceSansOrEmoji(codePoint: Int): Boolean {
         codePoint in 0x1F680..0x1F6FF -> true // Transport & Map Symbols (🚀, 🚗)
         codePoint in 0x1F900..0x1F9FF -> true // Supplemental Symbols & Pictographs (🦊, 🌮)
         codePoint in 0x1FA70..0x1FAFF -> true // Symbols and Pictographs Extended-A (🪓, 🪵)
-        codePoint in 0x2600..0x26FF && codePoint != 0x2661 -> true // Misc Symbols (⚡, ⚽, ⚠️), excluding ♡
+        codePoint in 0x2600..0x26FF && codePoint != 0x261E && codePoint != 0x2661 -> true // Misc Symbols (⚡, ⚽, ⚠️), excluding ☞ and ♡
         codePoint in 0x2700..0x27BF && codePoint != 0x27A2 -> true // // Dingbats (✨, ❌), exclude ➢
 
         // Reject everything else (like ↧ / U+21A7 or unsupported non-Latin scripts)
