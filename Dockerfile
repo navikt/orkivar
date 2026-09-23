@@ -1,4 +1,4 @@
-FROM busybox:1.36.1-uclibc as busybox
+FROM busybox:1.38.0-uclibc as busybox
 
 FROM gcr.io/distroless/java21
 
