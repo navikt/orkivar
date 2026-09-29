@@ -6,12 +6,12 @@ import io.kotest.matchers.shouldBe
 
 class IsCharacterSupportedTest: StringSpec({
 
-     "Skal vaske bort ugyldige japanske tegn" {
-        "heiら".vaskStringForUgyldigeTegn() shouldBe "hei"
+    "Skal ikke vaske bort japanske tegn" {
+      "heiら".vaskStringForUgyldigeTegn() shouldBe "heiら"
     }
 
-    "Skal vaske bort ugyldig Downwards Arrow from Bar (U+21A7)" {
-        "hei↧".vaskStringForUgyldigeTegn() shouldBe "hei"
+    "Skal ikke vaske bort ugyldig Downwards Arrow from Bar (U+21A7)" {
+      "hei↧".vaskStringForUgyldigeTegn() shouldBe "hei↧"
     }
 
     "Skal vaske bort vertical tab tegn" {
@@ -22,8 +22,8 @@ class IsCharacterSupportedTest: StringSpec({
         "hei \uD83D\uDE03".vaskStringForUgyldigeTegn() shouldBe "hei \uD83D\uDE03"
     }
 
-    "Skal ikke vaske rart tegn fra Navet" {
-        "hei \uED15".vaskStringForUgyldigeTegn() shouldBe "hei "
+    "Skal ikke vaske bort gyldige Unicode-tegn bare fordi de ikke er i Source Sans" {
+        "hei \uED15".vaskStringForUgyldigeTegn() shouldBe "hei \uED15"
     }
 
     "Skal ikke vaske bort spesialtegn" {
@@ -46,15 +46,15 @@ class IsCharacterSupportedTest: StringSpec({
         "```#_[]<>0*".vaskStringForUgyldigeTegn() shouldBe "```#_[]<>0*"
     }
 
-    "Skal vaske bort hjertetegn" {
-        "♡".vaskStringForUgyldigeTegn() shouldBe ""
+    "Skal ikke vaske bort hjertetegn" {
+      "♡".vaskStringForUgyldigeTegn() shouldBe "♡"
     }
 
-    "Skal vaske bort pil tegn" {
-        "➢".vaskStringForUgyldigeTegn() shouldBe ""
+    "Skal ikke vaske bort pil tegn" {
+      "➢".vaskStringForUgyldigeTegn() shouldBe "➢"
     }
 
-    "Skal vaske bort hand som peker tegn" {
-        "☞".vaskStringForUgyldigeTegn() shouldBe ""
+    "Skal ikke vaske bort hand som peker tegn" {
+      "☞".vaskStringForUgyldigeTegn() shouldBe "☞"
     }
 })
