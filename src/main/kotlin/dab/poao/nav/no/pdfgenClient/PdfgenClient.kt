@@ -78,6 +78,7 @@ fun String.vaskStringForUgyldigeTegn(): String {
    Unicode replacement is  🔊  ( U+1F50A ) or plain text like  [volume] .                   ┃
    For strict PDF/A/UA, replacing/removing  U+F028  is the right approach.  */
        .replace("\uF028", "\uD83D\uDD0A")
+       .replace("\ue72c", "")
        .sanitizeForPdfText("")
 }
 
