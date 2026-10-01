@@ -66,7 +66,12 @@ class PdfgenClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
 
 fun String.vaskStringForUgyldigeTegn(): String {
    return this
+       /* U+F0B7  is a Private Use Area character, not a real standardized Unicode symbol.        ┃
+   So it only works if a very specific legacy font defines it (often old                    ┃
+   Word/Symbol/Wingdings workflows). */
        .replace("\uF0B7", "\u2022")
+       /* U+ED5B  is private-use and has no universal meaning */
+       .replace("\uED5B", "")
        .sanitizeForPdfText("")
 }
 

@@ -61,4 +61,8 @@ class IsCharacterSupportedTest: StringSpec({
     "Skal erstatte U+F0B7 med bullet U+2022" {
         "hei \uF0B7".vaskStringForUgyldigeTegn() shouldBe "hei \u2022"
     }
+
+    "Skal vaske bort U+ED5B" {
+        "hei\uED5Bder".vaskStringForUgyldigeTegn() shouldBe "heider"
+    }
 })
