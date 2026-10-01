@@ -65,7 +65,9 @@ class PdfgenClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
 }
 
 fun String.vaskStringForUgyldigeTegn(): String {
-   return sanitizeForPdfText("")
+   return this
+       .replace("\uF0B7", "\u2022")
+       .sanitizeForPdfText("")
 }
 
 fun String.sanitizeForPdfText(replacement: String = ""): String {

@@ -57,4 +57,8 @@ class IsCharacterSupportedTest: StringSpec({
     "Skal ikke vaske bort hand som peker tegn" {
       "☞".vaskStringForUgyldigeTegn() shouldBe "☞"
     }
+
+    "Skal erstatte U+F0B7 med bullet U+2022" {
+        "hei \uF0B7".vaskStringForUgyldigeTegn() shouldBe "hei \u2022"
+    }
 })
