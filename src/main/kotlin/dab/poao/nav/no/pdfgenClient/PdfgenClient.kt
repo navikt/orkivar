@@ -72,6 +72,12 @@ fun String.vaskStringForUgyldigeTegn(): String {
        .replace("\uF0B7", "\u2022")
        /* U+ED5B  is private-use and has no universal meaning */
        .replace("\uED5B", "")
+       /* U+F028  is also Private Use Area (non-standard, font-dependent), so it has the same     ┃
+   portability problem.                                                                     ┃
+   If this came from an icon font (common), it often means a speaker/volume icon. A good    ┃
+   Unicode replacement is  🔊  ( U+1F50A ) or plain text like  [volume] .                   ┃
+   For strict PDF/A/UA, replacing/removing  U+F028  is the right approach.  */
+       .replace("\uF028", "\uD83D\uDD0A")
        .sanitizeForPdfText("")
 }
 
