@@ -73,4 +73,12 @@ class IsCharacterSupportedTest: StringSpec({
     "skal vaske bort rart tegn (usikker på hva det egentlig er)" {
         "\ue72c".vaskStringForUgyldigeTegn() shouldBe ""
     }
+
+    "skal vaske bort rart tegn nr 2 (usikker på hva det egentlig er)" {
+        "\uf0fc".vaskStringForUgyldigeTegn() shouldBe ""
+    }
+
+    "skal vaske bort rart tegn nr 3 (usikker på hva det egentlig er)" {
+        "\ue930".vaskStringForUgyldigeTegn() shouldBe ""
+    }
 })

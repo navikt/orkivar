@@ -79,6 +79,8 @@ fun String.vaskStringForUgyldigeTegn(): String {
    For strict PDF/A/UA, replacing/removing  U+F028  is the right approach.  */
        .replace("\uF028", "\uD83D\uDD0A")
        .replace("\ue72c", "")
+       .replace("\uf0fc", "")
+       .replace("\ue930", "")
        .sanitizeForPdfText("")
 }
 
