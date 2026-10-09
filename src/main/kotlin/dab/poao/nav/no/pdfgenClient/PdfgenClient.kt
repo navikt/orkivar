@@ -81,6 +81,7 @@ fun String.vaskStringForUgyldigeTegn(): String {
        .replace("\ue72c", "")
        .replace("\uf0fc", "")
        .replace("\ue930", "")
+       .replace("\uf0f0", "")
        .sanitizeForPdfText("")
 }
 
