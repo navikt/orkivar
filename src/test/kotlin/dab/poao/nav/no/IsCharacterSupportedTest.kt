@@ -14,6 +14,10 @@ class IsCharacterSupportedTest: StringSpec({
       "hei↧".vaskStringForUgyldigeTegn() shouldBe "hei↧"
     }
 
+    "Skal erstatte U+2981 med bullet U+2022" {
+      "hei\u2981".vaskStringForUgyldigeTegn() shouldBe "hei\u2022"
+    }
+
     "Skal vaske bort vertical tab tegn" {
         "hei\u000B\u000B".vaskStringForUgyldigeTegn() shouldBe "hei"
     }
