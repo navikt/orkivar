@@ -18,6 +18,10 @@ class IsCharacterSupportedTest: StringSpec({
       "hei\u2981".vaskStringForUgyldigeTegn() shouldBe "hei\u2022"
     }
 
+    "Skal erstatte U+F06F med tom firkant U+25A1" {
+        "hei \uF06F".vaskStringForUgyldigeTegn() shouldBe "hei \u25A1"
+    }
+
     "Skal vaske bort vertical tab tegn" {
         "hei\u000B\u000B".vaskStringForUgyldigeTegn() shouldBe "hei"
     }
