@@ -68,6 +68,7 @@ fun String.vaskStringForUgyldigeTegn(): String {
    return this
        .replace("\u2981", "\u2022")
        .replace("\uF06F", "\u25A1")
+       .replace("\uF0A7", "\u25A0")
        /* U+F0B7  is a Private Use Area character, not a real standardized Unicode symbol.        ┃
    So it only works if a very specific legacy font defines it (often old                    ┃
    Word/Symbol/Wingdings workflows). */
