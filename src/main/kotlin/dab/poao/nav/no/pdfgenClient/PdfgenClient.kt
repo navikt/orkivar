@@ -15,6 +15,7 @@ import io.ktor.server.config.*
 import kotlinx.serialization.json.Json
 import org.slf4j.LoggerFactory
 import org.slf4j.MarkerFactory
+import java.text.Normalizer
 
 sealed interface PdfgenResult
 data class FailedPdfGen(val message: String) : PdfgenResult
@@ -97,7 +98,11 @@ fun String.sanitizeForPdfText(replacement: String = ""): String {
        val charCount = Character.charCount(codePoint)
 
        if (isValidPdfTextCodePoint(codePoint)) {
-           result.append(this, i, i + charCount)
+           if (codePoint in 0x1D400..0x1D7FF && Character.isLetterOrDigit(codePoint)) {
+               result.append(Normalizer.normalize(substring(i, i + charCount), Normalizer.Form.NFKC))
+           } else {
+               result.append(this, i, i + charCount)
+           }
        } else {
            result.append(replacement)
        }

@@ -26,6 +26,21 @@ class IsCharacterSupportedTest: StringSpec({
         "hei \uF0A7".vaskStringForUgyldigeTegn() shouldBe "hei \u25A0"
     }
 
+    "Skal erstatte fete sans-serif Unicode-bokstaver med vanlige bokstaver" {
+        "𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭".vaskStringForUgyldigeTegn() shouldBe
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇".vaskStringForUgyldigeTegn() shouldBe
+            "abcdefghijklmnopqrstuvwxyz"
+    }
+
+    "Skal normalisere andre matematiske bokstavstiler og tall" {
+        "𝐀𝑏𝒄𝔇𝕖𝙁𝚐 𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵".vaskStringForUgyldigeTegn() shouldBe "AbcDeFg 0123456789"
+    }
+
+    "Skal ikke normalisere tegn utenfor matematiske alfanumeriske symboler" {
+        "² ½ \u212B".vaskStringForUgyldigeTegn() shouldBe "² ½ \u212B"
+    }
+
     "Skal vaske bort vertical tab tegn" {
         "hei\u000B\u000B".vaskStringForUgyldigeTegn() shouldBe "hei"
     }
