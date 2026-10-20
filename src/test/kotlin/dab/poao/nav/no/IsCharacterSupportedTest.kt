@@ -30,6 +30,10 @@ class IsCharacterSupportedTest: StringSpec({
         "hei \uF076".vaskStringForUgyldigeTegn() shouldBe "hei \u2022"
     }
 
+    "Skal erstatte U+F06C med bullet U+2022" {
+        "hei \uF06C".vaskStringForUgyldigeTegn() shouldBe "hei \u2022"
+    }
+
     "Skal erstatte fete sans-serif Unicode-bokstaver med vanlige bokstaver" {
         "𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭".vaskStringForUgyldigeTegn() shouldBe
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
