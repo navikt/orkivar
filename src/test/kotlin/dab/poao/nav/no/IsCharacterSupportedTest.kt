@@ -125,6 +125,10 @@ class IsCharacterSupportedTest: StringSpec({
         "hei\uE0ACder".vaskStringForUgyldigeTegn() shouldBe "heider"
     }
 
+    "Skal vaske bort U+F02A" {
+        "hei\uF02Ader".vaskStringForUgyldigeTegn() shouldBe "heider"
+    }
+
     "Skal bytte ut ikke kompatibelt høytaler ikon med unicode høytaler" {
         "\uF028".vaskStringForUgyldigeTegn() shouldBe "\uD83D\uDD0A"
     }
