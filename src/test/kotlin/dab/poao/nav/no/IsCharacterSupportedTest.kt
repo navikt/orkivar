@@ -137,6 +137,22 @@ class IsCharacterSupportedTest: StringSpec({
         "hei\uEAE4der".vaskStringForUgyldigeTegn() shouldBe "heider"
     }
 
+    "Skal vaske bort U+E370" {
+        "hei\uE370der".vaskStringForUgyldigeTegn() shouldBe "heider"
+    }
+
+    "Skal vaske bort U+E4F0" {
+        "hei\uE4F0der".vaskStringForUgyldigeTegn() shouldBe "heider"
+    }
+
+    "Skal vaske bort U+EB24" {
+        "hei\uEB24der".vaskStringForUgyldigeTegn() shouldBe "heider"
+    }
+
+    "Skal vaske bort U+ED3F" {
+        "hei\uED3Fder".vaskStringForUgyldigeTegn() shouldBe "heider"
+    }
+
     "Skal bytte ut ikke kompatibelt høytaler ikon med unicode høytaler" {
         "\uF028".vaskStringForUgyldigeTegn() shouldBe "\uD83D\uDD0A"
     }
