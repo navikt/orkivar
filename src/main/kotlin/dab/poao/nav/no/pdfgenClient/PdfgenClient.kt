@@ -88,6 +88,7 @@ fun String.vaskStringForUgyldigeTegn(): String {
        .replace("\uE70E", "")
        .replace("\uE350", "")
        .replace("\uF04A", "")
+       .replace("\uE316", "")
        .replace("\uf0fc", "")
        .replace("\ue930", "")
        .replace("\uf0f0", "")
