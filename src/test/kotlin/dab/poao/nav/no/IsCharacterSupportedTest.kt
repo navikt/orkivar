@@ -137,6 +137,10 @@ class IsCharacterSupportedTest: StringSpec({
         "hei\uEAE4der".vaskStringForUgyldigeTegn() shouldBe "heider"
     }
 
+    "Skal vaske bort U+F0E0" {
+        "hei\uF0E0der".vaskStringForUgyldigeTegn() shouldBe "heider"
+    }
+
     "Skal vaske bort U+E370" {
         "hei\uE370der".vaskStringForUgyldigeTegn() shouldBe "heider"
     }

@@ -94,6 +94,7 @@ fun String.vaskStringForUgyldigeTegn(): String {
        .replace("\uF02A", "")
        .replace("\uE4CC", "")
        .replace("\uEAE4", "")
+       .replace("\uF0E0", "")
        .replace("\uE370", "")
        .replace("\uE4F0", "")
        .replace("\uEB24", "")
