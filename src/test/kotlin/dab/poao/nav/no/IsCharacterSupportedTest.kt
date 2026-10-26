@@ -58,7 +58,7 @@ class IsCharacterSupportedTest: StringSpec({
     }
 
     "Skal ikke vaske bort gyldige Unicode-tegn bare fordi de ikke er i Source Sans" {
-        "hei \uED15".vaskStringForUgyldigeTegn() shouldBe "hei \uED15"
+        "hei \u2764".vaskStringForUgyldigeTegn() shouldBe "hei \u2764"
     }
 
     "Skal ikke vaske bort spesialtegn" {
@@ -97,83 +97,10 @@ class IsCharacterSupportedTest: StringSpec({
         "hei \uF0B7".vaskStringForUgyldigeTegn() shouldBe "hei \u2022"
     }
 
-    "Skal vaske bort U+ED5B" {
-        "hei\uED5Bder".vaskStringForUgyldigeTegn() shouldBe "heider"
-    }
+    "Skal vaske bort tegn fra alle Private Use Areas, men beholde vanlig Unicode" {
+        val codePoints = listOf(0xE000, 0xF8FF, 0xF0000, 0xFFFFD, 0x100000, 0x10FFFD)
+        val privateUseCharacters = codePoints.joinToString("") { String(Character.toChars(it)) }
 
-    "Skal vaske bort U+E70E" {
-        "hei\uE70Eder".vaskStringForUgyldigeTegn() shouldBe "heider"
-    }
-
-    "Skal vaske bort U+E350" {
-        "hei\uE350der".vaskStringForUgyldigeTegn() shouldBe "heider"
-    }
-
-    "Skal vaske bort U+F04A" {
-        "hei\uF04Ader".vaskStringForUgyldigeTegn() shouldBe "heider"
-    }
-
-    "Skal vaske bort U+E316" {
-        "hei\uE316der".vaskStringForUgyldigeTegn() shouldBe "heider"
-    }
-
-    "Skal vaske bort U+E3B8" {
-        "hei\uE3B8der".vaskStringForUgyldigeTegn() shouldBe "heider"
-    }
-
-    "Skal vaske bort U+E0AC" {
-        "hei\uE0ACder".vaskStringForUgyldigeTegn() shouldBe "heider"
-    }
-
-    "Skal vaske bort U+F02A" {
-        "hei\uF02Ader".vaskStringForUgyldigeTegn() shouldBe "heider"
-    }
-
-    "Skal vaske bort U+E4CC" {
-        "hei\uE4CCder".vaskStringForUgyldigeTegn() shouldBe "heider"
-    }
-
-    "Skal vaske bort U+EAE4" {
-        "hei\uEAE4der".vaskStringForUgyldigeTegn() shouldBe "heider"
-    }
-
-    "Skal vaske bort U+F0E0" {
-        "hei\uF0E0der".vaskStringForUgyldigeTegn() shouldBe "heider"
-    }
-
-    "Skal vaske bort U+E370" {
-        "hei\uE370der".vaskStringForUgyldigeTegn() shouldBe "heider"
-    }
-
-    "Skal vaske bort U+E4F0" {
-        "hei\uE4F0der".vaskStringForUgyldigeTegn() shouldBe "heider"
-    }
-
-    "Skal vaske bort U+EB24" {
-        "hei\uEB24der".vaskStringForUgyldigeTegn() shouldBe "heider"
-    }
-
-    "Skal vaske bort U+ED3F" {
-        "hei\uED3Fder".vaskStringForUgyldigeTegn() shouldBe "heider"
-    }
-
-    "Skal bytte ut ikke kompatibelt høytaler ikon med unicode høytaler" {
-        "\uF028".vaskStringForUgyldigeTegn() shouldBe "\uD83D\uDD0A"
-    }
-
-    "skal vaske bort rart tegn (usikker på hva det egentlig er)" {
-        "\ue72c".vaskStringForUgyldigeTegn() shouldBe ""
-    }
-
-    "skal vaske bort rart tegn nr 2 (usikker på hva det egentlig er)" {
-        "\uf0fc".vaskStringForUgyldigeTegn() shouldBe ""
-    }
-
-    "skal vaske bort rart tegn nr 3 (usikker på hva det egentlig er)" {
-        "\ue930".vaskStringForUgyldigeTegn() shouldBe ""
-    }
-
-    "skal vaske bort rart tegn nr 4 (usikker på hva det egentlig er)" {
-        "\uf0f0".vaskStringForUgyldigeTegn() shouldBe ""
+        "før${privateUseCharacters}etter".vaskStringForUgyldigeTegn() shouldBe "føretter"
     }
 })

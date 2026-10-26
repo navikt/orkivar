@@ -76,32 +76,12 @@ fun String.vaskStringForUgyldigeTegn(): String {
    So it only works if a very specific legacy font defines it (often old                    ┃
    Word/Symbol/Wingdings workflows). */
        .replace("\uF0B7", "\u2022")
-       /* U+ED5B  is private-use and has no universal meaning */
-       .replace("\uED5B", "")
        /* U+F028  is also Private Use Area (non-standard, font-dependent), so it has the same     ┃
    portability problem.                                                                     ┃
    If this came from an icon font (common), it often means a speaker/volume icon. A good    ┃
    Unicode replacement is  🔊  ( U+1F50A ) or plain text like  [volume] .                   ┃
    For strict PDF/A/UA, replacing/removing  U+F028  is the right approach.  */
        .replace("\uF028", "\uD83D\uDD0A")
-       .replace("\ue72c", "")
-       .replace("\uE70E", "")
-       .replace("\uE350", "")
-       .replace("\uF04A", "")
-       .replace("\uE316", "")
-       .replace("\uE3B8", "")
-       .replace("\uE0AC", "")
-       .replace("\uF02A", "")
-       .replace("\uE4CC", "")
-       .replace("\uEAE4", "")
-       .replace("\uF0E0", "")
-       .replace("\uE370", "")
-       .replace("\uE4F0", "")
-       .replace("\uEB24", "")
-       .replace("\uED3F", "")
-       .replace("\uf0fc", "")
-       .replace("\ue930", "")
-       .replace("\uf0f0", "")
        .sanitizeForPdfText("")
 }
 
@@ -140,6 +120,10 @@ private fun isValidPdfTextCodePoint(codePoint: Int): Boolean {
        codePoint == 0xFFFE ||
            codePoint == 0xFFFF ||
            codePoint in 0xFDD0..0xFDEF -> false
+
+       codePoint in 0xE000..0xF8FF ||
+           codePoint in 0xF0000..0xFFFFD ||
+           codePoint in 0x100000..0x10FFFD -> false
 
        else -> true
    }
