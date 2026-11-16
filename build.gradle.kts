@@ -3,15 +3,15 @@ val kotlin_version = "2.4.21"
 val logback_version = "1.6.6"
 val logstash_encoder_version = "9.0"
 val tokensupport_version = "6.0.14"
-val mockoauth_version = "6.1.4"
+val mockoauth_version = "6.1.5"
 val dab_common_version = "2026.11.03-09.22.cb2db26aaf5b"
 val hikaricp_version = "7.1.0"
 val embedded_postgres_version = "2.2.2"
 val postgres_driver_version = "42.7.14"
-val flyway_version = "13.12.0"
+val flyway_version = "13.12.2"
 val embeddedPostgresBinaries_version = "18.6.0"
-val exposed_version = "1.6.0"
-val kotest_version = "6.2.6"
+val exposed_version = "1.6.1"
+val kotest_version = "6.2.7"
 val prometeus_version = "1.17.2"
 val netty_version = "4.2.13.Final"
 
@@ -50,8 +50,8 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("com.fasterxml.jackson:jackson-bom:2.22.4"))
-    implementation(platform("tools.jackson:jackson-bom:3.1.8"))
+    implementation(platform("com.fasterxml.jackson:jackson-bom:2.23.0"))
+    implementation(platform("tools.jackson:jackson-bom:3.3.0"))
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktor_version")
     implementation("io.ktor:ktor-server-call-logging-jvm:$ktor_version")
