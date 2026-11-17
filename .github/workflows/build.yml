@@ -32,7 +32,7 @@ jobs:
       - name: ORKIVAR - Test and build
         run: ./gradlew build
       - name: Push docker image to GAR
-        uses: nais/docker-build-push@dd7421d5068057a020ca46ead966c26190c516b1
+        uses: nais/docker-build-push@588f76a6f45aeb1e75d5e8417ec6ef6d79b2b39f
         id: docker-build-push
         with:
           docker_context: .
