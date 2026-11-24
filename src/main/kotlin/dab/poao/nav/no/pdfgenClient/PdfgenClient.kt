@@ -67,6 +67,7 @@ class PdfgenClient(config: ApplicationConfig, httpClientEngine: HttpClientEngine
 
 fun String.vaskStringForUgyldigeTegn(): String {
    return this
+       .replace("\uD83E\uDC6A", "\u2192")
        .replace("\u2981", "\u2022")
        .replace("\uF076", "\u2022")
        .replace("\uF06C", "\u2022")

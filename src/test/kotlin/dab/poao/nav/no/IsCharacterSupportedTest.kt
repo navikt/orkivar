@@ -14,6 +14,10 @@ class IsCharacterSupportedTest: StringSpec({
       "hei↧".vaskStringForUgyldigeTegn() shouldBe "hei↧"
     }
 
+    "Skal erstatte pilen U+1F86A med U+2192" {
+      "før\uD83E\uDC6Aetter".vaskStringForUgyldigeTegn() shouldBe "før\u2192etter"
+    }
+
     "Skal erstatte U+2981 med bullet U+2022" {
       "hei\u2981".vaskStringForUgyldigeTegn() shouldBe "hei\u2022"
     }
